@@ -1,4 +1,5 @@
-# Maximum destinations within a time period
+# I love version control!
+Maximum destinations within a time period
 
 A Java 17-compatible routing project: start at a depot at a specified time, visit
 as many customer destinations as possible within their time windows, and return
