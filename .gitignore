@@ -1,0 +1,7 @@
+# Generated Java output
+**/out/
+*.class
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db

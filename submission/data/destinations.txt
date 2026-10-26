@@ -1,0 +1,10 @@
+1735161	Kuala Lumpur	Kuala Lumpur	Federal Territory of Kuala Lumpur,Gizlungzpoh,KL,KUL,Kouala Loumpou,Kouala Loumpour,Kuala Lumpor,Kuala Lumpur,Kuala-Lumpur,Kuala-Lumpuro,Kualae-Lumpur,Kualalumpura,Kualalumpūra,Kvala Lumpuras,Kvala Lumpūras,Kúala Lúmpúr,Wilayah Persekutuan Kuala Lumpur,ji long po,kaulalampur,kawlalampexr,kolalampur,ku'a lalampura,ku'ala lupura,ku'alalampura,ku'alalumpura,kuallalumpuleu,kuararunpuru,kuyalalamapura,kvalalampura,kwala lambwr,kwala lmpwr,kwalalampwr,kwalalmbwr,kwalalmpwr,kwalalwmpwr,kۇyalalۇmpۇr,Κουάλα Λουμπούρ,Куалæ-Лумпур,Куала Лумпур,Куала-Лумпур,Կուալա Լումպուր,קואלה לומפור,كوالا لامبور,كوالالمبور,كۇئالالۇمپۇر,کوالا لمپور,کوالالامپور,کوالالمپور,کوالالومپور,कुआ लालम्पुर,कुआलालम्पुर,क्वालालंपूर,কুয়ালালামপুর,ਕੁਆਲਾ ਲੁੰਪੁਰ,କୁଆଲାଲୁମ୍ପୁର,கோலாலம்பூர்,ಕೌಲಾಲಂಪುರ್,കോലാലമ്പൂർ,กัวลาลัมเปอร์,ཁལ་ལུང་ཕུ།,ကွာလာလမ်ပူမြို့,კუალა-ლუმპური,ኩዋላ ሉምፑር,クアラルンプール,吉隆坡,쿠알라룸푸르	3.1412	101.68653	P	PPLC	MY		14	0401			1453975		56	Asia/Kuala_Lumpur	2026-04-29
+12557764	Taman Petaling	Taman Petaling	Taman Petaling	3.19916	101.64983	P	PPL	MY		14	0401			423062		76	Asia/Kuala_Lumpur	2024-04-22
+12750606	Wangsa Maju	Wangsa Maju	Hawthornden,Wangsa	3.20056	101.73972	P	PPL	MY		14	0401			215600		92	Asia/Kuala_Lumpur	2024-04-22
+13118277	Bandar Utama	Bandar Utama		3.14818	101.61407	P	PPL	MY		14	0401			200000		63	Asia/Kuala_Lumpur	2024-10-27
+13118362	Bukit Jalil	Bukit Jalil		3.04913	101.68036	P	PPL	MY		14	0401			200000		76	Asia/Kuala_Lumpur	2024-10-28
+1735168	Ampang	Ampang	Ampang,Ampang Hilir,Ampang Jaya,Empangan,ampan,ampangjaya,an bang,anpan・jaya,அம்பாங்,アンパン・ジャヤ,安邦,암팡자야	3.15	101.76667	P	PPL	MY		14				126285		56	Asia/Kuala_Lumpur	2024-10-24
+13118233	Titiwangsa	Titiwangsa		3.17822	101.70312	P	PPL	MY		14	0401			122096		60	Asia/Kuala_Lumpur	2024-10-24
+11054399	Bukit Bintang	Bukit Bintang	Star Hill,Starhill	3.14657	101.71023	P	PPL	MY		14	0401			120529	0	56	Asia/Kuala_Lumpur	2024-10-24
+1744763	Sentul	Sentul		3.18333	101.68333	P	PPL	MY		14	0401			100000		41	Asia/Kuala_Lumpur	2024-10-24
+1760605	Kepong	Kepong	Kepong	3.21398	101.64018	P	PPL	MY		14	0401			85960		79	Asia/Kuala_Lumpur	2024-10-17

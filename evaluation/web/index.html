@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Algorithm comparison</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/inspection.js" defer></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>Algorithm comparison</h1>
+    <p>Maximise destinations visited within the time period, then minimise distance. Waiting and return travel count; service time is zero.</p>
+    <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+    <section class="panel settings-panel" aria-labelledby="settings-title">
+      <h2 id="settings-title">Inputs</h2>
+      <form id="compare-form">
+        <div class="controls">
+          <label>Departure offset <span id="origin-label">minutes from 08:00</span><input id="departure" name="startTime" type="number" min="0" step="any" value="0" required><small id="departure-clock">Leaves at 08:00</small></label>
+          <label>Time available <span>minutes, including return</span><input id="duration" name="durationMinutes" type="number" min="0" step="any" value="120" required></label>
+          <label>Travel speed <span>simulated km/h</span><input id="speed" name="speedKmh" type="number" min="0.000001" step="any" value="40" required></label>
+          <div class="run-control"><button id="compare-button" class="button primary" type="submit">Compare algorithms</button><small id="run-state" role="status" aria-live="polite">Same inputs for every algorithm.</small></div>
+        </div>
+        <details class="advanced"><summary>Search settings</summary><div class="advanced-fields"><label>Computation budget per algorithm (ms)<input id="compute-budget" name="timeLimitMs" type="number" min="0" max="10000" value="1000" required></label><label>Exact-search cap (including depot)<input id="exact-cap" name="maxDestinations" type="number" min="1" max="20" value="15" required></label><p>The trip period and computation budget are separate. A search limit means the best route found, without an optimality proof.</p></div></details>
+      </form>
+    </section>
+    <section class="results-section" aria-labelledby="results-title">
+      <div class="section-heading results-heading"><h2 id="results-title">Compare the results</h2><button id="download" class="button secondary small" disabled type="button">Export JSON</button></div>
+      <p id="comparison-summary" class="muted" aria-live="polite">Run a comparison to see route statistics. Expand an algorithm for its full journey.</p>
+      <div id="results" class="results-list"></div>
+    </section>
+    <div class="workspace">
+      <section class="panel graph-panel" aria-labelledby="graph-title">
+        <div class="section-heading"><h2 id="graph-title">Location graph</h2><span id="network-count" class="count-label">Loading…</span></div>
+        <div class="graph-toolbar"><label>Route overlay<select id="route-view"><option value="all">All routes</option><option value="nearest" selected>Nearest neighbour</option><option value="greedy">Greedy insertion</option><option value="exact">Branch and bound</option><option value="none">Input destinations only</option></select></label><label class="checkbox"><input type="checkbox" id="show-edges"> Show graph connections</label></div>
+        <p id="origin-info" class="point-info" aria-live="polite">Click a destination to set the current location and time, then hover to inspect.</p>
+        <button id="clear-origin" type="button" disabled>Clear origin</button>
+        <div class="graph-wrap"><svg id="network" viewBox="0 0 1000 480" role="group" aria-label="Geographic graph of input destinations and calculated routes"></svg><div id="graph-empty">Loading the current scenario…</div></div>
+        <div class="legend"><span><i class="depot-dot"></i> Depot</span><span><i class="open-dot"></i> Open</span><span><i class="closed-dot"></i> Closed</span><span><i class="selected-dot"></i> Selected location</span><span><i class="route-line nearest"></i> Nearest neighbour</span><span><i class="route-line greedy"></i> Greedy insertion</span><span><i class="route-line exact"></i> Branch and bound</span></div>
+        <p id="point-info" class="point-info" aria-live="polite">Click a destination first. Hover details will appear here and beside the pointer.</p>
+        <p class="caption">Coordinates from GeoNames. Lines show simulated direct travel, not roads. The graph is complete; connections are hidden by default for clarity.</p>
+      </section>
+      <details class="panel input-panel"><summary>Input data and dataset selection</summary>
+        <div class="section-heading"><h2 id="input-title">Input data</h2><button id="reload" class="text-button" type="button">Reload</button></div>
+        <p class="muted">Time windows in minutes from <strong id="input-origin">08:00</strong>. Edit a window, then compare again.</p>
+        <div class="input-table-wrap"><table class="input-table"><thead><tr><th>Destination</th><th>Opens</th><th>Closes</th></tr></thead><tbody id="input-rows"></tbody></table></div>
+        <p class="caption">Window edits apply to this comparison only. Reload restores the saved files.</p>
+        <details class="generation"><summary>Choose a new set from MY.txt</summary><p>Replace the saved <code>data/</code> scenario with records from the bundled full dataset. This also replaces existing windows and settings.</p>
+          <form id="generate-form">
+            <div class="generation-grid">
+              <label>Count, including depot<input name="count" type="number" min="1" max="200" value="10" required></label>
+              <label>Selection<select name="selection"><option value="population">Highest population</option><option value="random">Seeded random</option></select></label>
+              <label>Region (admin1)<input name="admin1" value="14" required></label>
+              <label>Feature class<select name="featureClass"><option>P</option><option>S</option><option>A</option><option>H</option><option>L</option><option>R</option><option>T</option><option>U</option><option>V</option><option value="all">All</option></select></label>
+              <label>Seed<input name="seed" type="number" step="1" value="42" required></label>
+              <label>Depot GeoNameID<input name="depot" type="number" min="1" step="1" value="1735161" required></label>
+              <label>Window slack (min)<input name="windowSlackMinutes" type="number" min="0" step="any" value="30" required></label>
+              <label>Window origin<input name="startClock" type="time" value="08:00" required></label>
+            </div>
+            <p class="caption">Use <code>all</code> for any region. Uses the speed and period set above. UI limit: 200 destinations.</p>
+            <button id="generate-button" class="button secondary" type="submit">Replace saved dataset</button>
+          </form>
+        </details>
+      </details>
+    </div>
+    <p class="caption">GeoNames coordinates; simulated direct travel and time windows. Nearest neighbour is the baseline. Exact search proves optimality only if it finishes.</p>
+    <div id="graph-tooltip" class="graph-tooltip" role="tooltip" hidden></div>
+  </main>
+</body>
+</html>

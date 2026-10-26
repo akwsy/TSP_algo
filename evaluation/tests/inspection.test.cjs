@@ -1,0 +1,32 @@
+// Optional dependency-free Node check for the UI-only time/window helpers.
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const context = vm.createContext({});
+vm.runInContext(fs.readFileSync(path.join(__dirname, '../web/inspection.js'), 'utf8'), context);
+const ui = context.Inspection;
+let checks = 0;
+function equal(actual, expected) { assert.equal(actual, expected); checks++; }
+const bukitArrival = 4.047385188991614, bukitOpen = 73.33111022604932;
+equal(ui.clock(bukitArrival, 480), '08:04');
+equal(ui.duration(bukitArrival), '00:04');
+equal(ui.clock(78.74126419744779, 480), '09:18');
+equal(ui.clock(bukitArrival + 5.410153971398469, 480), '08:09');
+equal(ui.clock(0, 480), '08:00');
+equal(ui.clock(1444.9, 480), '08:04 +1d');
+equal(ui.duration(125.9), '02:05');
+equal(ui.status(1, bukitOpen, 133.331, bukitArrival), 'Closed');
+equal(ui.status(2, .12396278746829736, 60.1239627874683, bukitArrival), 'Open');
+equal(ui.status(2, .12396278746829736, 60.1239627874683, 80.92466708479684), 'Closed');
+equal(ui.status(1, 10, 20, 10), 'Open');
+equal(ui.status(1, 10, 20, 20), 'Open');
+equal(ui.status(1, 10, 20, 20.01), 'Closed');
+equal(ui.status(0, 0, 1, 500), 'Open');
+equal(ui.status(1, 20, 10, 15), 'Unknown');
+equal(ui.status(1, -1, 10, 5), 'Unknown');
+const reference = { visits: [{ vertex: 0, arrival: 0, visitTime: 0 }, { vertex: 1, arrival: bukitArrival, visitTime: bukitOpen }] };
+equal(ui.arrivalAt(reference, 1), bukitArrival);
+equal(ui.arrivalAt(reference, 9), null);
+equal(ui.arrivalAt(null, 1), null);
+console.log(`PASS: ${checks} inspection display checks (arrival, accumulated clock, minute precision and open/closed boundaries).`);
