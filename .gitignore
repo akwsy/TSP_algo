@@ -8,3 +8,6 @@ Thumbs.db
 
 # Local issue tracker (specs and tickets)
 .scratch/
+# Python
+__pycache__/
+*.pyc
