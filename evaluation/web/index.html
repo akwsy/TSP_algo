@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Algorithm comparison</title>
   <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/map.css">
   <script src="/inspection.js" defer></script>
+  <script src="/map.js" defer></script>
   <script src="/app.js" defer></script>
 </head>
 <body>
@@ -38,6 +40,7 @@
         <p id="origin-info" class="point-info" aria-live="polite">Click a destination to set the current location and time, then hover to inspect.</p>
         <button id="clear-origin" type="button" disabled>Clear origin</button>
         <div class="graph-wrap"><svg id="network" viewBox="0 0 1000 480" role="group" aria-label="Geographic graph of input destinations and calculated routes"></svg><div id="graph-empty">Loading the current scenario…</div></div>
+        <div id="map-legend" class="map-legend" aria-label="Map legend"></div>
         <div class="legend"><span><i class="depot-dot"></i> Depot</span><span><i class="open-dot"></i> Open</span><span><i class="closed-dot"></i> Closed</span><span><i class="selected-dot"></i> Selected location</span><span><i class="route-line nearest"></i> Nearest neighbour</span><span><i class="route-line greedy"></i> Greedy insertion</span><span><i class="route-line exact"></i> Branch and bound</span></div>
         <p id="point-info" class="point-info" aria-live="polite">Click a destination first. Hover details will appear here and beside the pointer.</p>
         <p class="caption">Coordinates from GeoNames. Lines show simulated direct travel, not roads. The graph is complete; connections are hidden by default for clarity.</p>

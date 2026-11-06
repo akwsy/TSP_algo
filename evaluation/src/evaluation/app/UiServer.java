@@ -169,6 +169,8 @@ public final class UiServer {
             case "/app.js" -> "app.js";
             case "/inspection.js" -> "inspection.js";
             case "/styles.css" -> "styles.css";
+            case "/map.js" -> "map.js";
+            case "/map.css" -> "map.css";
             case "/evaluation", "/evaluation.html" -> "evaluation.html";
             case "/evaluation.js" -> "evaluation.js";
             case "/evaluation-data.json" -> "evaluation-data.json";
