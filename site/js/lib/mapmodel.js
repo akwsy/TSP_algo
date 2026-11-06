@@ -198,3 +198,51 @@ export const TILE_LIMITS = Object.freeze({ minZoom: 1, maxNativeZoom: 9, maxZoom
 export function clampZoom(z, min, max) {
   return Number.isFinite(z) ? Math.min(max, Math.max(min, z)) : min;
 }
+
+// ---- Hover details: when you get to a stop, how long you wait, when you leave; and the same for each leg ----
+// Everything shown is derived from the rounded clock times, so "arrive + wait = leave" and "depart + travel = arrive"
+// always agree on screen (no off-by-one-minute surprises).
+
+export const formatClock = clock;
+
+/** Minutes -> "45 min", "1 h", "1 h 12 min" (rounded to the nearest minute). */
+export function formatDuration(min) {
+  const t = Math.max(0, Math.round(min));
+  if (t < 60) return `${t} min`;
+  return t % 60 ? `${Math.floor(t / 60)} h ${t % 60} min` : `${Math.floor(t / 60)} h`;
+}
+
+const gap = (from, to) => formatDuration(Math.round(to) - Math.round(from));
+
+/** What happens at one stop of one run. visited=false when the run skips it; the depot has leave (departure) and back (return). */
+export function stopTimes(run, instance, id) {
+  const l = instance.locations.find((x) => x.id === id);
+  if (l?.isDepot) {
+    if (!validRoute(run)) return { visited: false, depot: true };
+    return { visited: true, depot: true, leave: clock(instance.departureMinute), back: clock(run.returnMinute) };
+  }
+  const s = validRoute(run) && run.route.slice(1, -1).includes(id) ? (run.schedule || []).find((x) => x.id === id) : null;
+  if (!s) return { visited: false };
+  const wait = Math.round(s.leaveMinute) - Math.round(s.arriveMinute);
+  return { visited: true, arrive: clock(s.arriveMinute), leave: clock(s.leaveMinute),
+    wait: wait > 0 ? `Waited ${formatDuration(wait)}` : "No wait" };
+}
+
+/** The trip between two consecutive stops of a run (null if the run does not go straight from one to the other). */
+export function legDetails(run, instance, fromId, toId) {
+  if (!validRoute(run)) return null;
+  const r = run.route;
+  const i = r.findIndex((id, k) => id === fromId && r[k + 1] === toId);
+  if (i < 0) return null;
+  const byId = new Map(instance.locations.map((l) => [l.id, l]));
+  const sched = new Map((run.schedule || []).map((s) => [s.id, s]));
+  const depart = i === 0 ? instance.departureMinute : sched.get(fromId)?.leaveMinute;
+  const last = i + 1 === r.length - 1;
+  const arrive = last ? run.returnMinute : sched.get(toId)?.arriveMinute;
+  if (typeof depart !== "number" || typeof arrive !== "number") return null;
+  const to = byId.get(toId) || { id: toId, name: `#${toId}` };
+  const wait = last ? 0 : Math.round(sched.get(toId).leaveMinute) - Math.round(arrive);
+  return { from: byId.get(fromId)?.name ?? `#${fromId}`, to: to.name, depart: clock(depart), arrive: clock(arrive),
+    travel: gap(depart, arrive), distance: `${num(instance.distanceKm[fromId][toId])} km`,
+    opens: to.isDepot ? "open all day" : windowText(to), then: wait > 0 ? `then waits ${formatDuration(wait)}` : null };
+}
