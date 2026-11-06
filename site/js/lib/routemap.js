@@ -2,6 +2,8 @@
 // SVG drawing of the same scene, so the map never goes blank. Force the fallback with ?map=svg on the page URL.
 import { h } from "./dom.js";
 import { buildScene, chooseEngine, project, slotColors } from "./mapmodel.js";
+import { algorithmStyle } from "./algstyle.js";
+import { marker } from "./charts.js";
 
 const LEAFLET = "1.9.4";
 const BASE = `https://cdnjs.cloudflare.com/ajax/libs/leaflet/${LEAFLET}/`;
@@ -28,6 +30,20 @@ export function loadLeaflet() {
 
 const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#888";
 export const algorithmColor = (index) => cssVar(`--c${(index % 6) + 1}`);
+
+/** Complete per-algorithm map entry fields (colour, dash, shape) from the algorithm's position in the sorted id list. */
+export function entryStyle(index) {
+  const s = algorithmStyle(index);
+  return { color: algorithmColor(s.colorIndex), dash: s.dash, shape: s.shape };
+}
+
+/** Small legend glyph: a line sample in the algorithm's colour and dash with its marker shape in the middle. */
+export function algorithmSwatch(entry) {
+  return svg("svg", { class: "alg-swatch", width: 34, height: 14, viewBox: "0 0 34 14", role: "img",
+    "aria-label": `${entry.id || "algorithm"} line style` },
+    svg("line", { x1: 1, x2: 33, y1: 7, y2: 7, stroke: entry.color, "stroke-width": 3, "stroke-dasharray": entry.dash || null }),
+    marker(entry.shape, 17, 7, entry.color, 3.5));
+}
 
 function svg(tag, attrs = {}, ...kids) {
   const el = document.createElementNS(SVGNS, tag);
@@ -107,6 +123,11 @@ function svgEngine(stage, instance, show, style) {
         root.append(svg("polyline", { class: "route", fill: "none", stroke: s.color, "stroke-width": 3.5, "stroke-dasharray": s.dash || null,
           "stroke-linejoin": "round", "stroke-linecap": "round", opacity: 0.9,
           points: line.ids.map((id) => `${pos.get(id).x.toFixed(1)},${pos.get(id).y.toFixed(1)}`).join(" ") }));
+        // Marker shape of the algorithm at the middle of each leg (identity beyond colour and dash).
+        line.ids.slice(1).forEach((id, i) => {
+          const a = pos.get(line.ids[i]), b = pos.get(id);
+          root.append(marker(s.shape, (a.x + b.x) / 2, (a.y + b.y) / 2, s.color, 3.5));
+        });
       }
       for (const p of scene.points) {
         const { x, y } = pos.get(p.id);
@@ -157,6 +178,12 @@ function leafletEngine(stage, instance, show, style) {
       for (const line of scene.lines) {
         const s = style(line.entry);
         L.polyline(line.ids.map((id) => at.get(id)), { color: s.color, weight: 4, opacity: 0.9, dashArray: s.dash || null }).addTo(layer);
+        line.ids.slice(1).forEach((id, i) => {
+          const a = at.get(line.ids[i]), b = at.get(id);
+          const glyph = svg("svg", { width: 12, height: 12, viewBox: "0 0 12 12" }, marker(s.shape, 6, 6, s.color, 3.5));
+          L.marker([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], { interactive: false, keyboard: false,
+            icon: L.divIcon({ html: glyph, className: "lf-icon", iconSize: [12, 12], iconAnchor: [6, 6] }) }).addTo(layer);
+        });
       }
       for (const p of scene.points) {
         const icon = h("span", { class: `lf-dot ${dotClass(p)}`, style: p.depot ? null : `--slot:${colors[p.slot]}` });

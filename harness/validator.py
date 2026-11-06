@@ -3,7 +3,8 @@
 TOLERANCE = 1e-9
 
 
-def _failure(reason):
+def failure_result(reason):
+    """Result for a run that produced no scorable route, with a plain-text reason."""
     return {
         "valid": False,
         "failureReason": reason,
@@ -49,7 +50,7 @@ def validate_route(instance, route):
 
     problem = _check_shape(route, len(locations))
     if problem:
-        return _failure(problem)
+        return failure_result(problem)
 
     clock = instance["departureMinute"]
     travel = wait = km = 0
@@ -66,13 +67,13 @@ def validate_route(instance, route):
         loc = locations[j]
         start = max(arrive, loc["opensAt"])
         if start > loc["closesAt"] + TOLERANCE:
-            return _failure(f"arrived late at location {j}: {start} after close {loc['closesAt']}")
+            return failure_result(f"arrived late at location {j}: {start} after close {loc['closesAt']}")
         wait += start - arrive
         schedule.append({"id": j, "arriveMinute": arrive, "startMinute": start, "leaveMinute": start})
         clock = start
 
     if clock > instance["deadlineMinute"] + TOLERANCE:
-        return _failure(f"returned to depot at {clock}, after deadline {instance['deadlineMinute']}")
+        return failure_result(f"returned to depot at {clock}, after deadline {instance['deadlineMinute']}")
 
     visited_ids = set(route[1:-1])
     return {

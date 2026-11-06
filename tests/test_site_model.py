@@ -38,15 +38,46 @@ class ModelTest(unittest.TestCase):
         self.assertEqual([r["algorithmId"] for r in rows], ["low", "dead"])
         self.assertIsNone(rows[1]["rank"])
 
+    def test_algorithms_with_failed_runs_rank_below_fully_valid_ones(self):
+        rows = call("rankGroups", [grp("flaky", 9, 10, failures=2), grp("solid", 4, 90),
+                                   grp("solid2", 4, 50), grp("flaky2", 9, 5, failures=1)])
+        self.assertEqual([r["algorithmId"] for r in rows], ["solid2", "solid", "flaky2", "flaky"])
+        self.assertEqual([r["rank"] for r in rows], [1, 2, 3, 4])
+        self.assertEqual([r["rankedBelow"] for r in rows], [0, 0, 1, 2])
+
+    def test_overview_badges_explain_failures_ranking_and_contradicted_optimal(self):
+        g = {**grp("a", 5, 10, failures=2), "timeouts": 1, "selfReportedTimeLimit": 3, "contradictedOptimal": 1}
+        flags = call("groupBadges", g)
+        self.assertEqual([(f["tone"], f["text"]) for f in flags], [
+            ("bad", "2 of 5 failed, 1 killed for time"),
+            ("warn", "ranked below: 2 failed runs"),
+            ("note", "3 reported TIME_LIMIT"),
+            ("warn", "OPTIMAL claim contradicted in 1 run")])
+        self.assertEqual(call("groupBadges", grp("b", 5, 10)), [{"tone": "ok", "text": "none"}])
+        # old aggregate files lack the newer counters
+        self.assertEqual(call("groupBadges", grp("b", 5, 10, failures=1))[1]["text"], "ranked below: 1 failed run")
+
     def test_classifies_failures_in_plain_words(self):
         def k(status, reason):
             return call("failureKind", {"status": status, "failureReason": reason})
         self.assertEqual(k("TIME_LIMIT", "exceeded the time limit of 1 s and was killed"), "timed out")
+        self.assertEqual(call("failureKind", {"status": "TIME_LIMIT", "killed": True, "valid": True}), "timed out")
+        self.assertEqual(call("failureKind", {"status": "TIME_LIMIT", "killed": False, "valid": False,
+                                              "failureReason": "route repeats a customer"}), "invalid")
         self.assertEqual(k(None, "exited with code 3"), "crashed")
         self.assertEqual(k("HEURISTIC", "route repeats a customer"), "invalid")
 
-    def test_failure_list_includes_invalid_and_timed_out_only(self):
+    def test_failure_list_includes_invalid_and_harness_killed_only(self):
         runs = [{"valid": True, "status": "HEURISTIC", "file": "ok"},
                 {"valid": False, "status": "HEURISTIC", "file": "bad"},
-                {"valid": True, "status": "TIME_LIMIT", "file": "slow"}]
-        self.assertEqual([r["file"] for r in call("failedRuns", runs)], ["bad", "slow"])
+                {"valid": True, "status": "TIME_LIMIT", "killed": True, "file": "slow"},
+                {"valid": True, "status": "TIME_LIMIT", "killed": False, "file": "own-limit"},
+                {"valid": False, "status": "TIME_LIMIT", "file": "old-killed",
+                 "failureReason": "exceeded the time limit of 1 s and was killed"}]
+        self.assertEqual([r["file"] for r in call("failedRuns", runs)], ["bad", "slow", "old-killed"])
+
+    def test_short_commit_keeps_the_dirty_marker(self):
+        h = "0123456789abcdef0123456789abcdef01234567"
+        self.assertEqual(call("shortCommit", h, 7), "0123456")
+        self.assertEqual(call("shortCommit", h + "+dirty", 7), "0123456+dirty")
+        self.assertIsNone(call("shortCommit", None, 7))

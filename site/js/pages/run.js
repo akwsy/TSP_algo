@@ -2,8 +2,9 @@ import { h, fmt, select } from "../lib/dom.js";
 import { loadIndex, loadRun } from "../lib/data.js";
 import { loadInstance, ensureMapCss, replaceHashParams } from "../lib/instances.js";
 import { algorithmColorIndex, routeSteps, clock } from "../lib/mapmodel.js";
-import { createRouteMap, algorithmColor, slotLegend } from "../lib/routemap.js";
-import { DASHES, runStats } from "../lib/rundisplay.js";
+import { createRouteMap, entryStyle, slotLegend } from "../lib/routemap.js";
+import { runStats } from "../lib/rundisplay.js";
+import { shortCommit } from "../lib/model.js";
 
 const ROLE = { depart: "Depart", stop: "Visit", return: "Return" };
 
@@ -46,12 +47,12 @@ export default {
       return;
     }
     const idx = algorithmColorIndex([...new Set(runs.map((r) => r.algorithmId))])[rec.algorithmId] ?? 0;
-    const entry = { id: rec.algorithmId, label: rec.algorithmId, color: algorithmColor(idx), dash: DASHES[idx % DASHES.length], run: rec };
+    const entry = { id: rec.algorithmId, label: rec.algorithmId, ...entryStyle(idx), run: rec };
     const map = createRouteMap(instance, { entries: [entry], forceSvg: ctx.params.get("map") === "svg", height: 380 });
     const steps = routeSteps(instance, rec);
     const head = ["#", "Step", "Location", "Slot / window", "Arrive", "Waiting", "Depart", "Leg km", "Cumulative km", "Return"];
     body.append(
-      h("p", { class: "meta" }, [rec.algorithmId, rec.instanceId, rec.timestamp, rec.commit ? `commit ${rec.commit.slice(0, 7)}` : null].filter(Boolean).join(" | ")),
+      h("p", { class: "meta" }, [rec.algorithmId, rec.instanceId, rec.timestamp, rec.commit ? `commit ${shortCommit(rec.commit)}` : null].filter(Boolean).join(" | ")),
       rec.valid === false
         ? h("p", { class: "fail-reason" }, h("span", { class: "badge bad" }, "no valid answer"), " ", rec.failureReason || "Run failed.")
         : h("dl", { class: "stats inline" }, runStats(rec).flatMap(([k, v]) => [h("dt", {}, k), h("dd", {}, v)])),

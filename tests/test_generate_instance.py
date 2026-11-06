@@ -69,6 +69,16 @@ class GenerateInstanceTest(unittest.TestCase):
              inst["deadlineMinute"], inst["speedKmh"]),
             (1, 360, 480, 840, 40))
 
+    def test_instance_id_names_every_non_default_parameter(self):
+        def iid(*args):
+            return self.generate(SMALL, "--seed", "1", "--customers", "2", *args)["instanceId"]
+        self.assertEqual(iid(), "n2-seed1")
+        self.assertEqual(iid("--departure", "420"), "n2-seed1-dep420")
+        self.assertEqual(iid("--period", "300"), "n2-seed1-per300")
+        self.assertEqual(iid("--speed", "50"), "n2-seed1-spd50")
+        self.assertEqual(iid("--speed", "42.5", "--departure", "420", "--period", "300"),
+                         "n2-seed1-dep420-per300-spd42.5")
+
     def test_only_populated_places_within_150km_are_customers(self):
         inst = self.generate(SMALL, "--seed", "5", "--customers", "2")
         names = sorted(l["name"] for l in inst["locations"][1:])

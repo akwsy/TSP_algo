@@ -100,7 +100,7 @@ Rules:
 - **stderr** is for your diagnostics (debug prints, progress). It never affects your score; the harness saves it in the run's result file so you can read it when debugging.
 - **Exit code 0** means "here is my answer". Any **nonzero** exit code means "I crashed"; the run is recorded as a failure (`exited with code N`) even if you printed something.
 - If stdout is not valid JSON, is not a JSON object, has a `status` that is not one of the three values in section 6, or has a `stats` that is not an object, the run is a failure with that reason (for example `output is not valid JSON` or `unknown status 'DONE'`).
-- **Time limit:** the limit is wall-clock time for the whole process, including start-up (for example, starting the Python interpreter). If your program is still running at the limit, the harness kills it, records the status as `TIME_LIMIT` whatever you claimed, and notes `exceeded the time limit of N s and was killed`. If you had already printed a complete result object, that route is still replayed and scored; otherwise the run is a failure with no route. Do not rely on this: **print your best answer and exit before the limit** (with `status` `TIME_LIMIT` if you stopped early; see section 6).
+- **Time limit:** the limit is wall-clock time for the whole process, including start-up (for example, starting the Python interpreter). If your program is still running at the limit, the harness kills it, records the status as `TIME_LIMIT` whatever you claimed, and notes `exceeded the time limit of N s and was killed`. If you had already printed a complete result object, that route is still replayed and scored; otherwise the run is a failure with no route. Only runs the harness killed count as timeouts. A valid route you print yourself with `status` `TIME_LIMIT` is an ordinary result and is not listed as a failure. Do not rely on being killed: **print your best answer and exit before the limit** (with `status` `TIME_LIMIT` if you stopped early; see section 6).
 - **No network access** and **no reading files** other than stdin. Everything you need is in the input.
 - **Deterministic:** the same input must always give the same output. If you use randomness, seed your random generator from the `seed` field of the input. Do not seed from the clock.
 
@@ -110,7 +110,7 @@ The input is one JSON object:
 
 | Field | Meaning |
 |---|---|
-| `instanceId` | Name of this instance, for example `"n4-seed5"` (4 customers, seed 5). |
+| `instanceId` | Name of this instance, for example `"n4-seed5"` (4 customers, seed 5). When departure, period or speed differ from the defaults (360, 480, 40) they are appended, for example `"n4-seed5-dep420-per300-spd50"`. |
 | `seed` | The seed the instance was generated from. Use it to seed any randomness you need. |
 | `departureMinute` | When you leave the depot. |
 | `periodMinutes` | How long you have. |
@@ -154,7 +154,7 @@ Print one JSON object:
 
 ### What the status values mean
 
-- **`OPTIMAL`**: you have **proved** that no valid route visits more customers, or visits as many with a shorter distance. Only exact methods that finished their search may say this. If you stopped because of your time limit, you must not claim `OPTIMAL`.
+- **`OPTIMAL`**: you have **proved** that no valid route visits more customers, or visits as many with a shorter distance. Only exact methods that finished their search may say this. If you stopped because of your time limit, you must not claim `OPTIMAL`. The website flags a claim as contradicted when another valid run on the same instance visited more customers.
 - **`HEURISTIC`**: a valid answer with no claim of being the best. Most algorithms report this.
 - **`TIME_LIMIT`**: you stopped early because time was running out, and `route` is the best you had found so far.
 

@@ -118,5 +118,90 @@ class RunTest(CliCase):
         self.assertGreater(rec["stats"]["iterations"], 0)
 
 
+PEEK = ('import json,sys\njson.load(sys.stdin)\n'
+        'try:\n n=len(json.load(open(sys.argv[1]))["runs"])\nexcept OSError:\n n=-1\n'
+        'print(json.dumps({"route":[0,0],"status":"HEURISTIC","stats":{"iterations":n}}))\n')
+
+
+class IndexDuringBatchTest(CliCase):
+    def test_index_is_up_to_date_after_every_run_and_leaves_no_temp_files(self):
+        folder = self.algs / "peek"
+        folder.mkdir()
+        (folder / "solve.py").write_text(PEEK)
+        (folder / "algorithm.json").write_text(json.dumps({
+            "id": "peek", "command": ["python3", "solve.py", str(self.tmp / "results" / "index.json")]}))
+        self.run_cli("--seeds", "1", "2")
+        # bad-route (alphabetically first) already wrote 2 runs; each peek run sees all earlier ones.
+        seen = [self.record(self.entry("peek", s))["stats"]["iterations"] for s in (1, 2)]
+        self.assertEqual(seen, [2, 3])
+        self.assertEqual(sorted(p.name for p in (self.tmp / "results").glob("*.tmp")), [])
+
+
+class CommitTest(CliCase):
+    def setUp(self):
+        super().setUp()
+        self.git("init", "-q")
+        self.git("add", ".")
+        self.git("commit", "-qm", "x")
+
+    def git(self, *args):
+        subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@example.com", *args],
+                       cwd=self.algs, check=True, capture_output=True)
+
+    def commits(self, alg):
+        return {self.record(e)["commit"] for e in self.index()["runs"] if e["algorithmId"] == alg}
+
+    def test_clean_algorithm_records_plain_hash_and_every_run_shares_it(self):
+        self.run_cli("--seeds", "1", "2", "3")
+        (commit,) = self.commits("skip-all")
+        self.assertRegex(commit, r"^[0-9a-f]{40}$")
+
+    def test_uncommitted_changes_are_marked_dirty(self):
+        (self.algs / "skip-all" / "solve.py").write_text(SKIP_ALL + "# edited\n")
+        self.run_cli("--seeds", "1")
+        (dirty,) = self.commits("skip-all")
+        self.assertRegex(dirty, r"^[0-9a-f]{40}\+dirty$")
+        (clean,) = self.commits("bad-route")
+        self.assertRegex(clean, r"^[0-9a-f]{40}$")
+
+    def test_untracked_new_file_counts_as_dirty(self):
+        (self.algs / "bad-route" / "helper.py").write_text("x = 1\n")
+        self.run_cli("--seeds", "1")
+        self.assertTrue(self.commits("bad-route").pop().endswith("+dirty"))
+
+
+class BadMetadataTest(CliCase):
+    def exit_with(self, meta):
+        folder = self.algs / "weird"
+        folder.mkdir()
+        (folder / "algorithm.json").write_text(meta if isinstance(meta, str) else json.dumps(meta))
+        proc = subprocess.run(
+            [sys.executable, "-m", "harness.run", "--dataset", str(self.tmp / "places.txt"),
+             "--instances-dir", str(self.tmp / "instances"), "--results-dir", str(self.tmp / "results"),
+             "--customers", "2", "--seeds", "1", "--algorithms-dir", str(self.algs)],
+            cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 2, proc.stderr)
+        self.assertIn("weird", proc.stderr)
+        self.assertIn("algorithm.json", proc.stderr)
+        self.assertNotIn("Traceback", proc.stderr)
+        return proc.stderr
+
+    def test_missing_or_non_string_id(self):
+        self.assertIn("id", self.exit_with({"command": ["python3", "x.py"]}))
+
+    def test_command_must_be_a_non_empty_list(self):
+        self.assertIn("command", self.exit_with({"id": "weird", "command": "python3 x.py"}))
+
+    def test_empty_command_list(self):
+        self.assertIn("command", self.exit_with({"id": "weird", "command": []}))
+
+    def test_time_limit_must_be_positive_number(self):
+        self.assertIn("timeLimitSeconds", self.exit_with(
+            {"id": "weird", "command": ["python3", "x.py"], "timeLimitSeconds": 0}))
+
+    def test_unparseable_json(self):
+        self.exit_with("{nope")
+
+
 if __name__ == "__main__":
     unittest.main()

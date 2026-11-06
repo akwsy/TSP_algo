@@ -5,11 +5,11 @@ from harness.aggregate import aggregate
 
 
 def rec(alg, inst, n, visited, dist=10.0, minutes=100.0, runtime=10.0, valid=True,
-        status="HEURISTIC", stats=None):
+        status="HEURISTIC", stats=None, killed=False):
     return {"algorithmId": alg, "instanceId": inst, "numCustomers": n, "valid": valid,
             "status": status, "visited": visited if valid else None,
             "distanceKm": dist if valid else None, "totalMinutes": minutes if valid else None,
-            "runtimeMs": runtime, "stats": stats}
+            "runtimeMs": runtime, "stats": stats, "killed": killed}
 
 
 def group(result, alg, n):
@@ -35,12 +35,36 @@ class AggregateTest(unittest.TestCase):
     def test_failures_and_timeouts_are_counted_and_excluded_from_visit_averages(self):
         recs = [rec("a", "i1", 5, 4),
                 rec("a", "i2", 5, 0, valid=False, runtime=100),
-                rec("a", "i3", 5, 2, status="TIME_LIMIT", runtime=300)]
+                rec("a", "i3", 5, 2, status="TIME_LIMIT", runtime=300, killed=True)]
         g = group(aggregate(recs), "a", 5)
         self.assertEqual((g["runs"], g["failures"], g["timeouts"]), (3, 1, 1))
         self.assertEqual(g["visited"]["mean"], 3)       # (4 + 2) / 2, the failure is left out
         self.assertEqual(g["visited"]["n"], 2)
         self.assertEqual(g["runtimeMs"]["mean"], (10 + 100 + 300) / 3)  # runtime covers every run
+
+    def test_self_reported_time_limit_is_a_valid_result_not_a_timeout(self):
+        recs = [rec("a", "i1", 5, 4, status="TIME_LIMIT"),
+                rec("a", "i2", 5, 2, status="TIME_LIMIT", killed=True),
+                rec("a", "i3", 5, 0, valid=False, status="TIME_LIMIT", killed=True)]
+        g = group(aggregate(recs), "a", 5)
+        self.assertEqual((g["timeouts"], g["selfReportedTimeLimit"], g["failures"]), (2, 1, 1))
+        self.assertEqual(g["visited"]["n"], 2)
+
+    def test_old_records_without_a_killed_field_use_the_failure_reason(self):
+        old = rec("a", "i1", 5, 0, valid=False, status="TIME_LIMIT")
+        del old["killed"]
+        old["failureReason"] = "exceeded the time limit of 1 s and was killed"
+        g = group(aggregate([old]), "a", 5)
+        self.assertEqual((g["timeouts"], g["selfReportedTimeLimit"]), (1, 0))
+
+    def test_contradicted_optimal_claim_is_counted(self):
+        recs = [rec("a", "i1", 5, 3, status="OPTIMAL"), rec("b", "i1", 5, 4),
+                rec("a", "i2", 5, 3, status="OPTIMAL"), rec("b", "i2", 5, 3),
+                rec("c", "i1", 5, 1, status="OPTIMAL", valid=False)]
+        res = aggregate(recs)
+        self.assertEqual(group(res, "a", 5)["contradictedOptimal"], 1)  # i1: claimed 3, 4 exists
+        self.assertEqual(group(res, "b", 5)["contradictedOptimal"], 0)
+        self.assertEqual(group(res, "c", 5)["contradictedOptimal"], 0)  # invalid runs make no claim
 
     def test_relative_performance_uses_best_known_visits_per_instance(self):
         recs = [rec("a", "i1", 5, 4), rec("b", "i1", 5, 2),

@@ -6,6 +6,7 @@ results/index.json.
 """
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -16,31 +17,60 @@ from .config import ConfigError, InstanceConfig
 from .dataset import DatasetError, load_places
 from .generate_instance import DEFAULT_DATASET
 from .instance import build_instance
-from .validator import validate_route
+from .validator import failure_result, validate_route
 
 ROOT = Path(__file__).resolve().parent.parent
 RESULT_FIELDS = ("valid", "failureReason", "visited", "skipped", "distanceKm", "travelMinutes",
                  "waitMinutes", "totalMinutes", "returnMinute", "schedule")
 
 
+def _metadata_problem(meta):
+    if not isinstance(meta, dict):
+        return "must be a JSON object"
+    if not isinstance(meta.get("id"), str) or not meta["id"]:
+        return "'id' must be a non-empty string"
+    command = meta.get("command")
+    if not isinstance(command, list) or not command or not all(isinstance(c, str) for c in command):
+        return "'command' must be a non-empty list of strings"
+    limit = meta.get("timeLimitSeconds")
+    if "timeLimitSeconds" in meta and (isinstance(limit, bool) or not isinstance(limit, (int, float)) or limit <= 0):
+        return "'timeLimitSeconds' must be a positive number"
+    return None
+
+
 def discover_algorithms(folder):
     """Return metadata dicts (with a private '_dir') for each algorithms/*/algorithm.json."""
     found = []
     for meta_path in sorted(Path(folder).glob("*/algorithm.json")):
-        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        try:
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        except ValueError as e:
+            raise ConfigError(f"{meta_path}: not valid JSON ({e})")
+        problem = _metadata_problem(meta)
+        if problem:
+            raise ConfigError(f"{meta_path}: {problem}")
         meta["_dir"] = meta_path.parent
+        meta["_commit"] = git_commit(meta_path.parent)  # once per algorithm, not per run
         found.append(meta)
     return found
 
 
-def git_commit(folder):
-    """Hash of the last commit touching the algorithm folder, or None."""
+def _git(folder, *args):
     try:
-        out = subprocess.run(["git", "log", "-1", "--format=%H", "--", "."], cwd=folder,
-                             capture_output=True, text=True, timeout=10)
+        out = subprocess.run(["git", *args], cwd=folder, capture_output=True, text=True, timeout=10)
     except (OSError, subprocess.TimeoutExpired):
         return None
-    return out.stdout.strip() or None if out.returncode == 0 else None
+    return out.stdout.strip() if out.returncode == 0 else None
+
+
+def git_commit(folder):
+    """Hash of the last commit touching the algorithm folder, or None. Uncommitted changes
+    (modified, staged or untracked files in the folder) append "+dirty" so results from
+    unrecorded code are never grouped with the clean commit."""
+    commit = _git(folder, "log", "-1", "--format=%H", "--", ".") or None
+    if commit and _git(folder, "status", "--porcelain", "--", "."):
+        commit += "+dirty"
+    return commit
 
 
 STATUSES = ("OPTIMAL", "HEURISTIC", "TIME_LIMIT")
@@ -73,8 +103,11 @@ def execute(meta, instance):
     limit = meta.get("timeLimitSeconds", 10)
     start = time.perf_counter()
     try:
-        proc = subprocess.run(meta["command"], cwd=meta["_dir"], input=json.dumps({**instance, "timeLimitSeconds": limit}),
-                              capture_output=True, text=True, timeout=limit)
+        proc = subprocess.run(meta["command"], cwd=meta["_dir"], input=json.dumps({**instance, "timeLimitSeconds": limit}).encode("utf-8"),
+                              capture_output=True, timeout=limit)
+    except OSError as exc:
+        runtime_ms = (time.perf_counter() - start) * 1000
+        return None, runtime_ms, f"could not start the command: {exc.strerror or exc}", "", False
     except subprocess.TimeoutExpired as exc:
         runtime_ms = (time.perf_counter() - start) * 1000
         error = f"exceeded the time limit of {limit} s and was killed"
@@ -84,9 +117,9 @@ def execute(meta, instance):
         return output, runtime_ms, error, _text(exc.stderr), True
     runtime_ms = (time.perf_counter() - start) * 1000
     if proc.returncode != 0:
-        return None, runtime_ms, f"exited with code {proc.returncode}", proc.stderr, False
-    output, error = parse_output(proc.stdout)
-    return output, runtime_ms, error, proc.stderr, False
+        return None, runtime_ms, f"exited with code {proc.returncode}", _text(proc.stderr), False
+    output, error = parse_output(_text(proc.stdout))
+    return output, runtime_ms, error, _text(proc.stderr), False
 
 
 def make_record(meta, instance, run_id):
@@ -95,19 +128,19 @@ def make_record(meta, instance, run_id):
     route = output.get("route")
     status = "TIME_LIMIT" if timed_out else output.get("status")
     if error and not (timed_out and route is not None):
-        checked = validate_route(instance, None)
-        checked["failureReason"] = error
+        checked = failure_result(error)
     else:
         checked = validate_route(instance, route)
     record = {
         "algorithmId": meta["id"],
-        "commit": git_commit(meta["_dir"]),
+        "commit": meta["_commit"],
         "instanceId": instance["instanceId"],
         "seed": instance.get("seed"),
         "numCustomers": len(instance["locations"]) - 1,
         "runId": run_id,
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "status": status,
+        "killed": timed_out,
         "route": route,
         "runtimeMs": runtime_ms,
         "stats": output.get("stats"),
@@ -115,6 +148,13 @@ def make_record(meta, instance, run_id):
     }
     record.update({k: checked[k] for k in RESULT_FIELDS})
     return record
+
+
+def write_index(path, index):
+    """Write the index atomically (temp file in the same folder, then rename)."""
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
+    os.replace(tmp, path)
 
 
 def run_batch(algorithms, instances, instances_dir, results_dir, extra=None):
@@ -142,14 +182,15 @@ def run_batch(algorithms, instances, instances_dir, results_dir, extra=None):
                 "file": name, "runId": run_id, "algorithmId": record["algorithmId"],
                 "commit": record["commit"], "instanceId": record["instanceId"],
                 "numCustomers": record["numCustomers"], "seed": record["seed"],
-                "timestamp": record["timestamp"], "status": record["status"],
+                "timestamp": record["timestamp"], "status": record["status"], "killed": record["killed"],
                 "valid": record["valid"], "visited": record["visited"],
                 "distanceKm": record["distanceKm"], "runtimeMs": record["runtimeMs"],
                 "failureReason": record["failureReason"], **(extra or {})})
+            write_index(index_path, index)  # after every run, so an interrupted batch stays consistent
             print(f"{record['algorithmId']} on {record['instanceId']}: "
                   f"{'valid, visited ' + str(record['visited']) if record['valid'] else 'FAILED: ' + str(record['failureReason'])}",
                   flush=True)
-    index_path.write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
+    write_index(index_path, index)
     return records
 
 

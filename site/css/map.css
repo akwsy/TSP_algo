@@ -7,6 +7,8 @@
 .alg-title { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 1.05rem; }
 .swatch { display: inline-block; width: 14px; height: 14px; border-radius: 4px; margin-right: 6px; vertical-align: -2px; border: 1px solid var(--surface); box-shadow: 0 0 0 1px var(--muted); }
 .alg-title .swatch { margin: 0; }
+.alg-swatch { display: inline-block; vertical-align: -2px; margin-right: 6px; flex: none; }
+.alg-title .alg-swatch { margin: 0; }
 .toggles { border: 0; padding: 0; margin: 0 0 12px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; }
 .toggles legend { font-size: .85rem; color: var(--muted); padding: 0; margin-bottom: 4px; float: left; margin-right: 14px; }
 label.check { display: inline-flex; align-items: center; gap: 4px; font-size: .95rem; color: var(--text); cursor: pointer; min-height: 32px; }
