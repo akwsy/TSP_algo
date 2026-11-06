@@ -1,5 +1,4 @@
 /* Map, instance explorer and route detail. Uses the site tokens from style.css. */
-:root { --s1: #fde725; --s2: #35b779; --s3: #31688e; --s4: #440154; }
 .pad { padding: 14px; }
 .spaced { margin-top: 16px; }
 .grid { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); margin-top: 12px; }

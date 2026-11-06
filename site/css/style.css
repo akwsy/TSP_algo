@@ -1,10 +1,9 @@
-/* Tokens. Palette: Okabe-Ito (colour-blind safe). Status is always paired with a text label. */
+/* Tokens. Series colours live in charts.css (--s1..--s6, validated). Status is always paired with a text label. */
 :root {
   --bg: #f7f7f5; --surface: #ffffff; --text: #1b1f24; --muted: #565d66; --line: #dcdcd6; --control: #80868f;
   --accent: #0060a0; --accent-text: #ffffff; --focus: #c25a00;
   --ok: #00694d; --warn: #8a5300; --bad: #a8321a;
   --bad-bg: #fbeae6; --warn-bg: #fbf0dc; --ok-bg: #e2f3ec;
-  --c1: #0072b2; --c2: #d55e00; --c3: #009e73; --c4: #cc79a7; --c5: #e69f00; --c6: #56b4e9;
   --radius: 8px; --gap: 16px; --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
