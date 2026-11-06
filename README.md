@@ -10,7 +10,7 @@ Several people each write a routing algorithm. This repo provides the specificat
 |---|---|
 | `PROJECT_BRIEF.md` | Full brief (wins over everything else) |
 | `data/` | GeoNames Malaysia dataset (`MY.txt`), field definitions and provenance |
-| `docs/` | Course brief PDF; `docs/ALGORITHM_SPEC.md` will hold the author-facing spec |
+| `docs/` | Course brief PDF; `docs/ALGORITHM_SPEC.md`, the specification for algorithm authors |
 | `harness/` | Python harness (graph builder, validator, runner, aggregator) |
 | `tests/` | Test suite |
 | `algorithms/`, `instances/`, `results/`, `site/` | Created by later tickets |
