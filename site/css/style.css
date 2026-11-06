@@ -1,6 +1,6 @@
 /* Tokens. Palette: Okabe-Ito (colour-blind safe). Status is always paired with a text label. */
 :root {
-  --bg: #f7f7f5; --surface: #ffffff; --text: #1b1f24; --muted: #565d66; --line: #dcdcd6;
+  --bg: #f7f7f5; --surface: #ffffff; --text: #1b1f24; --muted: #565d66; --line: #dcdcd6; --control: #80868f;
   --accent: #0060a0; --accent-text: #ffffff; --focus: #c25a00;
   --ok: #00694d; --warn: #8a5300; --bad: #a8321a;
   --bad-bg: #fbeae6; --warn-bg: #fbf0dc; --ok-bg: #e2f3ec;
@@ -9,14 +9,14 @@
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 :root[data-theme="dark"] {
-  --bg: #14171a; --surface: #1d2126; --text: #e8eaed; --muted: #a3abb4; --line: #333a42;
+  --bg: #14171a; --surface: #1d2126; --text: #e8eaed; --muted: #a3abb4; --line: #333a42; --control: #6f7881;
   --accent: #56b4e9; --accent-text: #0b1620; --focus: #f0a04b;
   --ok: #4fd1a1; --warn: #e6b45a; --bad: #ff8f77;
   --bad-bg: #3a2420; --warn-bg: #3a3020; --ok-bg: #1d3329;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #14171a; --surface: #1d2126; --text: #e8eaed; --muted: #a3abb4; --line: #333a42;
+    --bg: #14171a; --surface: #1d2126; --text: #e8eaed; --muted: #a3abb4; --line: #333a42; --control: #6f7881;
     --accent: #56b4e9; --accent-text: #0b1620; --focus: #f0a04b;
     --ok: #4fd1a1; --warn: #e6b45a; --bad: #ff8f77;
     --bad-bg: #3a2420; --warn-bg: #3a3020; --ok-bg: #1d3329;
@@ -35,7 +35,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 var(
 #nav a { color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 999px; font-weight: 500; }
 #nav a:hover { color: var(--text); background: var(--bg); }
 #nav a[aria-current="page"] { color: var(--accent-text); background: var(--accent); }
-.btn { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line);
+.btn { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--control);
   border-radius: 999px; padding: 6px 14px; cursor: pointer; }
 .btn:hover { border-color: var(--muted); }
 
@@ -46,7 +46,7 @@ h2 { font-size: 1.1rem; margin: 28px 0 10px; }
 .lede { color: var(--muted); margin: 0 0 20px; max-width: 70ch; }
 .toolbar { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; margin: 0 0 16px; }
 label { min-width: 0; max-width: 100%; display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; font-size: .85rem; color: var(--muted); }
-select { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--line);
+select { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--control);
   border-radius: 6px; padding: 6px 10px; min-height: 36px; max-width: 100%; }
 
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }

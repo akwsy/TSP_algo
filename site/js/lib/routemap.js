@@ -6,13 +6,18 @@ import { buildScene, chooseEngine, project, slotColors } from "./mapmodel.js";
 const LEAFLET = "1.9.4";
 const BASE = `https://cdnjs.cloudflare.com/ajax/libs/leaflet/${LEAFLET}/`;
 const SVGNS = "http://www.w3.org/2000/svg";
+// Subresource integrity for the pinned files (sha512 of the cdnjs files, matching the cdnjs API).
+const SRI = {
+  js: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==",
+  css: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==",
+};
 let leafletPromise = null;
 
 export function loadLeaflet() {
   if (window.L) return Promise.resolve(window.L);
   leafletPromise ??= new Promise((resolve, reject) => {
-    const css = h("link", { rel: "stylesheet", href: BASE + "leaflet.min.css" });
-    const js = h("script", { src: BASE + "leaflet.min.js", crossorigin: "" });
+    const css = h("link", { rel: "stylesheet", href: BASE + "leaflet.min.css", integrity: SRI.css, crossorigin: "" });
+    const js = h("script", { src: BASE + "leaflet.min.js", integrity: SRI.js, crossorigin: "" });
     js.onload = () => (window.L ? resolve(window.L) : reject(new Error("Leaflet missing")));
     js.onerror = () => reject(new Error("Leaflet failed to load"));
     document.head.append(css, js);
@@ -138,6 +143,8 @@ function leafletEngine(stage, instance, show, style) {
   // Wheel zoom only after a click, so scrolling the page past a map never zooms it by accident.
   map.on("click focus", () => map.scrollWheelZoom.enable());
   map.on("mouseout blur", () => map.scrollWheelZoom.disable());
+  const onEsc = (e) => { if (e.key === "Escape") map.closePopup(); };
+  document.addEventListener("keydown", onEsc, true);
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
   const layer = L.layerGroup().addTo(map);
@@ -168,6 +175,6 @@ function leafletEngine(stage, instance, show, style) {
       }
       if (!fitted) { map.fitBounds(L.latLngBounds([...at.values()]), { padding: [30, 30] }); fitted = true; }
     },
-    destroy() { map.remove(); },
+    destroy() { document.removeEventListener("keydown", onEsc, true); map.remove(); },
   };
 }
