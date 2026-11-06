@@ -1,0 +1,607 @@
+{
+  "experiment": "scaling",
+  "parameters": {
+    "sizes": [
+      5,
+      10,
+      15
+    ],
+    "instancesPerSize": 3,
+    "seeds": [
+      1,
+      2,
+      3
+    ],
+    "departureMinute": 360,
+    "periodMinutes": 480,
+    "speedKmh": 40.0
+  },
+  "sizes": [
+    5,
+    10,
+    15
+  ],
+  "algorithms": [
+    "broken-crash",
+    "broken-infeasible",
+    "broken-sleep",
+    "nearest-neighbour"
+  ],
+  "groups": [
+    {
+      "algorithmId": "broken-crash",
+      "numCustomers": 5,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 14.747999666724354,
+        "std": 0.4660198852566653,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-crash",
+      "numCustomers": 10,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 18.137097329599783,
+        "std": 5.562498782861385,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-crash",
+      "numCustomers": 15,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 15.972667000217674,
+        "std": 1.376777733054516,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-infeasible",
+      "numCustomers": 5,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 14.666750335891265,
+        "std": 0.8231426497380802,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-infeasible",
+      "numCustomers": 10,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 13.98808333275762,
+        "std": 0.25891226790174393,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-infeasible",
+      "numCustomers": 15,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 13.924485998965489,
+        "std": 0.12594280120598036,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-sleep",
+      "numCustomers": 5,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 3,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 1004.4069166639625,
+        "std": 0.5304594724827453,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-sleep",
+      "numCustomers": 10,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 3,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 1004.4554860020677,
+        "std": 0.4117332529089642,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-sleep",
+      "numCustomers": 15,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 3,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 1005.3405136689738,
+        "std": 1.494620989361204,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "nearest-neighbour",
+      "numCustomers": 5,
+      "runs": 3,
+      "failures": 0,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": 1.0,
+        "std": 1.0,
+        "n": 3
+      },
+      "distanceKm": {
+        "mean": 125.64617770901025,
+        "std": 131.49842236477448,
+        "n": 3
+      },
+      "totalMinutes": {
+        "mean": 249.81071072334018,
+        "std": 217.15258675049438,
+        "n": 3
+      },
+      "runtimeMs": {
+        "mean": 19.152610999299213,
+        "std": 6.393287520275342,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": 1.0,
+        "n": 3
+      },
+      "visitsBehindBest": {
+        "mean": 0.0,
+        "n": 3
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "nearest-neighbour",
+      "numCustomers": 10,
+      "runs": 3,
+      "failures": 0,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": 3.0,
+        "std": 1.0,
+        "n": 3
+      },
+      "distanceKm": {
+        "mean": 200.55713272193802,
+        "std": 112.48184577283386,
+        "n": 3
+      },
+      "totalMinutes": {
+        "mean": 381.22791924982477,
+        "std": 35.299402349571,
+        "n": 3
+      },
+      "runtimeMs": {
+        "mean": 14.048041664257957,
+        "std": 0.2177267797706539,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": 1.0,
+        "n": 3
+      },
+      "visitsBehindBest": {
+        "mean": 0.0,
+        "n": 3
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "nearest-neighbour",
+      "numCustomers": 15,
+      "runs": 3,
+      "failures": 0,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": 2.0,
+        "std": 1.0,
+        "n": 3
+      },
+      "distanceKm": {
+        "mean": 109.0594236613468,
+        "std": 61.23913590467957,
+        "n": 3
+      },
+      "totalMinutes": {
+        "mean": 389.33352724703013,
+        "std": 79.39376705230234,
+        "n": 3
+      },
+      "runtimeMs": {
+        "mean": 14.04468033433659,
+        "std": 0.1505865955951433,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": 1.0,
+        "n": 3
+      },
+      "visitsBehindBest": {
+        "mean": 0.0,
+        "n": 3
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    }
+  ],
+  "bestKnown": [
+    {
+      "instanceId": "n5-seed1",
+      "numCustomers": 5,
+      "visited": 0,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n5-seed2",
+      "numCustomers": 5,
+      "visited": 1,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n5-seed3",
+      "numCustomers": 5,
+      "visited": 2,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n10-seed1",
+      "numCustomers": 10,
+      "visited": 4,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n10-seed2",
+      "numCustomers": 10,
+      "visited": 3,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n10-seed3",
+      "numCustomers": 10,
+      "visited": 2,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n15-seed1",
+      "numCustomers": 15,
+      "visited": 2,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n15-seed2",
+      "numCustomers": 15,
+      "visited": 1,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n15-seed3",
+      "numCustomers": 15,
+      "visited": 3,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    }
+  ]
+}

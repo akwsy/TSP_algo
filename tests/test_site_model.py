@@ -1,0 +1,52 @@
+"""Website data logic (site/js/lib/model.js), run under node. Skipped when node is missing."""
+import json
+import shutil
+import subprocess
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+MODEL = ROOT / "site" / "js" / "lib" / "model.js"
+
+
+def call(fn, *args):
+    script = (f"import * as m from {json.dumps(MODEL.as_uri())};"
+              f"console.log(JSON.stringify(m[{json.dumps(fn)}](...{json.dumps(list(args))})));")
+    out = subprocess.run(["node", "--input-type=module", "-e", script],
+                         capture_output=True, text=True, check=True)
+    return json.loads(out.stdout)
+
+
+def grp(alg, visited, dist, failures=0, n=10):
+    return {"algorithmId": alg, "numCustomers": n, "runs": 5, "failures": failures,
+            "visited": {"mean": visited}, "distanceKm": {"mean": dist}}
+
+
+@unittest.skipUnless(shutil.which("node"), "node not installed")
+class ModelTest(unittest.TestCase):
+    def test_ranks_by_visits_then_shorter_distance(self):
+        rows = call("rankGroups", [grp("a", 4, 50), grp("b", 6, 90), grp("c", 6, 70)])
+        self.assertEqual([r["algorithmId"] for r in rows], ["c", "b", "a"])
+        self.assertEqual([r["rank"] for r in rows], [1, 2, 3])
+
+    def test_exact_ties_share_a_rank(self):
+        rows = call("rankGroups", [grp("a", 5, 10), grp("b", 5, 10), grp("c", 3, 1)])
+        self.assertEqual([r["rank"] for r in rows], [1, 1, 3])
+
+    def test_algorithm_with_no_valid_runs_is_last_not_zero_visits(self):
+        rows = call("rankGroups", [grp("dead", None, None, failures=5), grp("low", 0, 0)])
+        self.assertEqual([r["algorithmId"] for r in rows], ["low", "dead"])
+        self.assertIsNone(rows[1]["rank"])
+
+    def test_classifies_failures_in_plain_words(self):
+        def k(status, reason):
+            return call("failureKind", {"status": status, "failureReason": reason})
+        self.assertEqual(k("TIME_LIMIT", "exceeded the time limit of 1 s and was killed"), "timed out")
+        self.assertEqual(k(None, "exited with code 3"), "crashed")
+        self.assertEqual(k("HEURISTIC", "route repeats a customer"), "invalid")
+
+    def test_failure_list_includes_invalid_and_timed_out_only(self):
+        runs = [{"valid": True, "status": "HEURISTIC", "file": "ok"},
+                {"valid": False, "status": "HEURISTIC", "file": "bad"},
+                {"valid": True, "status": "TIME_LIMIT", "file": "slow"}]
+        self.assertEqual([r["file"] for r in call("failedRuns", runs)], ["bad", "slow"])
