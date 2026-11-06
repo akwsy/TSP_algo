@@ -66,12 +66,138 @@
       "Scenario types that deliberately hit search limits (" + data.excludedFamilies.join(", ") + ") are excluded here because the " +
       "exact solver is not a reference when it is cut short. Runtimes come from very small instances, so they show relative cost, not scaling.";
   }
-  fetch("/evaluation-data.json", { cache: "no-store" })
-    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(show)
-    .catch(function (e) {
-      var n = document.getElementById("notice");
-      n.textContent = "Could not load evaluation data: " + e.message; n.hidden = false;
-      document.getElementById("intro").textContent = "";
+  var NAMES = { nearest: "Nearest neighbour", greedy: "Greedy insertion", exact: "Branch and bound" };
+  var IDS = ["nearest", "greedy", "exact"];
+  var WHY = {
+    nearest: "it always drives to the closest customer first, which can use up time or distance that better choices needed.",
+    greedy: "it adds customers one at a time at the lowest extra cost, so an early cheap choice can block better ones."
+  };
+  function fail(message) {
+    var n = document.getElementById("notice");
+    n.textContent = message; n.hidden = false;
+  }
+  function mode(m) { return m === "blocks" ? "Block windows (fixed 6-hour slots)" : "Slack windows (built around arrival time)"; }
+  function hours(minutes) { return minutes % 60 === 0 ? minutes / 60 + " h" : minutes + " min"; }
+
+  var AXIS_MAX = 120, CHART_X = 150, CHART_W = 530, ROW_H = 44;
+  function xOf(percent) { return CHART_X + Math.max(0, Math.min(AXIS_MAX, percent)) / AXIS_MAX * CHART_W; }
+  function visitsChart(target, configs) {
+    var height = 28 + configs.length * ROW_H;
+    target.setAttribute("viewBox", "0 0 700 " + height);
+    target.replaceChildren();
+    [0, 25, 50, 75, 100].forEach(function (tick) {
+      target.appendChild(svg("line", { x1: xOf(tick), y1: 18, x2: xOf(tick), y2: height - 4, "class": tick === 100 ? "chart-ref" : "chart-grid" }));
+      target.appendChild(svg("text", { x: xOf(tick), y: 12, "font-size": 11, "text-anchor": "middle", "class": "chart-tick" }, tick + "%"));
     });
+    configs.forEach(function (c, i) {
+      var top = 24 + i * ROW_H;
+      var best = c.algorithms.exact.visits.mean;
+      target.appendChild(svg("text", { x: CHART_X - 10, y: top + 20, "font-size": 12, "text-anchor": "end", fill: "currentColor" },
+        c.customers + " customers, " + hours(c.periodMinutes)));
+      IDS.forEach(function (id, j) {
+        var a = c.algorithms[id], y = top + j * 12;
+        var value = best > 0 ? a.visits.mean / best * 100 : 0;
+        var spread = best > 0 ? a.visits.stdDev / best * 100 : 0;
+        var group = svg("g");
+        group.appendChild(svg("title", {}, NAMES[id] + ": " + a.visits.mean.toFixed(2) + " visits on average (±" + a.visits.stdDev.toFixed(2) + "), " + value.toFixed(0) + "% of the best possible"));
+        group.appendChild(svg("rect", { x: CHART_X, y: y, width: xOf(value) - CHART_X, height: 9, rx: 2, "class": "bar " + id }));
+        if (spread > 0) {
+          var mid = y + 4.5;
+          group.appendChild(svg("line", { x1: xOf(value - spread), y1: mid, x2: xOf(value + spread), y2: mid, "class": "whisker" }));
+          group.appendChild(svg("line", { x1: xOf(value - spread), y1: mid - 3, x2: xOf(value - spread), y2: mid + 3, "class": "whisker" }));
+          group.appendChild(svg("line", { x1: xOf(value + spread), y1: mid - 3, x2: xOf(value + spread), y2: mid + 3, "class": "whisker" }));
+        }
+        target.appendChild(group);
+      });
+    });
+  }
+  function benchmark(data) {
+    var host = document.getElementById("bench-groups");
+    document.getElementById("bench-intro").textContent =
+      "Each setup was run on " + data.scenariosPerConfig + " random scenarios (" + data.totals.scenarios + " in all), and every algorithm solved the same ones. Averages are shown with their spread." +
+      (data.totals.exactLimitHit > 0 ? " " + data.totals.exactLimitHit + " scenarios where the exact solver ran out of time are left out." : "");
+    host.replaceChildren();
+    ["slack", "blocks"].forEach(function (m) {
+      var configs = data.configs.filter(function (c) { return c.windowMode === m; })
+        .sort(function (a, b) { return a.customers - b.customers || a.periodMinutes - b.periodMinutes; });
+      if (!configs.length) return;
+      var section = el("div", { "class": "bench-mode" });
+      section.appendChild(el("h3", {}, mode(m)));
+      section.appendChild(el("p", { "class": "caption" }, "Average visits as a share of what the exact solver achieves. Whiskers show the spread (±1 standard deviation); the dashed line at 100% is the best possible."));
+      var legend = el("div", { "class": "legend" });
+      IDS.forEach(function (id) {
+        var item = el("span"); item.appendChild(el("span", { "class": "swatch " + id })); item.appendChild(document.createTextNode(NAMES[id]));
+        legend.appendChild(item);
+      });
+      section.appendChild(legend);
+      var chart = svg("svg", { "class": "bench-chart", role: "img", "aria-label": "Average visits per algorithm as a share of the exact solver, " + mode(m) });
+      section.appendChild(chart);
+      visitsChart(chart, configs);
+      var wrap = el("div", { "class": "route-table-wrap" }), t = el("table", { "class": "route-table bench-table" });
+      wrap.appendChild(t); section.appendChild(wrap);
+      var rows = configs.map(function (c) {
+        var row = [c.customers + " customers", hours(c.periodMinutes)];
+        IDS.forEach(function (id) { row.push(c.algorithms[id].visits.mean.toFixed(2) + " ± " + c.algorithms[id].visits.stdDev.toFixed(2)); });
+        IDS.forEach(function (id) { row.push((c.algorithms[id].optimalShare * 100).toFixed(0) + "%"); });
+        return row;
+      });
+      table(t, ["Customers", "Period", "Nearest visits", "Greedy visits", "Exact visits", "Nearest optimal", "Greedy optimal", "Exact optimal"], rows);
+      section.appendChild(el("p", { "class": "caption" }, "Visits are the average number of customers reached, with spread. Optimal is the share of scenarios solved optimally."));
+      host.appendChild(section);
+    });
+  }
+
+  var EPS = 1e-6;
+  function shortfall(c, id) {
+    var best = c.expected.exact, e = c.expected[id];
+    if (e.visits < best.visits) return "visits";
+    if (e.visits === best.visits && e.distanceKm > best.distanceKm + EPS) return "distance";
+    return null;
+  }
+  function boundary(cases) {
+    var short = 0;
+    var rows = cases.map(function (c) {
+      var notes = [], cells = [], drifted = false;
+      IDS.forEach(function (id) {
+        var gap = shortfall(c, id), a = c.actual[id], e = c.expected[id];
+        if (a.visits !== e.visits || Math.abs(a.distanceKm - e.distanceKm) > EPS) drifted = true;
+        var text = a.visits + " of " + c.expected.exact.visits;
+        if (gap === "distance") text += ", longer route";
+        cells.push({ text: text, gap: gap });
+        if (gap === "visits") notes.push(NAMES[id] + " reaches " + a.visits + " instead of " + c.expected.exact.visits + " because " + WHY[id]);
+        else if (gap === "distance") notes.push(NAMES[id] + " drives " + (a.distanceKm - c.expected.exact.distanceKm).toFixed(0) + " km further for the same visits because " + WHY[id]);
+      });
+      var fell = notes.length > 0;
+      if (fell) short++;
+      return { c: c, cells: cells, fell: fell,
+        note: drifted ? "Result differs from the expected one: please check." : fell ? notes.join(" ") : "All three algorithms match the best possible." };
+    });
+    document.getElementById("boundary-intro").textContent =
+      cases.length + " hand-built cases. In " + short + " of them at least one algorithm falls short of the exact solver; the other " + (cases.length - short) + " check edge behaviour such as deadlines to the minute, zero time and identical locations.";
+    var t = document.getElementById("boundary-table");
+    t.replaceChildren();
+    var head = el("tr");
+    ["Case", "What makes it hard", "Nearest", "Greedy", "Exact", "Outcome"].forEach(function (h) { head.appendChild(el("th", { scope: "col" }, h)); });
+    var thead = el("thead"); thead.appendChild(head); t.appendChild(thead);
+    var body = el("tbody");
+    rows.forEach(function (r) {
+      var tr = el("tr", r.fell ? { "class": "falls-short" } : {});
+      tr.appendChild(el("th", { scope: "row" }, r.c.name));
+      tr.appendChild(el("td", { "class": "wrap-cell" }, r.c.description));
+      r.cells.forEach(function (cell) { tr.appendChild(el("td", cell.gap ? { "class": "short-cell" } : {}, cell.text)); });
+      tr.appendChild(el("td", { "class": "wrap-cell" }, r.note));
+      body.appendChild(tr);
+    });
+    t.appendChild(body);
+  }
+
+  function load(url, handler, label) {
+    return fetch(url, { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(handler)
+      .catch(function (e) { fail("Could not load " + label + ": " + e.message); });
+  }
+  load("/benchmark-data.json", benchmark, "benchmark results");
+  load("/boundary-data.json", boundary, "boundary cases");
+  load("/evaluation-data.json", show, "simulation summary");
 })();

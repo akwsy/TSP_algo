@@ -9,14 +9,44 @@
 </head>
 <body>
   <main>
-    <p><a href="/">&larr; Back to the comparison tool</a></p>
-    <h1>Algorithm evaluation</h1>
-    <p id="intro">Loading simulation results…</p>
+    <header class="page-head">
+      <div>
+        <h1>Algorithm evaluation</h1>
+        <p class="lede">How well do the three route-planning algorithms do? Each tries to visit as many customers as possible within the time limit, and to drive as little as possible while doing so.</p>
+      </div>
+      <a class="nav-link" href="/">&larr; Back to the comparison tool</a>
+    </header>
     <div id="notice" class="notice error" role="alert" hidden></div>
+
+    <section class="panel" aria-labelledby="intro-title">
+      <h2 id="intro-title">How to read these results</h2>
+      <p>A result is <strong>optimal</strong> when it makes the same number of visits as the exact solver and drives no more distance. The exact solver (branch and bound) checks every sensible route, so it is the reference for the best possible answer.</p>
+      <ul class="legend-list">
+        <li><span class="swatch nearest"></span><span><strong>Nearest neighbour</strong>: always drives to the closest customer it can still reach. Quick, but can get trapped.</span></li>
+        <li><span class="swatch greedy"></span><span><strong>Greedy insertion</strong>: adds the customer that costs the least extra driving, one at a time.</span></li>
+        <li><span class="swatch exact"></span><span><strong>Branch and bound (exact)</strong>: finds the best route by search.</span></li>
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="bench-title">
+      <h2 id="bench-title">Averaged results by setup</h2>
+      <p id="bench-intro" class="muted">Loading benchmark results…</p>
+      <p class="caption">Window types: <strong>slack</strong> windows are opening hours built around when a customer can first be reached. <strong>Blocks</strong> are fixed 6-hour slots on the clock. Period is the time available for the whole round trip. Spread (&plusmn;) is the standard deviation: how much the number of visits varies from scenario to scenario. A small spread means a steady result.</p>
+      <div id="bench-groups"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="boundary-title">
+      <h2 id="boundary-title">Hard cases, one by one</h2>
+      <p id="boundary-intro" class="muted">Loading boundary cases…</p>
+      <p class="caption">Each case is a tiny hand-built problem with a known right answer, designed to trip an algorithm up. The table shows visits per algorithm against the best possible. Highlighted rows are cases where at least one algorithm falls short.</p>
+      <div class="route-table-wrap"><table id="boundary-table" class="route-table boundary-table"></table></div>
+    </section>
+
     <section class="panel" aria-labelledby="summary-title">
-      <h2 id="summary-title">Overall results</h2>
+      <h2 id="summary-title">Earlier simulation: overall results</h2>
+      <p id="intro" class="muted">Loading simulation results…</p>
       <div class="route-table-wrap"><table id="summary-table" class="route-table"></table></div>
-      <p class="caption">Optimal means the same number of visits as the exact solver and no more distance. Visits are shown as a share of the exact solver's total. The distance ratio compares only scenarios where the visit counts matched.</p>
+      <p class="caption">Visits are shown as a share of the exact solver's total. The distance ratio compares only scenarios where the visit counts matched.</p>
     </section>
     <section class="panel" aria-labelledby="chart-title">
       <h2 id="chart-title">How often each algorithm found the optimum</h2>
@@ -25,7 +55,7 @@
       <svg id="visits-chart" viewBox="0 0 700 192" role="img" aria-label="Bar chart of visits achieved relative to the exact solver"></svg>
     </section>
     <section class="panel" aria-labelledby="family-title">
-      <h2 id="family-title">Results by scenario type</h2>
+      <h2 id="family-title">Simulation results by scenario type</h2>
       <div class="route-table-wrap"><table id="family-table" class="route-table"></table></div>
       <p class="caption">Cells show the percentage of scenarios solved optimally. Hover a row for visits as a share of the best possible.</p>
     </section>

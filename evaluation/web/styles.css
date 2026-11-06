@@ -140,6 +140,27 @@ td{font-variant-numeric:tabular-nums}
 .generation-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
 .generation .button{margin-top:12px}
 
+/* ===== Evaluation page: benchmark charts and boundary table (T6) ===== */
+.legend-list{margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:14px}
+.legend-list li{display:flex;gap:8px;align-items:baseline}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--border-strong);flex:none}
+.swatch.nearest{background:var(--nearest)}.swatch.greedy{background:var(--greedy)}.swatch.exact{background:var(--exact)}
+.bench-mode{margin-top:22px}
+.bench-mode h3{font-size:15px;margin:0 0 4px}
+.bench-chart{display:block;width:100%;height:auto;max-width:700px;margin:6px 0 12px}
+.chart-grid{stroke:var(--border);stroke-width:1}
+.chart-ref{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 3}
+.chart-tick{fill:var(--muted)}
+.whisker{stroke:var(--text);stroke-width:1.5}
+.bench-table{min-width:700px}
+.boundary-table{min-width:880px}
+.boundary-table td{white-space:nowrap}
+.boundary-table td.wrap-cell{min-width:200px;white-space:normal;font-size:13px;line-height:1.45}
+.boundary-table tbody th{white-space:normal;min-width:130px}
+.boundary-table tr.falls-short>*{background:var(--danger-bg)}
+.boundary-table td.short-cell{font-weight:600;color:var(--danger)}
+.boundary-table td.short-cell::before{content:"\25BC ";font-size:10px}
+
 /* ===== Evaluation page charts ===== */
 .bar-track{fill:var(--surface-2)}
 .bar.nearest{fill:var(--nearest)}.bar.greedy{fill:var(--greedy)}.bar.exact{fill:var(--exact)}

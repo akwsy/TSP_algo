@@ -58,6 +58,8 @@ public final class UiServerTest {
             check(get(client, base + "/map.js").statusCode() == 200, "Map script served");
             check(get(client, base + "/map.css").statusCode() == 200, "Map styles served");
             check(get(client, base + "/evaluation-data.json").body().contains("\"summary\""), "Evaluation data served");
+            check(get(client, base + "/benchmark-data.json").body().contains("\"configs\""), "Benchmark data served");
+            check(get(client, base + "/boundary-data.json").body().contains("\"expected\""), "Boundary data served");
             check(get(client, base + "/inputs/MY.txt").statusCode() == 404, "Source files are not exposed as static assets");
             check(get(client, base + "/api/scenario").body().contains("\"customerCount\":2"), "Current input scenario");
             check(get(client, base + "/api/scenario").body().contains("\"distanceKm\":[["), "Hover distances are exposed in scenario JSON");

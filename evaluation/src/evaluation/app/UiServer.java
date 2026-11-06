@@ -175,6 +175,8 @@ public final class UiServer {
             case "/evaluation", "/evaluation.html" -> "evaluation.html";
             case "/evaluation.js" -> "evaluation.js";
             case "/evaluation-data.json" -> "evaluation-data.json";
+            case "/benchmark-data.json" -> "benchmark-data.json";
+            case "/boundary-data.json" -> "boundary-data.json";
             default -> null;
         };
         if (file == null) { json(request, 404, Map.of("error", "Not found")); return; }
