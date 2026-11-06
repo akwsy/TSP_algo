@@ -1,0 +1,147 @@
+"""Runner: python3 -m harness.run --seeds 1 2 3 [options]
+
+Runs every algorithm found in algorithms/*/algorithm.json on the same generated
+instances, validates each answer, and writes one result JSON per run plus
+results/index.json.
+"""
+import argparse
+import json
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+from .config import ConfigError, InstanceConfig
+from .dataset import DatasetError, load_places
+from .generate_instance import DEFAULT_DATASET
+from .instance import build_instance
+from .validator import validate_route
+
+ROOT = Path(__file__).resolve().parent.parent
+RESULT_FIELDS = ("valid", "failureReason", "visited", "skipped", "distanceKm", "travelMinutes",
+                 "waitMinutes", "totalMinutes", "returnMinute", "schedule")
+
+
+def discover_algorithms(folder):
+    """Return metadata dicts (with a private '_dir') for each algorithms/*/algorithm.json."""
+    found = []
+    for meta_path in sorted(Path(folder).glob("*/algorithm.json")):
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        meta["_dir"] = meta_path.parent
+        found.append(meta)
+    return found
+
+
+def git_commit(folder):
+    """Hash of the last commit touching the algorithm folder, or None."""
+    try:
+        out = subprocess.run(["git", "log", "-1", "--format=%H", "--", "."], cwd=folder,
+                             capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return out.stdout.strip() or None if out.returncode == 0 else None
+
+
+def execute(meta, instance):
+    """Run the algorithm once; return (output dict or None, runtimeMs, error text or None)."""
+    limit = meta.get("timeLimitSeconds", 10)
+    start = time.perf_counter()
+    try:
+        proc = subprocess.run(meta["command"], cwd=meta["_dir"], input=json.dumps(instance),
+                              capture_output=True, text=True, timeout=limit)
+    except subprocess.TimeoutExpired:
+        return None, (time.perf_counter() - start) * 1000, f"timed out after {limit} s"
+    runtime_ms = (time.perf_counter() - start) * 1000
+    if proc.returncode != 0:
+        return None, runtime_ms, f"exited with code {proc.returncode}"
+    try:
+        output = json.loads(proc.stdout)
+        if not isinstance(output, dict):
+            raise ValueError
+    except ValueError:
+        return None, runtime_ms, "output is not a JSON object"
+    return output, runtime_ms, None
+
+
+def make_record(meta, instance, run_id):
+    output, runtime_ms, error = execute(meta, instance)
+    output = output or {}
+    route = output.get("route")
+    if error:
+        checked = validate_route(instance, None)
+        checked["failureReason"] = error
+    else:
+        checked = validate_route(instance, route)
+    record = {
+        "algorithmId": meta["id"],
+        "commit": git_commit(meta["_dir"]),
+        "instanceId": instance["instanceId"],
+        "runId": run_id,
+        "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "status": output.get("status"),
+        "route": route,
+        "runtimeMs": runtime_ms,
+        "stats": output.get("stats"),
+    }
+    record.update({k: checked[k] for k in RESULT_FIELDS})
+    return record
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(prog="python3 -m harness.run",
+                                 description="Run all algorithms on the same generated instances.")
+    ap.add_argument("--seeds", type=int, nargs="+", required=True, help="one instance per seed")
+    ap.add_argument("--customers", type=int, default=10)
+    ap.add_argument("--departure", type=int, default=360)
+    ap.add_argument("--period", type=int, default=480)
+    ap.add_argument("--speed", type=float, default=40.0)
+    ap.add_argument("--dataset", default=str(DEFAULT_DATASET))
+    ap.add_argument("--algorithms-dir", default=str(ROOT / "algorithms"))
+    ap.add_argument("--instances-dir", default="instances")
+    ap.add_argument("--results-dir", default="results")
+    args = ap.parse_args(argv)
+
+    try:
+        places = load_places(args.dataset)
+        instances = [build_instance(places, InstanceConfig(
+            seed=s, num_customers=args.customers, departure_minute=args.departure,
+            period_minutes=args.period, speed_kmh=args.speed)) for s in args.seeds]
+        algorithms = discover_algorithms(args.algorithms_dir)
+    except (ConfigError, DatasetError, OSError, ValueError) as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 2
+    if not algorithms:
+        print(f"error: no algorithm.json found under {args.algorithms_dir}", file=sys.stderr)
+        return 2
+
+    instances_dir, results_dir = Path(args.instances_dir), Path(args.results_dir)
+    instances_dir.mkdir(parents=True, exist_ok=True)
+    results_dir.mkdir(parents=True, exist_ok=True)
+    for inst in instances:
+        (instances_dir / f"{inst['instanceId']}.json").write_text(
+            json.dumps(inst, indent=2) + "\n", encoding="utf-8")
+
+    index_path = results_dir / "index.json"
+    index = json.loads(index_path.read_text(encoding="utf-8")) if index_path.exists() else {"runs": []}
+    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    for meta in algorithms:
+        for inst in instances:
+            record = make_record(meta, inst, run_id)
+            name = f"{record['algorithmId']}__{record['instanceId']}__{run_id}.json"
+            (results_dir / name).write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+            index["runs"].append({
+                "file": name, "runId": run_id, "algorithmId": record["algorithmId"],
+                "commit": record["commit"], "instanceId": record["instanceId"],
+                "timestamp": record["timestamp"], "status": record["status"],
+                "valid": record["valid"], "visited": record["visited"],
+                "distanceKm": record["distanceKm"], "runtimeMs": record["runtimeMs"],
+                "failureReason": record["failureReason"]})
+            print(f"{record['algorithmId']} on {record['instanceId']}: "
+                  f"{'valid, visited ' + str(record['visited']) if record['valid'] else 'FAILED: ' + str(record['failureReason'])}")
+    index_path.write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
