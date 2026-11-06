@@ -7,4 +7,5 @@ cd "$EVAL_DIR/../submission"
 "$JAVAC" --release 17 -cp "out:$EVAL_DIR/out" -d "$EVAL_DIR/out" "$EVAL_DIR"/tests/*.java
 "$JAVA" -cp "out:$EVAL_DIR/out" tests.TestSuite
 "$JAVA" -cp "out:$EVAL_DIR/out" tests.BoundaryCases
+"$JAVA" -cp "out:$EVAL_DIR/out" tests.BenchmarkTest
 exec "$JAVA" -cp "out:$EVAL_DIR/out" tests.UiServerTest
