@@ -108,3 +108,82 @@ export function buildScene(instance, entries) {
     .map((p) => ({ entry: e.id, k, id: p.id, text: String(p.order) })));
   return { points, lines, badges };
 }
+
+// ---- Comparing algorithms on one map (all pure) ----
+
+/** Perpendicular pixel offsets for n routes drawn side by side, centred on the true line. */
+export function laneOffsets(n, gap = 4) {
+  return Array.from({ length: n }, (_, k) => (k - (n - 1) / 2) * gap + 0);
+}
+
+/** Both ends of the segment a->b moved `off` pixels to the left of the direction of travel (screen space, y down). */
+export function offsetSegment(a, b, off) {
+  const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
+  if (!len || !off) return [{ x: a.x, y: a.y }, { x: b.x, y: b.y }];
+  const nx = dy / len * off, ny = -dx / len * off;
+  return [{ x: a.x + nx, y: a.y + ny }, { x: b.x + nx, y: b.y + ny }];
+}
+
+const ok = (e) => validRoute(e.run) && typeof e.run.visited === "number";
+
+/** Id of the best shown algorithm by the scoring rule (most places visited, then shortest distance); null if none valid. */
+export function bestEntryId(entries) {
+  const good = entries.filter(ok);
+  if (!good.length) return null;
+  return good.reduce((b, e) => (e.run.visited > b.run.visited || (e.run.visited === b.run.visited && e.run.distanceKm < b.run.distanceKm) ? e : b)).id;
+}
+
+const num = (v) => String(Math.round(v * 10) / 10);
+function duration(min) {
+  const t = Math.round(min);
+  return t >= 60 ? `${Math.floor(t / 60)} h ${t % 60} min` : `${t} min`;
+}
+
+/** One plain-words row per shown algorithm for the summary panel. */
+export function summaryRows(entries) {
+  const best = bestEntryId(entries);
+  return entries.map((e) => {
+    const r = e.run || {};
+    const valid = ok(e);
+    return { id: e.id, label: e.label ?? e.id, valid, best: valid && e.id === best,
+      visited: valid ? r.visited : null,
+      distance: valid ? `${num(r.distanceKm)} km` : null,
+      time: valid ? duration(r.totalMinutes) : null };
+  });
+}
+
+/** Plain-words notes of places visited by exactly one shown algorithm ("Only B visited: Town X"). Needs 2+ valid runs. */
+export function differenceNotes(instance, entries) {
+  const good = entries.filter((e) => validRoute(e.run));
+  if (good.length < 2) return [];
+  const sets = good.map((e) => new Set(mapPoints(instance, e.run).filter((p) => p.kind === "visited").map((p) => p.id)));
+  const notes = [];
+  good.forEach((e, k) => {
+    const names = instance.locations.filter((l) => sets[k].has(l.id) && sets.every((s, j) => j === k || !s.has(l.id))).map((l) => l.name);
+    if (names.length) notes.push(`Only ${e.label ?? e.id} visited: ${names.join(", ")}`);
+  });
+  return notes;
+}
+
+const LABEL_H = 14;
+const labelWidth = (name) => Math.ceil(name.length * 6.4) + 8;
+
+/** Which side of its marker a label goes on so it stays inside the box. */
+export function labelSide(p, w) {
+  return p.x + 10 + labelWidth(p.name) > w ? "left" : "right";
+}
+
+/** ids of the destinations whose name is shown permanently: visited first, then input order, never overlapping. */
+export function labelPlan(points, w, h) {
+  const boxes = [], keep = [];
+  const order = [...points.keys()].sort((i, j) => (points[j].visited - points[i].visited) || i - j);
+  for (const i of order) {
+    const p = points[i], lw = labelWidth(p.name);
+    const x0 = labelSide(p, w) === "right" ? p.x + 10 : p.x - 10 - lw;
+    const box = [x0, p.y - LABEL_H / 2, x0 + lw, p.y + LABEL_H / 2];
+    if (box[0] < 0 || box[2] > w || box[1] < 0 || box[3] > h) continue;
+    if (boxes.some((b) => box[0] < b[2] && b[0] < box[2] && box[1] < b[3] && b[1] < box[3])) continue;
+    boxes.push(box); keep.push(p.id);
+  }
+  return keep;
+}

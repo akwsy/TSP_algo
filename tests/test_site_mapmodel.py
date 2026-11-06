@@ -113,5 +113,60 @@ class SceneTest(unittest.TestCase):
         self.assertFalse(any(p["filled"] for p in scene["points"]))
 
 
+def ent(i, visited, km, minutes=100, valid=True, skipped=()):
+    return {"id": i, "label": i.upper(), "run": {"valid": valid, "route": [0, 1, 0], "visited": visited, "distanceKm": km,
+            "totalMinutes": minutes, "skipped": list(skipped)}}
+
+
+@unittest.skipUnless(shutil.which("node"), "node not installed")
+class CompareModelTest(unittest.TestCase):
+    def test_lane_offsets_are_centred_and_spaced(self):
+        self.assertEqual(call("laneOffsets", 1, 4), [0])
+        self.assertEqual(call("laneOffsets", 3, 4), [-4, 0, 4])
+        self.assertEqual(call("laneOffsets", 2, 4), [-2, 2])
+
+    def test_offset_segment_moves_both_ends_to_the_left_of_travel(self):
+        # Heading east (+x) in screen space (y down): left of travel is up (-y).
+        self.assertEqual(call("offsetSegment", {"x": 0, "y": 0}, {"x": 10, "y": 0}, 3),
+                         [{"x": 0, "y": -3}, {"x": 10, "y": -3}])
+        self.assertEqual(call("offsetSegment", {"x": 5, "y": 5}, {"x": 5, "y": 5}, 3),
+                         [{"x": 5, "y": 5}, {"x": 5, "y": 5}])
+
+    def test_best_is_most_visited_then_shortest_distance_and_skips_failures(self):
+        es = [ent("a", 3, 50), ent("b", 4, 90), ent("c", 4, 80), ent("d", 9, 1, valid=False)]
+        self.assertEqual(call("bestEntryId", es), "c")
+        self.assertIsNone(call("bestEntryId", [ent("d", 9, 1, valid=False)]))
+
+    def test_summary_rows_in_plain_numbers(self):
+        rows = call("summaryRows", [ent("a", 3, 50.04, 125), ent("b", 4, 90, 61)])
+        self.assertEqual([(r["id"], r["visited"], r["best"]) for r in rows], [("a", 3, False), ("b", 4, True)])
+        self.assertEqual(rows[0]["distance"], "50 km")
+        self.assertEqual(rows[0]["time"], "2 h 5 min")
+        self.assertEqual(rows[1]["time"], "1 h 1 min")
+        self.assertEqual(call("summaryRows", [ent("x", 1, 5, 45)])[0]["time"], "45 min")
+
+    def test_only_visited_notes_name_places_nobody_else_visited(self):
+        other = {**RUN, "route": [0, 3, 1, 0], "schedule": [
+            {"id": 3, "arriveMinute": 1180, "startMinute": 1180, "leaveMinute": 1180},
+            {"id": 1, "arriveMinute": 1200, "startMinute": 1200, "leaveMinute": 1200}]}
+        es = [{"id": "a", "label": "A", "run": RUN}, {"id": "b", "label": "B", "run": other}]
+        self.assertEqual(call("differenceNotes", INST, es), ["Only A visited: P2", "Only B visited: P3"])
+        self.assertEqual(call("differenceNotes", INST, es[:1]), [])
+        same = [es[0], {"id": "c", "label": "C", "run": RUN}]
+        self.assertEqual(call("differenceNotes", INST, same), [])
+
+    def test_label_plan_keeps_visited_first_and_drops_overlaps(self):
+        pts = [{"id": 1, "name": "Alpha", "x": 50, "y": 50, "visited": False},
+               {"id": 2, "name": "Beta", "x": 52, "y": 52, "visited": True},
+               {"id": 3, "name": "Gamma", "x": 300, "y": 200, "visited": False}]
+        self.assertEqual(sorted(call("labelPlan", pts, 640, 480)), [2, 3])
+
+    def test_label_plan_keeps_labels_inside_the_box(self):
+        pts = [{"id": 1, "name": "Far east town", "x": 636, "y": 50, "visited": True}]
+        self.assertEqual(call("labelPlan", pts, 640, 480), [1])
+        self.assertEqual(call("labelSide", pts[0], 640), "left")
+        self.assertEqual(call("labelSide", {**pts[0], "x": 20}, 640), "right")
+
+
 if __name__ == "__main__":
     unittest.main()
