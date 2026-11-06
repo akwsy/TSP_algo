@@ -2,7 +2,7 @@
 // SVG drawing of the same scene, so the map never goes blank. Force the fallback with ?map=svg on the page URL.
 // The only text on the map is the destination names. Every route is a straight-line path with arrowheads and stop numbers.
 import { h } from "./dom.js";
-import { buildScene, chooseEngine, project, slotColors, laneOffsets, offsetSegment, summaryRows, differenceNotes, labelPlan, labelSide } from "./mapmodel.js";
+import { buildScene, chooseEngine, project, slotColors, laneOffsets, offsetSegment, summaryRows, differenceNotes, labelPlan, labelSide, TILE_LIMITS } from "./mapmodel.js";
 import { algorithmStyle } from "./algstyle.js";
 import { marker } from "./charts.js";
 
@@ -17,6 +17,8 @@ const SRI = {
 // Esri World Terrain Base: land relief, water and coastlines only, with no place names, shop icons or road names, and no API key.
 // (CARTO's label-free tiles now demand a key; Esri's grey canvas bakes region names into low zoom tiles. Dark mode darkens these tiles in CSS.)
 const TILES = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}";
+// 1x1 transparent GIF: a tile that fails to load shows the map background instead of the browser's broken-image grey.
+const BLANK_TILE = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 const ATTRIBUTION = "Tiles &copy; Esri, USGS, NOAA";
 let leafletPromise = null;
 
@@ -110,10 +112,22 @@ export function createRouteMap(instance, opts) {
   let entries = opts.entries;
   let engine = null; // { draw(scene), destroy() }
   const detail = h("div", { class: "map-detail", role: "status", "aria-live": "polite" }, "Hover or press a destination for details.");
-  const stage = h("div", { class: "map-stage", style: opts.height ? `height:${opts.height}px` : null });
+  const stage = h("div", { class: "map-stage", style: opts.height ? `min-height:${opts.height}px` : null });
+  const full = h("button", { type: "button", class: "map-full", "aria-pressed": "false", "aria-label": "Fullscreen map", title: "Fullscreen map (Esc to leave)" }, "Fullscreen");
   const note = h("p", { class: "meta map-note", hidden: true });
   const panel = h("div", { class: "map-summary" });
-  const el = h("figure", { class: "routemap" }, panel, stage, note, detail);
+  const el = h("figure", { class: "routemap" }, panel, h("div", { class: "map-frame" }, stage, full), note, detail);
+  const setFull = (on) => {
+    el.classList.toggle("is-full", on);
+    full.setAttribute("aria-pressed", String(on));
+    full.textContent = on ? "Exit fullscreen" : "Fullscreen";
+    full.setAttribute("aria-label", on ? "Exit fullscreen map" : "Fullscreen map");
+    document.documentElement.classList.toggle("map-locked", on);
+    engine?.invalidate?.();
+  };
+  full.addEventListener("click", () => setFull(!el.classList.contains("is-full")));
+  const onKey = (e) => { if (e.key === "Escape" && el.classList.contains("is-full")) { setFull(false); full.focus(); } };
+  document.addEventListener("keydown", onKey);
   let dead = false;
 
   function show(point) {
@@ -155,7 +169,7 @@ export function createRouteMap(instance, opts) {
     el,
     ready,
     setEntries(next) { entries = next; drawPanel(); if (engine) engine.draw(scene()); },
-    destroy() { dead = true; engine?.destroy(); },
+    destroy() { dead = true; document.removeEventListener("keydown", onKey); document.documentElement.classList.remove("map-locked"); engine?.destroy(); },
   };
 }
 
@@ -174,10 +188,8 @@ function badgeNode(x, y, text, color) {
 
 function svgEngine(stage, show, style) {
   const W = 640, H = 480;
-  const root = svg("svg", { viewBox: `0 0 ${W} ${H}`, class: "map-svg", role: "group", "aria-label": "Route map (plain drawing)" });
+  const root = svg("svg", { viewBox: `0 0 ${W} ${H}`, class: "map-svg", preserveAspectRatio: "xMidYMid meet", role: "group", "aria-label": "Route map (plain drawing)" });
   stage.replaceChildren(root);
-  stage.style.height = "auto";
-  stage.style.aspectRatio = `${W} / ${H}`;
   const colors = slotColors();
   return {
     draw(scene) {
@@ -185,6 +197,10 @@ function svgEngine(stage, show, style) {
       const pos = new Map(scene.points.map((p, i) => [p.id, xy[i]]));
       const g = routeDrawing(scene.lines, (id) => pos.get(id), style);
       root.replaceChildren();
+      for (const l of g.legs) {
+        root.append(svg("line", { class: "route-halo", stroke: "var(--surface)", "stroke-width": 7, "stroke-linecap": "round", opacity: 0.8,
+          x1: l.a.x.toFixed(1), y1: l.a.y.toFixed(1), x2: l.b.x.toFixed(1), y2: l.b.y.toFixed(1) }));
+      }
       for (const l of g.legs) {
         root.append(svg("line", { class: "route", stroke: l.color, "stroke-width": 3.5, "stroke-dasharray": l.dash || null,
           "stroke-linecap": "round", opacity: 0.92, x1: l.a.x.toFixed(1), y1: l.a.y.toFixed(1), x2: l.b.x.toFixed(1), y2: l.b.y.toFixed(1) }));
@@ -219,11 +235,14 @@ function svgEngine(stage, show, style) {
 
 function leafletEngine(stage, show, style) {
   const L = window.L;
-  const map = L.map(stage, { zoomControl: true, attributionControl: true, keyboard: true, scrollWheelZoom: false });
+  const map = L.map(stage, { zoomControl: true, attributionControl: true, keyboard: true, scrollWheelZoom: false,
+    minZoom: TILE_LIMITS.minZoom, maxZoom: TILE_LIMITS.maxZoom });
   // Wheel zoom only after a click, so scrolling the page past a map never zooms it by accident.
   map.on("click focus", () => map.scrollWheelZoom.enable());
   map.on("mouseout blur", () => map.scrollWheelZoom.disable());
-  L.tileLayer(TILES, { maxZoom: 13, maxNativeZoom: 13, attribution: ATTRIBUTION }).addTo(map);
+  // Real tiles end at maxNativeZoom; deeper zooms upscale them (soft but never blank). A missing tile shows the background.
+  L.tileLayer(TILES, { minZoom: TILE_LIMITS.minZoom, maxZoom: TILE_LIMITS.maxZoom, maxNativeZoom: TILE_LIMITS.maxNativeZoom,
+    errorTileUrl: BLANK_TILE, className: "base-tiles", attribution: ATTRIBUTION }).addTo(map);
   const layer = L.layerGroup().addTo(map);
   const colors = slotColors();
   let fitted = false, last = null;
@@ -234,7 +253,8 @@ function leafletEngine(stage, show, style) {
     const px = new Map([...ll].map(([id, v]) => [id, map.latLngToContainerPoint(v)]));
     const back = (p) => map.containerPointToLatLng([p.x, p.y]);
     const g = routeDrawing(scene.lines, (id) => px.get(id), style);
-    for (const l of g.legs) L.polyline([back(l.a), back(l.b)], { color: l.color, weight: 4, opacity: 0.92, dashArray: l.dash || null, interactive: false }).addTo(layer);
+    for (const l of g.legs) L.polyline([back(l.a), back(l.b)], { color: cssVar("--surface"), weight: 8, opacity: 0.8, lineCap: "round", lineJoin: "round", interactive: false }).addTo(layer);
+    for (const l of g.legs) L.polyline([back(l.a), back(l.b)], { color: l.color, weight: 4.5, opacity: 0.96, lineCap: "round", lineJoin: "round", dashArray: l.dash || null, interactive: false }).addTo(layer);
     const icon = (node, size, cls = "lf-icon") => L.divIcon({ html: node, className: cls, iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
     for (const s of g.shapes) {
       L.marker(back(s), { interactive: false, keyboard: false,
@@ -267,6 +287,7 @@ function leafletEngine(stage, show, style) {
       if (!fitted) { map.fitBounds(L.latLngBounds(scene.points.map((p) => [p.lat, p.lon])), { padding: [40, 40] }); fitted = true; }
       paint(scene);
     },
+    invalidate() { map.invalidateSize(); },
     destroy() { map.off(); map.remove(); },
   };
 }

@@ -190,9 +190,9 @@ export function labelPlan(points, w, h) {
 
 /**
  * Esri World Terrain Base: the service advertises levels 0-13, but from level 10 up it returns a grey "Map data not yet available"
- * placeholder (checked against the live service), so level 9 is the last real tile. Beyond it we let Leaflet upscale level 9 tiles.
+ * placeholder (checked against the live service), so level 9 is the last real tile. Beyond it Leaflet upscales level 9 tiles up to 4x (level 11); 16x (level 13) looked too pixelated.
  */
-export const TILE_LIMITS = Object.freeze({ minZoom: 1, maxNativeZoom: 9, maxZoom: 13 });
+export const TILE_LIMITS = Object.freeze({ minZoom: 1, maxNativeZoom: 9, maxZoom: 11 });
 
 /** Zoom level forced into [min, max]; anything that is not a number falls back to min. */
 export function clampZoom(z, min, max) {

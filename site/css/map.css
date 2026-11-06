@@ -1,7 +1,7 @@
 /* Map, instance explorer and route detail. Uses the site tokens from style.css. */
 .pad { padding: 14px; }
 .spaced { margin-top: 16px; }
-.grid { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); margin-top: 12px; }
+.grid { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(min(100%, 560px), 1fr)); margin-top: 12px; }
 .alg-card { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .alg-title { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 1.05rem; }
 .swatch { display: inline-block; width: 14px; height: 14px; border-radius: 4px; margin-right: 6px; vertical-align: -2px; border: 1px solid var(--surface); box-shadow: 0 0 0 1px var(--muted); }
@@ -23,40 +23,69 @@ label.check input { width: 18px; height: 18px; accent-color: var(--accent); marg
 .stats.inline { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 10px 0 14px; }
 .stats.inline dt, .stats.inline dd { text-align: left; }
 .stats.inline dt { grid-column: auto; }
-.routemap { margin: 0; display: grid; gap: 8px; }
-.map-stage { width: 100%; min-height: 240px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: var(--bg); position: relative; isolation: isolate; }
-.map-svg { display: block; width: 100%; height: 100%; }
-.map-svg .route { vector-effect: non-scaling-stroke; }
-.map-svg .pt-label { font: 600 11px var(--font); fill: var(--text); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
-.map-svg .pt.depot { fill: var(--text); stroke: var(--surface); stroke-width: 2; }
+
+/* Route map. The map is the star: wide page, tall stage, calm basemap, crisp routes and markers. */
+main:has(.routemap) { max-width: min(1640px, 100%); }
+.routemap { margin: 0; display: grid; gap: 10px; min-width: 0; }
+.map-frame { position: relative; isolation: isolate; z-index: 0; }
+.map-stage { width: 100%; height: clamp(460px, 74vh, 940px); border-radius: 12px; overflow: hidden; border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 88%, var(--line)); position: relative; isolation: isolate; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px -12px rgba(0,0,0,.18); }
+.alg-card .map-stage { height: clamp(420px, 62vh, 760px); }
+.map-full { position: absolute; top: 10px; left: 56px; z-index: 800; font: 600 .8rem var(--font); color: var(--text); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; min-height: 32px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.18); }
+.map-full:hover { border-color: var(--control); }
+.routemap.is-full { position: fixed; inset: 0; z-index: 2000; background: var(--bg); padding: 10px; grid-template-rows: auto 1fr auto auto; }
+.routemap.is-full .map-frame { min-height: 0; }
+.routemap.is-full .map-stage { height: 100%; border-radius: 10px; }
+.map-locked { overflow: hidden; }
+.map-svg { display: block; width: 100%; height: 100%; background: radial-gradient(ellipse at 50% 40%, var(--surface), var(--bg)); }
+.map-svg .route { vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.map-svg .route-halo { vector-effect: non-scaling-stroke; }
+.map-svg .pt-label { font: 600 12px var(--font); fill: var(--text); paint-order: stroke; stroke: var(--surface); stroke-width: 3.5px; stroke-linejoin: round; pointer-events: none; }
+.map-svg .pt { filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.35)); }
+.map-svg .pt.depot { fill: var(--text); stroke: var(--surface); stroke-width: 2.5; rx: 3; }
 .map-svg .pt-group { cursor: pointer; }
 .map-svg .pt-group:focus-visible { outline: none; }
 .map-svg .pt-group:focus-visible .pt { stroke: var(--focus); stroke-width: 4; }
 .badge-t { font: 700 10px var(--font); fill: #fff; paint-order: stroke; stroke: rgba(0,0,0,.45); stroke-width: 1.2px; }
-.map-detail { font-size: .88rem; min-height: 3.2em; padding: 8px 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; }
+.map-detail { font-size: .9rem; min-height: 3.4em; padding: 9px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 .map-detail strong { display: block; }
 .map-note { margin: 0; }
 .lf-icon { background: none; border: 0; }
-.lf-dot { display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--slot, #888); border: 2px solid #1b1f24; box-shadow: 0 0 0 1.5px #fff; }
-.lf-dot.hollow { background: #fff; border: 4px solid var(--slot, #888); box-shadow: 0 0 0 1.5px #fff, 0 0 0 3px #1b1f24; }
-.lf-dot.depot { border-radius: 3px; background: #1b1f24; border-color: #fff; }
-.lf-badge { display: block; width: 18px; height: 18px; border-radius: 50%; color: #fff; font: 700 11px/18px var(--font); text-align: center; text-shadow: 0 0 2px rgba(0,0,0,.7); border: 1.5px solid #fff; }
+.lf-dot { display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--slot, #888); border: 2.5px solid #fff;
+  box-shadow: 0 0 0 1px rgba(15,20,26,.75), 0 2px 5px rgba(0,0,0,.35); transition: transform .12s; }
+.lf-dot.hollow { background: #fff; border: 4px solid var(--slot, #888); box-shadow: 0 0 0 1px rgba(15,20,26,.55), 0 2px 5px rgba(0,0,0,.3); }
+.lf-dot.depot { width: 22px; height: 22px; border-radius: 5px; background: #1b1f24; border: 2.5px solid #fff; box-shadow: 0 0 0 1px rgba(15,20,26,.75), 0 2px 6px rgba(0,0,0,.4); position: relative; }
+.lf-dot.depot::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #fff; }
+.leaflet-marker-icon:hover .lf-dot { transform: scale(1.18); }
+.lf-badge { display: block; width: 18px; height: 18px; border-radius: 50%; color: #fff; font: 700 11px/15px var(--font); text-align: center; text-shadow: 0 0 2px rgba(0,0,0,.6); border: 1.5px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.35); }
 .leaflet-marker-icon:focus-visible .lf-dot { outline: 3px solid var(--focus); outline-offset: 3px; }
 .map-summary { display: grid; gap: 6px; }
 .map-summary[hidden] { display: none; }
 .sum-list, .sum-notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
-.sum-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
-.sum-list li.best { border-color: var(--ok); box-shadow: inset 4px 0 0 var(--ok); }
+.sum-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 6px; }
+.sum-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); font-size: .88rem; }
+.sum-list li.best { border-color: var(--ok); box-shadow: inset 3px 0 0 var(--ok); }
 .sum-nums { color: var(--muted); font-variant-numeric: tabular-nums; }
-.sum-notes { font-size: .88rem; color: var(--text); }
+.sum-notes { font-size: .84rem; color: var(--muted); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
 .sum-notes li::before { content: "\2260  "; color: var(--muted); }
 .arrow { pointer-events: none; }
-.leaflet-tooltip.lf-label { font: 600 11px var(--font); color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; box-shadow: none; opacity: .94; }
+.leaflet-tooltip.lf-label { font: 600 12px var(--font); color: var(--text); background: var(--surface); border: 0; border-radius: 999px; padding: 2px 9px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.28); opacity: .96; white-space: nowrap; }
 .leaflet-tooltip.lf-label::before { display: none; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.75) contrast(.9); } }
-:root[data-theme="dark"] .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.75) contrast(.9); }
-.leaflet-container { font-family: var(--font); background: var(--bg); }
+.leaflet-container { font-family: var(--font); background: color-mix(in srgb, var(--bg) 88%, var(--line)); }
+.leaflet-control-zoom { border: 0 !important; box-shadow: 0 1px 4px rgba(0,0,0,.3) !important; border-radius: 8px !important; overflow: hidden; }
+.leaflet-bar a, .leaflet-control-attribution { background-color: var(--surface) !important; color: var(--text) !important; }
+.leaflet-control-attribution { opacity: .85; font-size: 10px; }
+.leaflet-control-attribution a { color: var(--accent) !important; }
+.leaflet-tile { outline: 1px solid transparent; }
+/* Calm basemap: desaturate and lighten so routes and markers pop. Dark mode inverts it, then dims. */
+.leaflet-tile-pane { filter: saturate(.4) brightness(1.06) contrast(.88); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) saturate(.45) brightness(.72) contrast(.88); } }
+:root[data-theme="dark"] .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) saturate(.45) brightness(.72) contrast(.88); }
 @media (max-width: 640px) {
   .pad { padding: 10px; }
   .grid { grid-template-columns: 1fr; }
+  .map-stage, .alg-card .map-stage { height: clamp(420px, 68vh, 640px); border-radius: 10px; }
+  .map-full { left: 10px; top: 56px; }
 }
