@@ -181,5 +181,76 @@ class CompareModelTest(unittest.TestCase):
         self.assertEqual(call("clampZoom", None, 1, 13), 1)
 
 
+# Worked example from docs/ALGORITHM_SPEC.md section 8: route [0,1,3,2,0], departure 06:00 (360).
+SPEC_INST = {"departureMinute": 360, "deadlineMinute": 1440, "speedKmh": 40,
+             "locations": [dict(loc(0, 3, 101), name="Depot"), dict(loc(1, 3, 102, 0), name="Alpha"),
+                           dict(loc(2, 4, 101, 1), name="Beta", opensAt=1170, closesAt=1300),
+                           dict(loc(3, 2, 101, 3), name="Gamma", opensAt=630, closesAt=900)],
+             "distanceKm": [[0, 47.45, 30, 40], [47.45, 0, 20, 92.62], [30, 20, 0, 25], [40, 92.62, 25, 0]]}
+SPEC_RUN = {"valid": True, "route": [0, 1, 3, 2, 0], "returnMinute": 1264.73,
+            "schedule": [{"id": 1, "arriveMinute": 431.18, "startMinute": 431.18, "leaveMinute": 431.18},
+                         {"id": 3, "arriveMinute": 570.11, "startMinute": 630, "leaveMinute": 630},
+                         {"id": 2, "arriveMinute": 855.16, "startMinute": 1170, "leaveMinute": 1170}]}
+
+
+@unittest.skipUnless(shutil.which("node"), "node not installed")
+class HoverDetailsTest(unittest.TestCase):
+    def test_format_clock_and_duration(self):
+        self.assertEqual(call("formatClock", 431.18), "07:11")
+        self.assertEqual(call("formatClock", 5), "00:05")
+        self.assertEqual([call("formatDuration", v) for v in (0, 0.4, 45, 60, 72, 138.94, 315)],
+                         ["0 min", "0 min", "45 min", "1 h", "1 h 12 min", "2 h 19 min", "5 h 15 min"])
+
+    def test_stop_with_no_wait(self):
+        t = call("stopTimes", SPEC_RUN, SPEC_INST, 1)
+        self.assertEqual((t["visited"], t["arrive"], t["wait"], t["leave"]), (True, "07:11", "No wait", "07:11"))
+
+    def test_stop_with_wait_adds_up(self):
+        t = call("stopTimes", SPEC_RUN, SPEC_INST, 3)
+        self.assertEqual((t["arrive"], t["wait"], t["leave"]), ("09:30", "Waited 1 h", "10:30"))
+        t = call("stopTimes", SPEC_RUN, SPEC_INST, 2)
+        self.assertEqual((t["arrive"], t["wait"], t["leave"]), ("14:15", "Waited 5 h 15 min", "19:30"))
+
+    def test_wait_is_from_shown_times_so_it_always_adds_up(self):
+        run = {"valid": True, "route": [0, 1, 0], "returnMinute": 700,
+               "schedule": [{"id": 1, "arriveMinute": 570.4, "startMinute": 629.8, "leaveMinute": 629.8}]}
+        t = call("stopTimes", run, SPEC_INST, 1)
+        # 09:30 and 10:30 are shown, so the wait shown is exactly one hour (not 59 min)
+        self.assertEqual((t["arrive"], t["wait"], t["leave"]), ("09:30", "Waited 1 h", "10:30"))
+
+    def test_depot_and_skipped_stop(self):
+        d = call("stopTimes", SPEC_RUN, SPEC_INST, 0)
+        self.assertEqual((d["depot"], d["leave"], d["back"]), (True, "06:00", "21:05"))
+        run = dict(SPEC_RUN, route=[0, 1, 0], returnMinute=700)
+        self.assertFalse(call("stopTimes", run, SPEC_INST, 2)["visited"])
+        self.assertFalse(call("stopTimes", None, SPEC_INST, 2)["visited"])
+
+    def test_leg_between_stops(self):
+        g = call("legDetails", SPEC_RUN, SPEC_INST, 1, 3)
+        self.assertEqual((g["from"], g["to"]), ("Alpha", "Gamma"))
+        self.assertEqual((g["depart"], g["arrive"], g["travel"], g["distance"]), ("07:11", "09:30", "2 h 19 min", "92.6 km"))
+        self.assertEqual(g["opens"], "10:30-15:00")
+        self.assertEqual(g["then"], "then waits 1 h")
+
+    def test_first_leg_leaves_at_departure_and_last_returns_to_depot(self):
+        g = call("legDetails", SPEC_RUN, SPEC_INST, 0, 1)
+        self.assertEqual((g["depart"], g["arrive"], g["travel"], g["then"]), ("06:00", "07:11", "1 h 11 min", None))
+        g = call("legDetails", SPEC_RUN, SPEC_INST, 2, 0)
+        self.assertEqual((g["depart"], g["arrive"], g["travel"], g["opens"], g["to"]), ("19:30", "21:05", "1 h 35 min", "open all day", "Depot"))
+
+    def test_stop_line_wording(self):
+        self.assertEqual(call("stopLine", call("stopTimes", SPEC_RUN, SPEC_INST, 3)), "Arrive 09:30 · Waited 1 h · Leave 10:30")
+        self.assertEqual(call("stopLine", call("stopTimes", SPEC_RUN, SPEC_INST, 0)), "Leave 06:00 · Back 21:05")
+        self.assertEqual(call("stopLine", call("stopTimes", None, SPEC_INST, 3)), "not visited")
+
+    def test_leg_rows_wording(self):
+        rows = call("legRows", call("legDetails", SPEC_RUN, SPEC_INST, 1, 3))
+        self.assertEqual(rows, [["Travel time", "2 h 19 min"], ["Departure", "07:11"], ["Arrival", "09:30 (then waits 1 h)"],
+                                ["Opening hours", "10:30-15:00"], ["Distance", "92.6 km"]])
+
+    def test_unknown_leg_is_null(self):
+        self.assertIsNone(call("legDetails", SPEC_RUN, SPEC_INST, 1, 2))
+
+
 if __name__ == "__main__":
     unittest.main()
