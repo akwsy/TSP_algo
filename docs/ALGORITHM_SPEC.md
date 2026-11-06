@@ -97,10 +97,10 @@ For each instance, the harness:
 Rules:
 
 - **stdout** must contain exactly one JSON object and nothing else. No progress messages, no banners.
-- **stderr** is for your diagnostics (debug prints, progress). It never affects your result.
+- **stderr** is for your diagnostics (debug prints, progress). It never affects your score; the harness saves it in the run's result file so you can read it when debugging.
 - **Exit code 0** means "here is my answer". Any **nonzero** exit code means "I crashed"; the run is recorded as a failure (`exited with code N`) even if you printed something.
-- If stdout is not a JSON object, the run is a failure (`output is not a JSON object`).
-- **Time limit:** the limit is wall-clock time for the whole process, including start-up (for example, starting the Python interpreter). If your program is still running at the limit, the harness kills it and records the run as timed out with no route (`timed out after N s`). Anything printed before being killed is discarded, so **print your best answer and exit before the limit** (with `status` `TIME_LIMIT` if you stopped early; see section 6).
+- If stdout is not valid JSON, is not a JSON object, has a `status` that is not one of the three values in section 6, or has a `stats` that is not an object, the run is a failure with that reason (for example `output is not valid JSON` or `unknown status 'DONE'`).
+- **Time limit:** the limit is wall-clock time for the whole process, including start-up (for example, starting the Python interpreter). If your program is still running at the limit, the harness kills it, records the status as `TIME_LIMIT` whatever you claimed, and notes `exceeded the time limit of N s and was killed`. If you had already printed a complete result object, that route is still replayed and scored; otherwise the run is a failure with no route. Do not rely on this: **print your best answer and exit before the limit** (with `status` `TIME_LIMIT` if you stopped early; see section 6).
 - **No network access** and **no reading files** other than stdin. Everything you need is in the input.
 - **Deterministic:** the same input must always give the same output. If you use randomness, seed your random generator from the `seed` field of the input. Do not seed from the clock.
 
