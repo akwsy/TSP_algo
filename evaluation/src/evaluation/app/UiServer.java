@@ -83,15 +83,20 @@ public final class UiServer {
             if (bytes.length > MAX_BODY) { json(request, 413, Map.of("error", "Input form is too large")); return; }
             Map<String, String> values = form(new String(bytes, StandardCharsets.UTF_8));
             if (path.equals("/api/generate")) {
-                int count = integer(values, "count", 10);
+                var defaults = GenerationOptions.defaults();
+                var base = defaults.selection();
+                int count = integer(values, "count", base.count());
                 if (count < 1 || count > MAX_UI_DESTINATIONS)
                     throw new IllegalArgumentException("The UI supports 1–200 destinations including depot; use the CLI for larger selections");
-                var selection = new GeoNamesLoader.Selection(count, values.getOrDefault("featureClass", "P"),
-                        values.getOrDefault("admin1", "14"), Long.parseLong(values.getOrDefault("depot", "1735161")),
-                        values.getOrDefault("selection", "population"), Long.parseLong(values.getOrDefault("seed", "42")));
-                var options = new GenerationOptions(selection, number(values, "speedKmh", 40),
-                        values.getOrDefault("startClock", "08:00"), number(values, "durationMinutes", 120),
-                        number(values, "windowSlackMinutes", 30));
+                var selection = new GeoNamesLoader.Selection(count, values.getOrDefault("featureClass", base.featureClass()),
+                        values.getOrDefault("admin1", base.admin1()),
+                        values.containsKey("depot") ? Long.parseLong(values.get("depot")) : base.depotId(),
+                        values.getOrDefault("selection", base.method()),
+                        values.containsKey("seed") ? Long.parseLong(values.get("seed")) : base.seed());
+                var options = new GenerationOptions(selection, number(values, "speedKmh", defaults.speedKmh()),
+                        values.getOrDefault("startClock", defaults.startClock()),
+                        number(values, "durationMinutes", defaults.durationMinutes()),
+                        number(values, "windowSlackMinutes", defaults.windowSlackMinutes()));
                 ScenarioFiles.generate(source, data, options);
                 json(request, 200, ComparisonService.scenario(loadScenario(data, null))); return;
             }
@@ -164,10 +169,14 @@ public final class UiServer {
             case "/app.js" -> "app.js";
             case "/inspection.js" -> "inspection.js";
             case "/styles.css" -> "styles.css";
+            case "/evaluation", "/evaluation.html" -> "evaluation.html";
+            case "/evaluation.js" -> "evaluation.js";
+            case "/evaluation-data.json" -> "evaluation-data.json";
             default -> null;
         };
         if (file == null) { json(request, 404, Map.of("error", "Not found")); return; }
-        String type = file.endsWith(".js") ? "text/javascript" : file.endsWith(".css") ? "text/css" : "text/html";
+        String type = file.endsWith(".js") ? "text/javascript" : file.endsWith(".css") ? "text/css"
+                : file.endsWith(".json") ? "application/json" : "text/html";
         send(request, 200, type + "; charset=utf-8", Files.readAllBytes(web.resolve(file)));
     }
     private static void json(HttpExchange request, int status, Object value) throws IOException {

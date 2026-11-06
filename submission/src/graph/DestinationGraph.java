@@ -32,6 +32,8 @@ public final class DestinationGraph {
 
     public int size() { return destinations.size(); }
     public Destination destination(int index) { return destinations.get(index); }
+    public double opensAt(int index) { return destinations.get(index).opensAt(); }
+    public double closesAt(int index) { return destinations.get(index).closesAt(); }
     public List<Destination> destinations() { return destinations; }
     public int indexOf(long id) {
         Integer index = indices.get(id);

@@ -118,7 +118,11 @@ public final class TestSuite {
             check(zero.visitedCount() == 0, "Zero-period noncoincident customers");
         }
         var cap = exact.solve(g, 0, 10, new SolverOptions(1, 10000));
-        check(cap.status() == SEARCH_LIMIT_REACHED && cap.visitedCount() == 0 && cap.hasRoute(), "Cap gives no optimality proof");
+        var greedyRoute = new GreedyInsertionSolver().solve(g, 0, 10, OPTIONS);
+        check(greedyRoute.visitedCount() > 0, "Cap fixture needs a reachable customer");
+        check(cap.status() == SEARCH_LIMIT_REACHED && cap.hasRoute(), "Cap gives no optimality proof");
+        check(cap.visitedCount() == greedyRoute.visitedCount(), "Cap falls back to the greedy route, not depot-only");
+        validate(g, cap, 0, 10);
         var alone = new DestinationGraph(List.of(depot()), 40);
         validate(alone, exact.solve(alone, 0, 0, OPTIONS), 0, 0);
         var coincident = new DestinationGraph(List.of(depot(), d(2, 0, 0, 0, 0)), 40);

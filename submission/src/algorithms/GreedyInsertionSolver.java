@@ -15,7 +15,7 @@ public final class GreedyInsertionSolver implements RouteSolver {
             Candidate best = null;
             for (int v = 1; v < graph.size(); v++) if (!used[v]) {
                 for (int pos = 1; pos < route.size(); pos++) {
-                    if (options.expired(started)) return result(SEARCH_LIMIT_REACHED,
+                    if (options.expired(started)) return RouteResult.of(SEARCH_LIMIT_REACHED,
                             ScheduleEvaluator.evaluate(graph, route, startTime, timePeriod).schedule(), started, evaluated,
                             "Computation limit reached; returning the current feasible subset");
                     List<Integer> candidate = new ArrayList<>(route); candidate.add(pos, v);
@@ -23,7 +23,7 @@ public final class GreedyInsertionSolver implements RouteSolver {
                     if (!ScheduleEvaluator.evaluate(graph, candidate, startTime, timePeriod).feasible()) continue;
                     int before = route.get(pos - 1), after = route.get(pos);
                     double delta = graph.distance(before, v) + graph.distance(v, after) - graph.distance(before, after);
-                    Candidate c = new Candidate(v, pos, delta, graph.destination(v).closesAt(),
+                    Candidate c = new Candidate(v, pos, delta, graph.closesAt(v),
                             graph.destination(v).geoNameId(), candidate);
                     if (best == null || ORDER.compare(c, best) < 0) best = c;
                 }
@@ -31,7 +31,7 @@ public final class GreedyInsertionSolver implements RouteSolver {
             if (best == null) break;
             route = best.route(); used[best.vertex()] = true;
         }
-        return result(FEASIBLE_HEURISTIC,
+        return RouteResult.of(FEASIBLE_HEURISTIC,
                 ScheduleEvaluator.evaluate(graph, route, startTime, timePeriod).schedule(), started, evaluated,
                 "Feasible subset; maximum visit count is not proved");
     }
@@ -39,8 +39,4 @@ public final class GreedyInsertionSolver implements RouteSolver {
     private static final Comparator<Candidate> ORDER = Comparator.comparingDouble(Candidate::delta)
             .thenComparingDouble(Candidate::close).thenComparingLong(Candidate::id)
             .thenComparingInt(Candidate::position);
-    static RouteResult result(RouteResult.Status status, ScheduleEvaluator.Schedule schedule,
-                              long started, long states, String message) {
-        return new RouteResult(status, schedule, (System.nanoTime() - started) / 1_000_000.0, states, message);
-    }
 }

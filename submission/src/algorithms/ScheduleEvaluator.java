@@ -29,12 +29,23 @@ public final class ScheduleEvaluator {
         return startTime + timePeriod;
     }
 
+    /** Time a visit to {@code to} starts when leaving {@code from} at {@code time}; waits for opening. */
+    public static double visitTime(DestinationGraph graph, int from, int to, double time) {
+        return Math.max(time + graph.travelMinutes(from, to), graph.opensAt(to));
+    }
+
+    /** True if a visit starting at {@code visitTime} meets the window and still allows returning by the deadline. */
+    public static boolean canVisit(DestinationGraph graph, int vertex, double visitTime, double deadline) {
+        return visitTime <= graph.closesAt(vertex) + EPS
+                && visitTime + graph.travelMinutes(vertex, 0) <= deadline + EPS;
+    }
+
     /** A subset of customers is allowed, but the route must return within the period. */
     public static Evaluation evaluate(DestinationGraph graph, List<Integer> route,
                                       double startTime, double timePeriod) {
         double deadline = deadline(graph, startTime, timePeriod);
         if (route == null || route.size() < 2 || route.get(0) != 0 || route.get(route.size() - 1) != 0)
-            return bad("Route must start and finish at the depot");
+            return infeasible("Route must start and finish at the depot");
         boolean[] seen = new boolean[graph.size()]; seen[0] = true;
         List<Visit> visits = new ArrayList<>();
         visits.add(new Visit(0, startTime, startTime, 0));
@@ -42,22 +53,22 @@ public final class ScheduleEvaluator {
         int previous = 0;
         for (int pos = 1; pos < route.size(); pos++) {
             int v = route.get(pos);
-            if (v < 0 || v >= graph.size()) return bad("Invalid vertex");
+            if (v < 0 || v >= graph.size()) return infeasible("Invalid vertex");
             boolean returnLeg = pos == route.size() - 1;
-            if (!returnLeg && seen[v]) return bad("Repeated destination or intermediate depot");
+            if (!returnLeg && seen[v]) return infeasible("Repeated destination or intermediate depot");
             seen[v] = true;
             double leg = graph.travelMinutes(previous, v);
             double arrival = time + leg;
             Destination d = graph.destination(v);
             double visitTime = returnLeg ? arrival : Math.max(arrival, d.opensAt());
-            if (!returnLeg && visitTime > d.closesAt() + EPS) return bad("Late at " + d.geoNameId());
+            if (!returnLeg && visitTime > d.closesAt() + EPS) return infeasible("Late at " + d.geoNameId());
             double wait = visitTime - arrival;
             distance += graph.distance(previous, v); travel += leg; waiting += wait;
             visits.add(new Visit(v, arrival, visitTime, wait));
             time = visitTime; previous = v;
         }
-        if (!Double.isFinite(time) || time > deadline + EPS) return bad("Return exceeds the time period");
+        if (!Double.isFinite(time) || time > deadline + EPS) return infeasible("Return exceeds the time period");
         return new Evaluation(true, new Schedule(route, visits, distance, travel, waiting, time), "Feasible");
     }
-    private static Evaluation bad(String reason) { return new Evaluation(false, null, reason); }
+    private static Evaluation infeasible(String reason) { return new Evaluation(false, null, reason); }
 }

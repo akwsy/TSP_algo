@@ -53,6 +53,9 @@ public final class UiServerTest {
             check(get(client, base + "/styles.css").statusCode() == 200, "CSS served");
             check(get(client, base + "/inspection.js").statusCode() == 200, "Inspection time/window helpers served");
             check(get(client, base + "/app.js").body().contains("renderResults"), "JS served");
+            check(get(client, base + "/evaluation").body().contains("Algorithm evaluation"), "Evaluation page served");
+            check(get(client, base + "/evaluation.js").statusCode() == 200, "Evaluation script served");
+            check(get(client, base + "/evaluation-data.json").body().contains("\"summary\""), "Evaluation data served");
             check(get(client, base + "/inputs/MY.txt").statusCode() == 404, "Source files are not exposed as static assets");
             check(get(client, base + "/api/scenario").body().contains("\"customerCount\":2"), "Current input scenario");
             check(get(client, base + "/api/scenario").body().contains("\"distanceKm\":[["), "Hover distances are exposed in scenario JSON");

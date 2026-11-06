@@ -17,13 +17,12 @@ public final class NearestNeighbourSolver implements RouteSolver {
         while (route.size() < graph.size() + 1) {
             int best = -1; double bestVisit = 0;
             for (int v = 1; v < graph.size(); v++) if (!used[v]) {
-                if (System.nanoTime() - started >= java.util.concurrent.TimeUnit.MILLISECONDS.toNanos(options.timeLimitMillis())) return result(SEARCH_LIMIT_REACHED,
+                if (options.expired(started)) return RouteResult.of(SEARCH_LIMIT_REACHED,
                         ScheduleEvaluator.evaluate(graph, route, startTime, timePeriod).schedule(), started, evaluated,
                         "Computation limit reached; returning the current feasible baseline route");
                 evaluated++;
-                double visit = Math.max(time + graph.travelMinutes(current, v), graph.destination(v).opensAt());
-                if (visit > graph.destination(v).closesAt() + ScheduleEvaluator.EPS
-                        || visit + graph.travelMinutes(v, 0) > deadline + ScheduleEvaluator.EPS) continue;
+                double visit = ScheduleEvaluator.visitTime(graph, current, v, time);
+                if (!ScheduleEvaluator.canVisit(graph, v, visit, deadline)) continue;
                 if (best < 0 || graph.distance(current, v) < graph.distance(current, best)
                         || (Double.compare(graph.distance(current, v), graph.distance(current, best)) == 0
                             && graph.destination(v).geoNameId() < graph.destination(best).geoNameId())) {
@@ -34,12 +33,8 @@ public final class NearestNeighbourSolver implements RouteSolver {
             route.add(route.size() - 1, best); used[best] = true;
             current = best; time = bestVisit;
         }
-        return result(FEASIBLE_HEURISTIC,
+        return RouteResult.of(FEASIBLE_HEURISTIC,
                 ScheduleEvaluator.evaluate(graph, route, startTime, timePeriod).schedule(), started, evaluated,
                 "Nearest feasible neighbour baseline; maximum visit count is not proved");
-    }
-    private static RouteResult result(RouteResult.Status status, ScheduleEvaluator.Schedule schedule,
-                                      long started, long states, String message) {
-        return new RouteResult(status, schedule, (System.nanoTime() - started) / 1_000_000.0, states, message);
     }
 }
