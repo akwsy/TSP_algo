@@ -1,6 +1,38 @@
 # Algorithm Specification
 
-This document tells you, an algorithm author, everything you need to write an algorithm that this project can run, check and compare. You do not need to read any other file in the repository. If something here disagrees with `PROJECT_BRIEF.md`, the brief wins; please report the difference.
+This document tells you, an algorithm author, everything you need to write an algorithm that this project can run, check and compare. You do not need to read the harness or website code to write one, but you do need a checkout of this repository to run and check your algorithm (section 9). If something here disagrees with `PROJECT_BRIEF.md`, the brief wins; please report the difference.
+
+## Start here: instructions for AI coding agents (and developers using them)
+
+If you are an AI coding agent and a developer has asked you to implement an algorithm "per this specification", this section is your task description. Follow it exactly.
+
+**What to deliver.** One new folder, `algorithms/<algorithm-id>/`, containing only:
+
+- `algorithm.json`, filled in completely (section 3), with honest `complexity` and `exact` values;
+- your program (for example `solve.py`), written to the rules in sections 4 to 7.
+
+**What not to touch.** Do not edit anything outside your own folder: not `harness/`, `site/`, `docs/`, `tests/`, `README.md`, and not another algorithm's folder. If you think the harness or this document is wrong, say so in your final report instead of changing it.
+
+**Language and dependencies.** Use the language the developer asks for. If they do not say, use Python 3 with the standard library only, so the program runs anywhere the harness runs. If you must use a third-party package or a compiled program, say so plainly in `algorithm.json`'s `description` and in your report, because the harness does not install anything.
+
+**Rules that are easy to get wrong** (each is explained below; the harness checks them):
+
+1. Read only stdin, print exactly one JSON object to stdout, send everything else to stderr, and exit with code 0.
+2. Use the given `distanceKm` matrix and read departure, deadline and speed from the input. Never hard-code them.
+3. Same input must give byte-identical output. Seed any randomness from the input's `seed`. **Do not stop your search by the clock if you want identical output**: stop after a fixed amount of work (a fixed number of restarts or iterations). If you do cap by the clock as a safety net, set `status` to `TIME_LIMIT` when the cap is what stopped you, and know that results can then differ between runs.
+4. Report `OPTIMAL` only if you completed an exhaustive search that proves it. Otherwise `HEURISTIC`, or `TIME_LIMIT` if you stopped early.
+5. Put your main "amount of work" counter in `stats` under the name `iterations` or `nodesExpanded`. Other names are stored but only these two feed the website's work chart. Do not put times or other values that change between runs into `stats` or `notes`.
+6. Return `[0, 0]` when nothing can be served. Never output an invalid route; if in doubt, drop the last stop.
+7. Your program must handle 5 to 100 customers and finish well inside `timeLimitSeconds` (keep it at the default 10 unless the developer says otherwise).
+
+**How to check your work before reporting done** (commands are in section 9; do all of them):
+
+1. Run your program by hand on a 5-customer and a 100-customer instance and validate the routes with the validator command.
+2. Run it twice on the same instance and confirm the two outputs are identical.
+3. Run `python3 -m harness.experiment scaling --sizes 5 20 100 --instances 5` and confirm that **every one of your runs is valid** (no `FAILED` lines) and none is slower than a few seconds.
+4. Compare your visit counts with the baseline `nearest-neighbour` in the same output. You do not have to beat it, but if you are far worse, look for a bug.
+
+**What to put in your final report.** The folder you created; how the algorithm works in two or three sentences; the declared complexity and why; what you ran and the real results (validity, determinism, runtimes, visits next to the baseline); anything you were unsure about or that this document did not cover. Do not claim a check you did not run.
 
 ## 1. The problem
 
@@ -102,7 +134,9 @@ Rules:
 - If stdout is not valid JSON, is not a JSON object, has a `status` that is not one of the three values in section 6, or has a `stats` that is not an object, the run is a failure with that reason (for example `output is not valid JSON` or `unknown status 'DONE'`).
 - **Time limit:** the limit is wall-clock time for the whole process, including start-up (for example, starting the Python interpreter). If your program is still running at the limit, the harness kills it, records the status as `TIME_LIMIT` whatever you claimed, and notes `exceeded the time limit of N s and was killed`. If you had already printed a complete result object, that route is still replayed and scored; otherwise the run is a failure with no route. Only runs the harness killed count as timeouts. A valid route you print yourself with `status` `TIME_LIMIT` is an ordinary result and is not listed as a failure. Do not rely on being killed: **print your best answer and exit before the limit** (with `status` `TIME_LIMIT` if you stopped early; see section 6).
 - **No network access** and **no reading files** other than stdin. Everything you need is in the input.
-- **Deterministic:** the same input must always give the same output. If you use randomness, seed your random generator from the `seed` field of the input. Do not seed from the clock.
+- **Deterministic:** the same input must always give the same output. If you use randomness, seed your random generator from the `seed` field of the input. Do not seed from the clock. Also do not let the clock decide how much work you do: "search for 2 seconds" gives different answers on a faster or slower machine. Stop after a fixed number of iterations or restarts instead. If you add a clock-based cap only as a safety net, report `TIME_LIMIT` when it is what stopped you.
+- **Dependencies:** the harness only runs your `command`; it does not install anything. Prefer the language's standard library. Anything else must be stated in your `description`.
+- **Commit your folder** before you run the official experiment. The harness records the git commit of your folder with every result; uncommitted changes are marked `+dirty` and shown as a separate version on the website's history page.
 
 ## 5. Input
 
@@ -148,7 +182,7 @@ Print one JSON object:
 | `route` | Required. The location ids in visiting order, **starting and ending with 0**. Each customer appears at most once and the depot appears only at the two ends. Visiting nobody is `[0, 0]`. Use plain integers (`3`, not `3.0` or `"3"`). |
 | `status` | Required. One of `OPTIMAL`, `HEURISTIC`, `TIME_LIMIT` (below). |
 | `notes` | Optional free text for humans. |
-| `stats` | Optional object of numbers describing how much work you did (nodes expanded, iterations, and so on). Used for the "work done" charts. Pick names that make sense for your method. |
+| `stats` | Optional object of numbers describing how much work you did. The "work done" charts use `nodesExpanded` if you report it, otherwise `iterations`; put your main work counter under one of those two names. Any other numbers you add (for example `restarts`) are stored with the run but are not charted. Do not put anything in `stats` that changes between runs of the same input, such as seconds. |
 
 **Do not report times, distances or visit counts.** The harness computes all of them from your route, so they cannot be misreported. Extra fields such as `"distanceKm"` are ignored.
 
@@ -299,7 +333,23 @@ python3 -c "import json; from harness.validator import validate_route; inst = js
 
 If `valid` is `false`, `failureReason` says why (for example `arrived late at location 4: ...`).
 
-**Run every algorithm**, yours included, on the same instances (one per seed):
+**Check a large instance and determinism.** Make a 100-customer instance, run your program twice on it, and confirm the two outputs are identical and appear quickly:
+
+```
+python3 -m harness.generate_instance --seed 7 --customers 100 --out instances/n100-seed7.json
+cd algorithms/<your-algorithm-id>
+python3 solve.py < ../../instances/n100-seed7.json > /tmp/out-a.json
+python3 solve.py < ../../instances/n100-seed7.json > /tmp/out-b.json
+diff /tmp/out-a.json /tmp/out-b.json && echo identical
+```
+
+**Run the real comparison.** This runs every algorithm, yours included, on the same sets of 5, 20 and 100 customers and prints one line per run. Every line for your algorithm should say `valid`:
+
+```
+python3 -m harness.experiment scaling --sizes 5 20 100 --instances 5
+```
+
+**Run every algorithm** on specific instances (one per seed) without the experiment:
 
 ```
 python3 -m harness.run --seeds 1 2 3 --customers 10
@@ -319,4 +369,9 @@ This writes the instances to `instances/`, one result file per (algorithm, insta
 - [ ] `status` is `OPTIMAL` only with proof, `TIME_LIMIT` if you stopped early, otherwise `HEURISTIC`.
 - [ ] Same input gives the same output; any randomness is seeded from `seed`.
 - [ ] Prints its answer and exits with code 0 before `timeLimitSeconds`.
-- [ ] Checked on a few instances with the validator command in section 9.
+- [ ] Stops after a fixed amount of work, not by the clock (or reports `TIME_LIMIT` if a clock cap stopped it).
+- [ ] Main work counter is in `stats` as `iterations` or `nodesExpanded`; no run-to-run varying values in `stats` or `notes`.
+- [ ] Nothing outside `algorithms/<id>/` was changed.
+- [ ] Checked on a few instances with the validator command in section 9, including a 100-customer instance run twice with identical output.
+- [ ] `python3 -m harness.experiment scaling --sizes 5 20 100 --instances 5` shows only valid runs for your algorithm.
+- [ ] Folder committed to git.

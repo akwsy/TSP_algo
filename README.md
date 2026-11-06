@@ -19,6 +19,16 @@ Several people each write a routing algorithm. This repo provides the specificat
 
 Harness: Python 3 (standard library only). Website: plain HTML/JS.
 
+## One command: run everything and open the website
+
+```
+python3 start.py                                  # run all algorithms, then open http://127.0.0.1:8000/
+python3 start.py --sizes 5 10 --instances 3       # a quick small run first
+python3 start.py --skip-run                       # just open the site on existing results
+```
+
+`--port` and `--no-browser` are also available. Press Ctrl+C to stop the website. The separate commands are below.
+
 ## Run the experiment
 
 ```
