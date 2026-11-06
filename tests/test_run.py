@@ -118,6 +118,25 @@ class RunTest(CliCase):
         self.assertGreater(rec["stats"]["iterations"], 0)
 
 
+PEEK = ('import json,sys\njson.load(sys.stdin)\n'
+        'try:\n n=len(json.load(open(sys.argv[1]))["runs"])\nexcept OSError:\n n=-1\n'
+        'print(json.dumps({"route":[0,0],"status":"HEURISTIC","stats":{"iterations":n}}))\n')
+
+
+class IndexDuringBatchTest(CliCase):
+    def test_index_is_up_to_date_after_every_run_and_leaves_no_temp_files(self):
+        folder = self.algs / "peek"
+        folder.mkdir()
+        (folder / "solve.py").write_text(PEEK)
+        (folder / "algorithm.json").write_text(json.dumps({
+            "id": "peek", "command": ["python3", "solve.py", str(self.tmp / "results" / "index.json")]}))
+        self.run_cli("--seeds", "1", "2")
+        # bad-route (alphabetically first) already wrote 2 runs; each peek run sees all earlier ones.
+        seen = [self.record(self.entry("peek", s))["stats"]["iterations"] for s in (1, 2)]
+        self.assertEqual(seen, [2, 3])
+        self.assertEqual(sorted(p.name for p in (self.tmp / "results").glob("*.tmp")), [])
+
+
 class CommitTest(CliCase):
     def setUp(self):
         super().setUp()

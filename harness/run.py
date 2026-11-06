@@ -6,6 +6,7 @@ results/index.json.
 """
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -148,6 +149,13 @@ def make_record(meta, instance, run_id):
     return record
 
 
+def write_index(path, index):
+    """Write the index atomically (temp file in the same folder, then rename)."""
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
+    os.replace(tmp, path)
+
+
 def run_batch(algorithms, instances, instances_dir, results_dir, extra=None):
     """Run every algorithm on every instance; write instances, one result file per run and
     results/index.json. `extra` (e.g. {"experiment": "scaling"}) is added to each record and
@@ -177,10 +185,11 @@ def run_batch(algorithms, instances, instances_dir, results_dir, extra=None):
                 "valid": record["valid"], "visited": record["visited"],
                 "distanceKm": record["distanceKm"], "runtimeMs": record["runtimeMs"],
                 "failureReason": record["failureReason"], **(extra or {})})
+            write_index(index_path, index)  # after every run, so an interrupted batch stays consistent
             print(f"{record['algorithmId']} on {record['instanceId']}: "
                   f"{'valid, visited ' + str(record['visited']) if record['valid'] else 'FAILED: ' + str(record['failureReason'])}",
                   flush=True)
-    index_path.write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
+    write_index(index_path, index)
     return records
 
 
