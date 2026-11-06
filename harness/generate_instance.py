@@ -4,7 +4,8 @@ import json
 import sys
 from pathlib import Path
 
-from .config import ConfigError, InstanceConfig
+from .config import (ConfigError, DEFAULT_DEPARTURE, DEFAULT_PERIOD, DEFAULT_SPEED,
+                     InstanceConfig)
 from .dataset import DatasetError, load_places
 from .instance import build_instance
 
@@ -16,9 +17,9 @@ def main(argv=None):
                                  description="Generate a seeded problem instance file.")
     ap.add_argument("--seed", type=int, help="required; drives selection and slot assignment")
     ap.add_argument("--customers", type=int, default=10)
-    ap.add_argument("--departure", type=int, default=360, help="departure minute since midnight")
-    ap.add_argument("--period", type=int, default=480, help="period in minutes")
-    ap.add_argument("--speed", type=float, default=40.0, help="km/h")
+    ap.add_argument("--departure", type=int, default=DEFAULT_DEPARTURE, help="departure minute since midnight")
+    ap.add_argument("--period", type=int, default=DEFAULT_PERIOD, help="period in minutes")
+    ap.add_argument("--speed", type=float, default=DEFAULT_SPEED, help="km/h")
     ap.add_argument("--dataset", default=str(DEFAULT_DATASET))
     ap.add_argument("--out", help="output file (default instances/<instanceId>.json)")
     args = ap.parse_args(argv)

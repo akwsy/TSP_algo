@@ -82,6 +82,12 @@ class RunTest(CliCase):
             self.assertIn(key, rec)
         self.assertGreater(rec["runtimeMs"], 0)
 
+    def test_default_instance_runs_from_06_00_until_midnight(self):
+        self.run_cli("--seeds", "1")
+        inst = json.loads((self.tmp / "instances" / "n2-seed1.json").read_text())
+        self.assertEqual((inst["departureMinute"], inst["periodMinutes"], inst["deadlineMinute"]),
+                         (360, 1080, 1440))
+
     def test_algorithm_receives_its_configured_time_limit(self):
         write_algorithm(self.algs, "echo-limit", ECHO_LIMIT)
         meta = self.algs / "echo-limit" / "algorithm.json"
