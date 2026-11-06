@@ -110,7 +110,7 @@ The input is one JSON object:
 
 | Field | Meaning |
 |---|---|
-| `instanceId` | Name of this instance, for example `"n4-seed5"` (4 customers, seed 5). |
+| `instanceId` | Name of this instance, for example `"n4-seed5"` (4 customers, seed 5). When departure, period or speed differ from the defaults (360, 480, 40) they are appended, for example `"n4-seed5-dep420-per300-spd50"`. |
 | `seed` | The seed the instance was generated from. Use it to seed any randomness you need. |
 | `departureMinute` | When you leave the depot. |
 | `periodMinutes` | How long you have. |
