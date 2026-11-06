@@ -1,12 +1,12 @@
-/* Charts and run history. Series colours: Okabe-Ito picks, each re-chosen for the dark surface. Identity is never colour alone
+/* Charts and run history. Series colours: validated with the dataviz validate_palette.js (blue, orange, teal, amber, pink, violet; no grey) per theme. Identity is never colour alone
    (markers, dashes, legend, tooltip names). */
 :root {
-  --s1: #0072b2; --s2: #d55e00; --s3: #009e73; --s4: #cc79a7; --s5: #b07d00; --s6: #5d6670;
+  --s1: #2a78d6; --s2: #e0602a; --s3: #0c9684; --s4: #b88200; --s5: #d9588c; --s6: #6250d6;
   --up: var(--ok); --down: var(--bad);
 }
-:root[data-theme="dark"] { --s1: #56b4e9; --s2: #ff8a3d; --s3: #2fd0a0; --s4: #e59bc4; --s5: #f0c040; --s6: #aab3bd; }
+:root[data-theme="dark"] { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9; }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --s1: #56b4e9; --s2: #ff8a3d; --s3: #2fd0a0; --s4: #e59bc4; --s5: #f0c040; --s6: #aab3bd; }
+  :root:not([data-theme="light"]) { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9; }
 }
 .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: var(--gap); }
 .chart { margin: 0; padding: 14px 14px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); min-width: 0; }

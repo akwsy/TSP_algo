@@ -14,7 +14,7 @@ export const windowText = (loc) => loc.isDepot ? "open all day" : `${clock(loc.o
 const SLOT_COLORS = ["#fde725", "#35b779", "#31688e", "#440154"];
 export const slotColors = () => [...SLOT_COLORS];
 
-/** Stable colour slot per algorithm: index in sorted id order (site palette is --c1..--c6). */
+/** Stable colour slot per algorithm: index in sorted id order (site palette is --s1..--s6). */
 export function algorithmColorIndex(ids) {
   return Object.fromEntries([...ids].sort().map((id, i) => [id, i]));
 }
