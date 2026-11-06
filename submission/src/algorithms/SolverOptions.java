@@ -8,7 +8,7 @@ public record SolverOptions(int maxDestinations, long timeLimitMillis) {
             throw new IllegalArgumentException("Invalid solver limits");
     }
     public static SolverOptions defaults() { return new SolverOptions(15, 10_000); }
-    boolean expired(long started) {
+    public boolean expired(long started) {
         return System.nanoTime() - started >= TimeUnit.MILLISECONDS.toNanos(timeLimitMillis);
     }
 }
