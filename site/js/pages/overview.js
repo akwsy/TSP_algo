@@ -1,22 +1,22 @@
 import { h, fmt, select } from "../lib/dom.js";
 import { loadAggregate, loadAlgorithms, experimentNames } from "../lib/data.js";
-import { rankGroups } from "../lib/model.js";
+import { rankGroups, groupBadges } from "../lib/model.js";
 
 const meanSd = (s, digits) => s && typeof s.mean === "number"
   ? [h("span", { class: "num-strong" }, fmt(s.mean, digits)),
      typeof s.std === "number" ? h("span", { class: "sd" }, ` ±${fmt(s.std, digits)}`) : null]
   : h("span", { class: "muted" }, "n/a");
 
+const TONE = { ok: "badge ok", bad: "badge bad", warn: "badge warn", note: "badge" };
+
 function failureCell(g) {
-  if (!g.failures) return h("span", { class: "badge ok" }, "none");
-  const timeouts = g.timeouts ? `, ${g.timeouts} timed out` : "";
-  return h("span", { class: "badge bad" }, `${g.failures} of ${g.runs}${timeouts}`);
+  return groupBadges(g).map((b) => h("span", { class: TONE[b.tone], style: "display:block;margin-bottom:2px" }, b.text));
 }
 
 function table(groups, algs, size) {
   const rows = rankGroups(groups);
   return h("div", { class: "card table-wrap" }, h("table", {},
-    h("caption", {}, `Ranked by mean visits, then shorter mean distance. ${size} customers. Failed runs are left out of the means, never counted as zero visits.`),
+    h("caption", {}, `Ranked by mean visits, then shorter mean distance, with algorithms that had any failed run ranked below those valid on every run. ${size} customers. Failed runs are left out of the means, never counted as zero visits.`),
     h("thead", {}, h("tr", {},
       h("th", { scope: "col" }, "Rank"), h("th", { scope: "col", class: "l" }, "Algorithm"),
       h("th", { scope: "col", class: "l" }, "Declared complexity"),
