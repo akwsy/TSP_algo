@@ -45,15 +45,16 @@ h1 { font-size: 1.6rem; line-height: 1.2; margin: 0 0 4px; }
 h2 { font-size: 1.1rem; margin: 28px 0 10px; }
 .lede { color: var(--muted); margin: 0 0 20px; max-width: 70ch; }
 .toolbar { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; margin: 0 0 16px; }
-label { display: grid; gap: 4px; font-size: .85rem; color: var(--muted); }
+label { min-width: 0; max-width: 100%; display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; font-size: .85rem; color: var(--muted); }
 select { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--line);
-  border-radius: 6px; padding: 6px 10px; min-height: 36px; }
+  border-radius: 6px; padding: 6px 10px; min-height: 36px; max-width: 100%; }
 
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .table-wrap { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
 caption { text-align: left; padding: 12px 14px 4px; color: var(--muted); font-size: .85rem; }
-th, td { padding: 10px 14px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th, td { padding: 10px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td.wrap { white-space: normal; min-width: 7rem; }
 th:first-child, td:first-child, th.l, td.l { text-align: left; }
 th { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
 tbody tr:last-child td { border-bottom: 0; }

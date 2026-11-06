@@ -43,6 +43,7 @@ async function route() {
     if (a.dataset.path === (page ? page.path : "")) a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
   }
+  nav.querySelector("[aria-current]")?.scrollIntoView?.({ inline: "center", block: "nearest" });
   if (typeof cleanup === "function") cleanup();
   cleanup = null;
   main.replaceChildren();
