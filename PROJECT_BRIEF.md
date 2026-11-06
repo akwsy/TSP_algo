@@ -92,7 +92,7 @@ All parameters live in one configuration object, with the defaults below. None i
 | `seed` | required | Drives selection and slot assignment. |
 | `numCustomers` | 10 | Customers, not counting the depot. |
 | `departureMinute` | 360 (06:00) | Departure time from the depot. |
-| `periodMinutes` | 480 | Available period. Return must be ≤ `departureMinute + periodMinutes`. |
+| `periodMinutes` | 1080 (06:00 to 24:00; the owner changed this default from 480) | Available period. Return must be ≤ `departureMinute + periodMinutes`. |
 | `speedKmh` | 40 | Constant travel speed. |
 
 Validity rule: `departureMinute + periodMinutes ≤ 1440`. Reject otherwise.
@@ -129,8 +129,8 @@ Each algorithm lives in `algorithms/<algorithm-id>/` with an `algorithm.json`:
   "instanceId": "n10-seed42",
   "seed": 42,
   "departureMinute": 360,
-  "periodMinutes": 480,
-  "deadlineMinute": 840,
+  "periodMinutes": 1080,
+  "deadlineMinute": 1440,
   "speedKmh": 40,
   "timeLimitSeconds": 10,
   "locations": [
@@ -292,7 +292,7 @@ Expected values in tests must come from hand-worked examples or the spec, never 
 
 1. **"6 a.m. to 12 a.m."** is read as 06:00 to midnight (18 h), giving four 4.5-hour slots. If the owner meant 6 a.m. to noon, the slots would be 1.5 hours each. Confirm before building.
 2. **Location selection default:** depot = Kuala Lumpur; customers are a seeded random sample of populated places (feature class `P`) within 150 km of the depot, without replacement. Peninsular Malaysia is spread out and a 40 km/h speed makes most far locations unreachable, so a radius keeps instances meaningful. The owner may prefer pure random from the whole dataset or another rule.
-3. **Defaults:** departure 06:00, period 480 min, speed 40 km/h, as in 4.5.
+3. **Defaults:** departure 06:00, period 1080 min (owner changed from 480), speed 40 km/h, as in 4.5.
 4. **"The distance and the distance with travel and the time taken"** is read as: distance travelled (km), travel time (min), and total time taken (travel plus waiting). Confirm if something else was meant.
 5. **Experiment 1 sizes and instance count** (5–100 customers, 30 instances each) are proposals.
 6. **Algorithm language:** assumed to be language-agnostic (command line, JSON over stdin/stdout). The new program's own language is the new chat's choice; recommend whatever keeps the harness and website simple (for example Python for the harness and plain HTML/JS for the site), and state the choice.
