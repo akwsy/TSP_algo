@@ -15,12 +15,14 @@ def solve(inst):
         return dist[i][j] / speed * 60
 
     route = [0]
+    checks = 0  # customer feasibility checks: the work done
     clock = inst["departureMinute"]
     here = 0
     todo = set(range(1, len(locs)))
     while True:
         best = None  # (distance, id, start time)
         for j in sorted(todo):
+            checks += 1
             start = max(clock + minutes(here, j), locs[j]["opensAt"])
             if start > locs[j]["closesAt"] + EPS:
                 continue
@@ -36,7 +38,7 @@ def solve(inst):
     route.append(0)
     return {"route": route, "status": "HEURISTIC",
             "notes": "nearest-neighbour baseline",
-            "stats": {"customersVisited": len(route) - 2}}
+            "stats": {"customersVisited": len(route) - 2, "iterations": checks}}
 
 
 if __name__ == "__main__":

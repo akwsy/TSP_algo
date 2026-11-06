@@ -20,6 +20,9 @@ DATASET = [
 SKIP_ALL = ('import json,sys\njson.load(sys.stdin)\n'
             'print(json.dumps({"route":[0,0],"status":"HEURISTIC",'
             '"distanceKm":999,"visited":99,"stats":{"iterations":7}}))\n')
+ECHO_LIMIT = ('import json,sys\ni=json.load(sys.stdin)\n'
+              'print(json.dumps({"route":[0,0],"status":"HEURISTIC",'
+              '"stats":{"limit":i.get("timeLimitSeconds")}}))\n')
 BAD_ROUTE = 'import sys\nprint(\'{"route":[0,5,0],"status":"HEURISTIC"}\')\n'
 
 
@@ -79,6 +82,13 @@ class RunTest(CliCase):
             self.assertIn(key, rec)
         self.assertGreater(rec["runtimeMs"], 0)
 
+    def test_algorithm_receives_its_configured_time_limit(self):
+        write_algorithm(self.algs, "echo-limit", ECHO_LIMIT)
+        meta = self.algs / "echo-limit" / "algorithm.json"
+        meta.write_text(json.dumps({**json.loads(meta.read_text()), "timeLimitSeconds": 7}))
+        self.run_cli("--seeds", "1")
+        self.assertEqual(self.record(self.entry("echo-limit", 1))["stats"], {"limit": 7})
+
     def test_invalid_route_is_recorded_as_failure_without_crashing(self):
         self.run_cli("--seeds", "1")
         rec = self.record(self.entry("bad-route", 1))
@@ -104,6 +114,8 @@ class RunTest(CliCase):
         rec = self.record(self.entry("nearest-neighbour", 1))
         self.assertTrue(rec["valid"], rec["failureReason"])
         self.assertRegex(rec["commit"], r"^[0-9a-f]{40}$")
+        self.assertIsInstance(rec["stats"]["iterations"], int)
+        self.assertGreater(rec["stats"]["iterations"], 0)
 
 
 if __name__ == "__main__":
