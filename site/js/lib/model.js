@@ -30,3 +30,10 @@ export function failureKind(run) {
 export function failedRuns(runs) {
   return runs.filter((r) => r.valid === false || r.status === "TIME_LIMIT");
 }
+
+/** Short display form of a recorded commit; keeps the "+dirty" marker (uncommitted changes). */
+export function shortCommit(commit, length = 7) {
+  if (!commit) return null;
+  const [hash, ...rest] = String(commit).split("+");
+  return [hash.slice(0, length), ...rest].join("+");
+}

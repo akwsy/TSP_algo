@@ -1,6 +1,6 @@
 import { h, select } from "../lib/dom.js";
 import { loadIndex, loadRun } from "../lib/data.js";
-import { failedRuns, failureKind } from "../lib/model.js";
+import { failedRuns, failureKind, shortCommit } from "../lib/model.js";
 
 const BADGE = { "timed out": "warn", crashed: "bad", invalid: "bad" };
 
@@ -12,7 +12,7 @@ function item(run, rec) {
     h("div", { class: "fail-head" },
       h("span", { class: `badge ${BADGE[kind]}` }, kind),
       h("strong", {}, run.algorithmId), h("span", {}, `on ${run.instanceId}`),
-      h("span", { class: "meta" }, [run.timestamp, run.commit ? `commit ${run.commit.slice(0, 7)}` : null].filter(Boolean).join(" | "))),
+      h("span", { class: "meta" }, [run.timestamp, run.commit ? `commit ${shortCommit(run.commit)}` : null].filter(Boolean).join(" | "))),
     h("p", { class: "fail-reason" }, reason),
     stderr
       ? h("details", {}, h("summary", {}, "Captured stderr"), h("pre", {}, stderr))

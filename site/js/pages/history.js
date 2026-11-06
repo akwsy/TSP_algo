@@ -1,8 +1,9 @@
 import { h, fmt, select } from "../lib/dom.js";
 import { loadIndex, loadAlgorithms } from "../lib/data.js";
 import { groupRunsByCommit, compareVersions } from "../lib/scaling.js";
+import { shortCommit } from "../lib/model.js";
 
-const label = (g) => (g.commit ? g.commit.slice(0, 8) : "no commit recorded");
+const label = (g) => (g.commit ? shortCommit(g.commit, 8) : "no commit recorded");
 const when = (ts) => (ts || "").replace("T", " ").replace(/(\.\d+)?(\+00:00|Z)?$/, " UTC");
 
 function compareTable(c, a, b) {

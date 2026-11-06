@@ -50,3 +50,9 @@ class ModelTest(unittest.TestCase):
                 {"valid": False, "status": "HEURISTIC", "file": "bad"},
                 {"valid": True, "status": "TIME_LIMIT", "file": "slow"}]
         self.assertEqual([r["file"] for r in call("failedRuns", runs)], ["bad", "slow"])
+
+    def test_short_commit_keeps_the_dirty_marker(self):
+        h = "0123456789abcdef0123456789abcdef01234567"
+        self.assertEqual(call("shortCommit", h, 7), "0123456")
+        self.assertEqual(call("shortCommit", h + "+dirty", 7), "0123456+dirty")
+        self.assertIsNone(call("shortCommit", None, 7))

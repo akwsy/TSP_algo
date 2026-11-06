@@ -118,6 +118,39 @@ class RunTest(CliCase):
         self.assertGreater(rec["stats"]["iterations"], 0)
 
 
+class CommitTest(CliCase):
+    def setUp(self):
+        super().setUp()
+        self.git("init", "-q")
+        self.git("add", ".")
+        self.git("commit", "-qm", "x")
+
+    def git(self, *args):
+        subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@example.com", *args],
+                       cwd=self.algs, check=True, capture_output=True)
+
+    def commits(self, alg):
+        return {self.record(e)["commit"] for e in self.index()["runs"] if e["algorithmId"] == alg}
+
+    def test_clean_algorithm_records_plain_hash_and_every_run_shares_it(self):
+        self.run_cli("--seeds", "1", "2", "3")
+        (commit,) = self.commits("skip-all")
+        self.assertRegex(commit, r"^[0-9a-f]{40}$")
+
+    def test_uncommitted_changes_are_marked_dirty(self):
+        (self.algs / "skip-all" / "solve.py").write_text(SKIP_ALL + "# edited\n")
+        self.run_cli("--seeds", "1")
+        (dirty,) = self.commits("skip-all")
+        self.assertRegex(dirty, r"^[0-9a-f]{40}\+dirty$")
+        (clean,) = self.commits("bad-route")
+        self.assertRegex(clean, r"^[0-9a-f]{40}$")
+
+    def test_untracked_new_file_counts_as_dirty(self):
+        (self.algs / "bad-route" / "helper.py").write_text("x = 1\n")
+        self.run_cli("--seeds", "1")
+        self.assertTrue(self.commits("bad-route").pop().endswith("+dirty"))
+
+
 class BadMetadataTest(CliCase):
     def exit_with(self, meta):
         folder = self.algs / "weird"

@@ -49,18 +49,27 @@ def discover_algorithms(folder):
         if problem:
             raise ConfigError(f"{meta_path}: {problem}")
         meta["_dir"] = meta_path.parent
+        meta["_commit"] = git_commit(meta_path.parent)  # once per algorithm, not per run
         found.append(meta)
     return found
 
 
-def git_commit(folder):
-    """Hash of the last commit touching the algorithm folder, or None."""
+def _git(folder, *args):
     try:
-        out = subprocess.run(["git", "log", "-1", "--format=%H", "--", "."], cwd=folder,
-                             capture_output=True, text=True, timeout=10)
+        out = subprocess.run(["git", *args], cwd=folder, capture_output=True, text=True, timeout=10)
     except (OSError, subprocess.TimeoutExpired):
         return None
-    return out.stdout.strip() or None if out.returncode == 0 else None
+    return out.stdout.strip() if out.returncode == 0 else None
+
+
+def git_commit(folder):
+    """Hash of the last commit touching the algorithm folder, or None. Uncommitted changes
+    (modified, staged or untracked files in the folder) append "+dirty" so results from
+    unrecorded code are never grouped with the clean commit."""
+    commit = _git(folder, "log", "-1", "--format=%H", "--", ".") or None
+    if commit and _git(folder, "status", "--porcelain", "--", "."):
+        commit += "+dirty"
+    return commit
 
 
 STATUSES = ("OPTIMAL", "HEURISTIC", "TIME_LIMIT")
@@ -123,7 +132,7 @@ def make_record(meta, instance, run_id):
         checked = validate_route(instance, route)
     record = {
         "algorithmId": meta["id"],
-        "commit": git_commit(meta["_dir"]),
+        "commit": meta["_commit"],
         "instanceId": instance["instanceId"],
         "seed": instance.get("seed"),
         "numCustomers": len(instance["locations"]) - 1,
