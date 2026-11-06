@@ -33,7 +33,7 @@ function table(groups, algs, size) {
           : h("span", { class: "muted" }, "not declared")),
         h("td", {}, meanSd(g.visited, 2)), h("td", {}, meanSd(g.distanceKm, 1)),
         h("td", {}, meanSd(g.totalMinutes, 0)), h("td", {}, meanSd(g.runtimeMs, 1)),
-        h("td", {}, failureCell(g)));
+        h("td", { class: "wrap" }, failureCell(g)));
     }))));
 }
 

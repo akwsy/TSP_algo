@@ -74,8 +74,8 @@ export default {
     el.append(
       h("h1", {}, "Scaling"),
       h("p", { class: "lede" }, "How each algorithm behaves as the number of customers grows. Hover a chart or use the left and right arrow keys to read values."),
-      names.length > 1 && h("div", { class: "toolbar" }, select("Experiment", names.map((n) => ({ value: n, label: n })), exp,
-        (v) => ctx.navigate(`scaling?experiment=${encodeURIComponent(v)}`))),
+      ...(names.length > 1 ? [h("div", { class: "toolbar" }, select("Experiment", names.map((n) => ({ value: n, label: n })), exp,
+        (v) => ctx.navigate(`scaling?experiment=${encodeURIComponent(v)}`)))] : []),
       h("div", { class: "chart-grid" }, charts),
       h("h2", {}, "Measured growth against declared complexity"),
       h("p", { class: "meta" }, "Both axes are logarithmic, so a straight line's slope is the growth exponent. Failed runs are left out of the quality means; runtime and work include every run that reported them. Sizes with a zero or missing value cannot appear on a log axis and are listed under the chart."),

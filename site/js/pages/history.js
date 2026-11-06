@@ -71,7 +71,7 @@ export default {
     }
 
     el.append(h("h2", {}, "Versions, newest first"),
-      groups.map((g) => h("section", { class: "card hist-commit", "aria-label": `${label(g)} ${g.algorithmId}` },
+      ...groups.map((g) => h("section", { class: "card hist-commit", "aria-label": `${label(g)} ${g.algorithmId}` },
         h("div", { class: "hist-head" }, h("span", { class: "mono num-strong" }, label(g)),
           h("span", { class: "muted" }, `${when(g.first)}${g.first === g.last ? "" : ` to ${when(g.last)}`}`),
           h("span", { class: g.valid === g.runs.length ? "badge ok" : "badge warn" }, `${g.valid} of ${g.runs.length} valid`)),
