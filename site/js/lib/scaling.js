@@ -12,7 +12,7 @@ export function buildSeries(groups, metric) {
     const std = has(s.std) ? s.std : null;
     if (!byAlg.has(g.algorithmId)) byAlg.set(g.algorithmId, []);
     byAlg.get(g.algorithmId).push({
-      x: g.numCustomers, mean: s.mean, std, n: s.n ?? null,
+      x: g.numCustomers, y: s.mean, mean: s.mean, std, n: s.n ?? null,
       lo: std == null ? null : s.mean - std, hi: std == null ? null : s.mean + std,
     });
   }

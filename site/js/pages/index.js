@@ -5,6 +5,8 @@
 // return a cleanup function. Use js/lib/data.js to load results and js/lib/dom.js to build DOM.
 import overview from "./overview.js";
 import failures from "./failures.js";
+import scaling from "./scaling.js";
+import history from "./history.js";
 
-export const pages = [overview, failures];
+export const pages = [overview, failures, scaling, history];
 export const defaultPath = "overview";

@@ -1,0 +1,49 @@
+/* Charts and run history. Series colours: Okabe-Ito picks, each re-chosen for the dark surface. Identity is never colour alone
+   (markers, dashes, legend, tooltip names). */
+:root {
+  --s1: #0072b2; --s2: #d55e00; --s3: #009e73; --s4: #cc79a7; --s5: #b07d00; --s6: #5d6670;
+  --up: var(--ok); --down: var(--bad);
+}
+:root[data-theme="dark"] { --s1: #56b4e9; --s2: #ff8a3d; --s3: #2fd0a0; --s4: #e59bc4; --s5: #f0c040; --s6: #aab3bd; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --s1: #56b4e9; --s2: #ff8a3d; --s3: #2fd0a0; --s4: #e59bc4; --s5: #f0c040; --s6: #aab3bd; }
+}
+.chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: var(--gap); }
+.chart { margin: 0; padding: 14px 14px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); min-width: 0; }
+.chart figcaption { font-weight: 650; margin-bottom: 6px; }
+.chart-wrap { position: relative; }
+.chart-svg { width: 100%; height: auto; display: block; touch-action: pan-y; border-radius: 6px; }
+.chart-svg text { font: 11px var(--font); fill: var(--muted); }
+.chart-svg .axis-title { fill: var(--text); font-size: 11.5px; }
+.chart-svg .grid line { stroke: var(--line); stroke-width: 1; }
+.chart-svg .grid line.tick { stroke: var(--muted); }
+.chart-svg .axis { stroke: var(--muted); stroke-width: 1; }
+.chart-svg .crosshair { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
+.chart-tip { position: absolute; top: 8px; z-index: 3; pointer-events: none; min-width: 150px; max-width: 70%;
+  background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / .18); font-size: .82rem; }
+.chart-tip[hidden] { display: none; }
+.tip-row { display: flex; gap: 6px; align-items: center; margin-top: 3px; }
+.tip-row span { flex: 1; overflow-wrap: anywhere; }
+.tip-row b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sw { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.legend { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 0; margin: 8px 0 0; font-size: .85rem; }
+.legend li { display: flex; align-items: center; gap: 6px; }
+.legend svg { overflow: visible; }
+.chart-table { margin-top: 6px; }
+.chart-table .table-wrap { margin-top: 6px; max-height: 260px; overflow: auto; }
+.chart-table th, .chart-table td { padding: 5px 10px; }
+.chart-note, .chart-empty { color: var(--muted); font-size: .85rem; margin: 6px 0 0; }
+.scale-list { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 4px; font-size: .85rem; }
+.scale-list li { display: flex; gap: 8px; align-items: baseline; }
+.scale-list .sw { transform: translateY(1px); }
+
+.hist-commit { margin: 0 0 var(--gap); padding: 12px 14px; }
+.hist-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.mono { font-family: var(--mono); font-size: .9em; }
+.compare { padding: 14px; margin-bottom: var(--gap); }
+.delta { font-weight: 650; }
+.delta.better { color: var(--up); }
+.delta.worse { color: var(--down); }
+@media (max-width: 640px) { .chart { padding: 10px 8px; } .chart-tip { max-width: 85%; } }
+.hist-note { margin: 0; padding: 12px 14px 4px; }
