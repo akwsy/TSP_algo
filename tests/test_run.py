@@ -118,5 +118,38 @@ class RunTest(CliCase):
         self.assertGreater(rec["stats"]["iterations"], 0)
 
 
+class BadMetadataTest(CliCase):
+    def exit_with(self, meta):
+        folder = self.algs / "weird"
+        folder.mkdir()
+        (folder / "algorithm.json").write_text(meta if isinstance(meta, str) else json.dumps(meta))
+        proc = subprocess.run(
+            [sys.executable, "-m", "harness.run", "--dataset", str(self.tmp / "places.txt"),
+             "--instances-dir", str(self.tmp / "instances"), "--results-dir", str(self.tmp / "results"),
+             "--customers", "2", "--seeds", "1", "--algorithms-dir", str(self.algs)],
+            cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 2, proc.stderr)
+        self.assertIn("weird", proc.stderr)
+        self.assertIn("algorithm.json", proc.stderr)
+        self.assertNotIn("Traceback", proc.stderr)
+        return proc.stderr
+
+    def test_missing_or_non_string_id(self):
+        self.assertIn("id", self.exit_with({"command": ["python3", "x.py"]}))
+
+    def test_command_must_be_a_non_empty_list(self):
+        self.assertIn("command", self.exit_with({"id": "weird", "command": "python3 x.py"}))
+
+    def test_empty_command_list(self):
+        self.assertIn("command", self.exit_with({"id": "weird", "command": []}))
+
+    def test_time_limit_must_be_positive_number(self):
+        self.assertIn("timeLimitSeconds", self.exit_with(
+            {"id": "weird", "command": ["python3", "x.py"], "timeLimitSeconds": 0}))
+
+    def test_unparseable_json(self):
+        self.exit_with("{nope")
+
+
 if __name__ == "__main__":
     unittest.main()

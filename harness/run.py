@@ -23,11 +23,31 @@ RESULT_FIELDS = ("valid", "failureReason", "visited", "skipped", "distanceKm", "
                  "waitMinutes", "totalMinutes", "returnMinute", "schedule")
 
 
+def _metadata_problem(meta):
+    if not isinstance(meta, dict):
+        return "must be a JSON object"
+    if not isinstance(meta.get("id"), str) or not meta["id"]:
+        return "'id' must be a non-empty string"
+    command = meta.get("command")
+    if not isinstance(command, list) or not command or not all(isinstance(c, str) for c in command):
+        return "'command' must be a non-empty list of strings"
+    limit = meta.get("timeLimitSeconds")
+    if "timeLimitSeconds" in meta and (isinstance(limit, bool) or not isinstance(limit, (int, float)) or limit <= 0):
+        return "'timeLimitSeconds' must be a positive number"
+    return None
+
+
 def discover_algorithms(folder):
     """Return metadata dicts (with a private '_dir') for each algorithms/*/algorithm.json."""
     found = []
     for meta_path in sorted(Path(folder).glob("*/algorithm.json")):
-        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        try:
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        except ValueError as e:
+            raise ConfigError(f"{meta_path}: not valid JSON ({e})")
+        problem = _metadata_problem(meta)
+        if problem:
+            raise ConfigError(f"{meta_path}: {problem}")
         meta["_dir"] = meta_path.parent
         found.append(meta)
     return found
