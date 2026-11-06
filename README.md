@@ -19,15 +19,48 @@ Several people each write a routing algorithm. This repo provides the specificat
 
 Harness: Python 3 (standard library only). Website: plain HTML/JS.
 
-## One command: run everything and open the website
+## Quick start: run the evaluation and open the website
+
+You need Python 3 and git (nothing to install; the harness and the server use only the standard library) and a web browser. An internet connection is optional: it is only used for the map tiles, and the map falls back to a plain drawing without it.
 
 ```
-python3 start.py                                  # run all algorithms, then open http://127.0.0.1:8000/
+git clone https://github.com/akwsy/TSP_algo.git
+cd TSP_algo
+python3 start.py
+```
+
+`start.py` does two things in order:
+
+1. **Runs the evaluation.** It builds the problem instances, runs every algorithm in `algorithms/` on the same instances, checks each answer independently, and writes the results into `results/`. The full default run (7 sizes from 5 to 100 customers, 30 instances each) takes about 10 seconds with the baseline algorithm.
+2. **Starts the website** at http://127.0.0.1:8000/ and opens it in your browser. Press Ctrl+C in the terminal to stop it.
+
+Useful options:
+
+```
 python3 start.py --sizes 5 10 --instances 3       # a quick small run first
-python3 start.py --skip-run                       # just open the site on existing results
+python3 start.py --skip-run                       # just open the site on results you already have
+python3 start.py --port 8001                      # if port 8000 is busy
+python3 start.py --no-browser                     # do not open a browser window
 ```
 
-`--port` and `--no-browser` are also available. Press Ctrl+C to stop the website. The separate commands are below.
+**What you see on the website** (top navigation):
+
+- **Overview:** every algorithm side by side with a ranking (most places visited, then shortest distance), its declared complexity, and failure counts. Pick the number of customers from the dropdown.
+- **Scaling:** charts of visits, distance, time and runtime against the number of customers, and how measured runtime and work grow compared with the declared complexity.
+- **Instance:** one problem at a time, showing every algorithm's route on the map for comparison (side by side or overlaid).
+- **Route detail:** one algorithm's run on one example, with the map and a step-by-step table. Choose the algorithm, the example and the number of places from the dropdowns.
+- **History:** results grouped by algorithm version (git commit), to compare an algorithm before and after a change.
+- **Failures:** runs that were invalid, crashed or timed out, with the reason.
+
+**To evaluate your own algorithm:** put it in `algorithms/<your-id>/` following `docs/ALGORITHM_SPEC.md`, commit it, and run `python3 start.py` again. It appears next to the baseline on every page. The same document contains a checklist and instructions for AI coding agents.
+
+**To look at the website without running anything:** this shows the committed sample results, including some deliberately broken algorithms.
+
+```
+python3 site/serve.py --results tests/fixtures/sample-results --algorithms tests/fixtures/sample-algorithms --instances tests/fixtures/sample-instances
+```
+
+The separate commands behind `start.py` are described in the next sections.
 
 ## Run the experiment
 
