@@ -4,8 +4,13 @@ it groups by (algorithmId, numCustomers) and by instanceId, so any experiment wo
 Definitions
 - failure: record["valid"] is false. Failures are counted but left out of the
   visited / distance / total-minutes averages and the best-known comparison.
-- timeout: record["status"] == "TIME_LIMIT" (the runner sets it when it kills the process).
-  A timed-out run with a valid route counts as a timeout and still enters the averages.
+- timeout: a run the harness killed for exceeding the time limit (record["killed"] is true,
+  or, for older records, the failureReason ends "was killed"). A killed run that had already
+  printed a valid route counts as a timeout and still enters the averages.
+- selfReportedTimeLimit: a valid run the algorithm itself reported as status TIME_LIMIT
+  without being killed. That is an ordinary valid result, not a timeout or failure.
+- contradictedOptimal: valid runs that claimed OPTIMAL but visited fewer customers than the
+  best known for that instance, so the claim is demonstrably wrong. Invalid runs make no claim.
 - runtime and work cover every run that has the value (failures included).
 - work: the first key of `work_keys` found as a number in record["stats"]
   (default nodesExpanded, then iterations). Runs without one are skipped; if none
@@ -50,6 +55,12 @@ def _work(record, work_keys):
     return None, None
 
 
+def _killed(record):
+    if "killed" in record:
+        return bool(record["killed"])
+    return str(record.get("failureReason") or "").endswith("was killed")
+
+
 def _best_known(records):
     best = {}
     for r in records:
@@ -86,7 +97,10 @@ def aggregate(records, work_keys=DEFAULT_WORK_KEYS):
         groups.append({
             "algorithmId": alg, "numCustomers": n, "runs": len(runs),
             "failures": len(runs) - len(valid),
-            "timeouts": sum(1 for r in runs if r["status"] == "TIME_LIMIT"),
+            "timeouts": sum(1 for r in runs if _killed(r)),
+            "selfReportedTimeLimit": sum(1 for r in valid if r["status"] == "TIME_LIMIT" and not _killed(r)),
+            "contradictedOptimal": sum(1 for r in valid if r["status"] == "OPTIMAL"
+                                       and r["visited"] < best[r["instanceId"]]["visited"]),
             "optimalReports": sum(1 for r in valid if r["status"] == "OPTIMAL"),
             "visited": _summary([r["visited"] for r in valid]),
             "distanceKm": _summary([r["distanceKm"] for r in valid]),

@@ -140,6 +140,7 @@ def make_record(meta, instance, run_id):
         "runId": run_id,
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "status": status,
+        "killed": timed_out,
         "route": route,
         "runtimeMs": runtime_ms,
         "stats": output.get("stats"),
@@ -181,7 +182,7 @@ def run_batch(algorithms, instances, instances_dir, results_dir, extra=None):
                 "file": name, "runId": run_id, "algorithmId": record["algorithmId"],
                 "commit": record["commit"], "instanceId": record["instanceId"],
                 "numCustomers": record["numCustomers"], "seed": record["seed"],
-                "timestamp": record["timestamp"], "status": record["status"],
+                "timestamp": record["timestamp"], "status": record["status"], "killed": record["killed"],
                 "valid": record["valid"], "visited": record["visited"],
                 "distanceKm": record["distanceKm"], "runtimeMs": record["runtimeMs"],
                 "failureReason": record["failureReason"], **(extra or {})})

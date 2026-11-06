@@ -8,7 +8,7 @@ import test_run
 ROOT = test_run.ROOT
 
 BROKEN = ROOT / "tests" / "fixtures" / "broken" / "solve.py"
-MODES = ("infeasible", "malformed", "bad-status", "bad-types", "crash", "sleep", "partial", "invalid-utf8")
+MODES = ("infeasible", "malformed", "bad-status", "bad-types", "crash", "sleep", "partial", "invalid-utf8", "self-time-limit")
 
 
 class FailureTest(test_run.CliCase):
@@ -73,6 +73,15 @@ class FailureTest(test_run.CliCase):
         rec = self.rec("partial")
         self.assertEqual((rec["status"], rec["route"], rec["valid"], rec["visited"]),
                          ("TIME_LIMIT", [0, 0], True, 0))
+
+    def test_killed_runs_are_marked_and_self_reported_time_limit_is_not(self):
+        self.assertTrue(self.rec("sleep")["killed"])
+        self.assertTrue(self.rec("partial")["killed"])
+        self.assertFalse(self.rec("crash")["killed"])
+        own = self.rec("self-time-limit")
+        self.assertEqual((own["status"], own["valid"], own["killed"]), ("TIME_LIMIT", True, False))
+        self.assertTrue(self.entry("sleep", 1)["killed"])
+        self.assertFalse(self.entry("self-time-limit", 1)["killed"])
 
     def test_good_runs_have_empty_stderr_and_fixture_is_not_a_real_entry(self):
         self.assertEqual(self.rec("skip-all")["stderr"], "")
