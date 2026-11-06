@@ -5,3 +5,6 @@
 # Operating-system metadata
 .DS_Store
 Thumbs.db
+
+# Local issue tracker (specs and tickets)
+.scratch/
