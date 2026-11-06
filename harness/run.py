@@ -43,32 +43,58 @@ def git_commit(folder):
     return out.stdout.strip() or None if out.returncode == 0 else None
 
 
+STATUSES = ("OPTIMAL", "HEURISTIC", "TIME_LIMIT")
+
+
+def _text(data):
+    return data.decode("utf-8", "replace") if isinstance(data, bytes) else (data or "")
+
+
+def parse_output(stdout):
+    """Return (output dict, None) or (None, plain reason) for an algorithm's stdout."""
+    try:
+        output = json.loads(stdout)
+    except ValueError:
+        return None, "output is not valid JSON"
+    if not isinstance(output, dict):
+        return None, "output is not a JSON object"
+    status = output.get("status")
+    if not isinstance(status, str):
+        return None, "status must be a string"
+    if status not in STATUSES:
+        return None, f"unknown status {status!r}"
+    if "stats" in output and output["stats"] is not None and not isinstance(output["stats"], dict):
+        return None, "stats must be an object"
+    return output, None
+
+
 def execute(meta, instance):
-    """Run the algorithm once; return (output dict or None, runtimeMs, error text or None)."""
+    """Run the algorithm once; return (output dict or None, runtimeMs, error or None, stderr, timedOut)."""
     limit = meta.get("timeLimitSeconds", 10)
     start = time.perf_counter()
     try:
         proc = subprocess.run(meta["command"], cwd=meta["_dir"], input=json.dumps(instance),
                               capture_output=True, text=True, timeout=limit)
-    except subprocess.TimeoutExpired:
-        return None, (time.perf_counter() - start) * 1000, f"timed out after {limit} s"
+    except subprocess.TimeoutExpired as exc:
+        runtime_ms = (time.perf_counter() - start) * 1000
+        error = f"exceeded the time limit of {limit} s and was killed"
+        output, _ = parse_output(_text(exc.stdout)) if _text(exc.stdout).strip() else (None, None)
+        if output is not None:
+            output["status"] = "TIME_LIMIT"
+        return output, runtime_ms, error, _text(exc.stderr), True
     runtime_ms = (time.perf_counter() - start) * 1000
     if proc.returncode != 0:
-        return None, runtime_ms, f"exited with code {proc.returncode}"
-    try:
-        output = json.loads(proc.stdout)
-        if not isinstance(output, dict):
-            raise ValueError
-    except ValueError:
-        return None, runtime_ms, "output is not a JSON object"
-    return output, runtime_ms, None
+        return None, runtime_ms, f"exited with code {proc.returncode}", proc.stderr, False
+    output, error = parse_output(proc.stdout)
+    return output, runtime_ms, error, proc.stderr, False
 
 
 def make_record(meta, instance, run_id):
-    output, runtime_ms, error = execute(meta, instance)
+    output, runtime_ms, error, stderr, timed_out = execute(meta, instance)
     output = output or {}
     route = output.get("route")
-    if error:
+    status = "TIME_LIMIT" if timed_out else output.get("status")
+    if error and not (timed_out and route is not None):
         checked = validate_route(instance, None)
         checked["failureReason"] = error
     else:
@@ -79,10 +105,11 @@ def make_record(meta, instance, run_id):
         "instanceId": instance["instanceId"],
         "runId": run_id,
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "status": output.get("status"),
+        "status": status,
         "route": route,
         "runtimeMs": runtime_ms,
         "stats": output.get("stats"),
+        "stderr": stderr,
     }
     record.update({k: checked[k] for k in RESULT_FIELDS})
     return record

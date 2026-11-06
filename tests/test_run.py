@@ -32,7 +32,9 @@ def write_algorithm(root, alg_id, source):
         "timeLimitSeconds": 10}))
 
 
-class RunTest(unittest.TestCase):
+class CliCase(unittest.TestCase):
+    """Shared CLI helpers; no tests of its own."""
+
     def setUp(self):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
@@ -62,6 +64,8 @@ class RunTest(unittest.TestCase):
         return next(e for e in self.index()["runs"]
                     if e["algorithmId"] == alg and e["instanceId"] == f"n2-seed{seed}")
 
+
+class RunTest(CliCase):
     def test_metrics_come_from_the_validator_and_runtime_from_the_harness(self):
         self.run_cli("--seeds", "1")
         rec = self.record(self.entry("skip-all", 1))
