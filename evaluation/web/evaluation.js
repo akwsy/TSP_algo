@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var COLORS = { nearest: "#ba5d18", greedy: "#3266ad", exact: "#23754a" };
+  var CLASSES = { nearest: "nearest", greedy: "greedy", exact: "exact" };
   var NS = "http://www.w3.org/2000/svg";
   function el(tag, attrs, text) {
     var e = document.createElement(tag);
@@ -32,11 +32,11 @@
   function bars(target, items) {
     target.replaceChildren();
     items.forEach(function (item, i) {
-      var y = 10 + i * 45;
-      target.appendChild(svg("text", { x: 0, y: y + 22, "font-size": 13, fill: "currentColor" }, item.label));
-      target.appendChild(svg("rect", { x: 200, y: y, width: 440, height: 30, fill: "#eee" }));
-      target.appendChild(svg("rect", { x: 200, y: y, width: Math.max(0, Math.min(100, item.value)) * 4.4, height: 30, fill: item.color }));
-      target.appendChild(svg("text", { x: 648, y: y + 21, "font-size": 13, fill: "currentColor" }, pct(item.value)));
+      var y = 6 + i * 62;
+      target.appendChild(svg("text", { x: 0, y: y + 18, "font-size": 20, fill: "currentColor" }, item.label));
+      target.appendChild(svg("text", { x: 700, y: y + 18, "font-size": 20, "font-weight": 600, "text-anchor": "end", fill: "currentColor" }, pct(item.value)));
+      target.appendChild(svg("rect", { x: 0, y: y + 28, width: 700, height: 22, rx: 4, "class": "bar-track" }));
+      target.appendChild(svg("rect", { x: 0, y: y + 28, width: Math.max(0, Math.min(100, item.value)) * 7, height: 22, rx: 4, "class": "bar " + item.color }));
     });
   }
   function show(data) {
@@ -50,8 +50,8 @@
         return [a.name, pct(a.optimalPct), pct(a.visitsPctOfOptimal), a.avgDistanceRatio.toFixed(3) + "×",
           a.avgRuntimeMs.toFixed(2) + " ms", a.maxRuntimeMs.toFixed(1) + " ms", Math.round(a.avgStates).toString()];
       }));
-    bars(document.getElementById("optimal-chart"), s.map(function (a) { return { label: a.name, value: a.optimalPct, color: COLORS[a.id] }; }));
-    bars(document.getElementById("visits-chart"), s.map(function (a) { return { label: a.name, value: a.visitsPctOfOptimal, color: COLORS[a.id] }; }));
+    bars(document.getElementById("optimal-chart"), s.map(function (a) { return { label: a.name, value: a.optimalPct, color: CLASSES[a.id] }; }));
+    bars(document.getElementById("visits-chart"), s.map(function (a) { return { label: a.name, value: a.visitsPctOfOptimal, color: CLASSES[a.id] }; }));
     table(document.getElementById("family-table"),
       ["Scenario type", "Scenarios", "Nearest neighbour", "Greedy insertion", "Branch and bound"],
       data.families.map(function (f) {
