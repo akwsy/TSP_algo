@@ -103,6 +103,8 @@ def make_record(meta, instance, run_id):
         "algorithmId": meta["id"],
         "commit": git_commit(meta["_dir"]),
         "instanceId": instance["instanceId"],
+        "seed": instance.get("seed"),
+        "numCustomers": len(instance["locations"]) - 1,
         "runId": run_id,
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "status": status,
@@ -113,6 +115,42 @@ def make_record(meta, instance, run_id):
     }
     record.update({k: checked[k] for k in RESULT_FIELDS})
     return record
+
+
+def run_batch(algorithms, instances, instances_dir, results_dir, extra=None):
+    """Run every algorithm on every instance; write instances, one result file per run and
+    results/index.json. `extra` (e.g. {"experiment": "scaling"}) is added to each record and
+    index entry. Returns the list of records."""
+    instances_dir.mkdir(parents=True, exist_ok=True)
+    results_dir.mkdir(parents=True, exist_ok=True)
+    for inst in instances:
+        (instances_dir / f"{inst['instanceId']}.json").write_text(
+            json.dumps(inst, indent=2) + "\n", encoding="utf-8")
+
+    index_path = results_dir / "index.json"
+    index = json.loads(index_path.read_text(encoding="utf-8")) if index_path.exists() else {"runs": []}
+    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    records = []
+    for meta in algorithms:
+        for inst in instances:
+            record = make_record(meta, inst, run_id)
+            record.update(extra or {})
+            records.append(record)
+            name = f"{record['algorithmId']}__{record['instanceId']}__{run_id}.json"
+            (results_dir / name).write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+            index["runs"].append({
+                "file": name, "runId": run_id, "algorithmId": record["algorithmId"],
+                "commit": record["commit"], "instanceId": record["instanceId"],
+                "numCustomers": record["numCustomers"], "seed": record["seed"],
+                "timestamp": record["timestamp"], "status": record["status"],
+                "valid": record["valid"], "visited": record["visited"],
+                "distanceKm": record["distanceKm"], "runtimeMs": record["runtimeMs"],
+                "failureReason": record["failureReason"], **(extra or {})})
+            print(f"{record['algorithmId']} on {record['instanceId']}: "
+                  f"{'valid, visited ' + str(record['visited']) if record['valid'] else 'FAILED: ' + str(record['failureReason'])}",
+                  flush=True)
+    index_path.write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
+    return records
 
 
 def main(argv=None):
@@ -142,31 +180,7 @@ def main(argv=None):
         print(f"error: no algorithm.json found under {args.algorithms_dir}", file=sys.stderr)
         return 2
 
-    instances_dir, results_dir = Path(args.instances_dir), Path(args.results_dir)
-    instances_dir.mkdir(parents=True, exist_ok=True)
-    results_dir.mkdir(parents=True, exist_ok=True)
-    for inst in instances:
-        (instances_dir / f"{inst['instanceId']}.json").write_text(
-            json.dumps(inst, indent=2) + "\n", encoding="utf-8")
-
-    index_path = results_dir / "index.json"
-    index = json.loads(index_path.read_text(encoding="utf-8")) if index_path.exists() else {"runs": []}
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-    for meta in algorithms:
-        for inst in instances:
-            record = make_record(meta, inst, run_id)
-            name = f"{record['algorithmId']}__{record['instanceId']}__{run_id}.json"
-            (results_dir / name).write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
-            index["runs"].append({
-                "file": name, "runId": run_id, "algorithmId": record["algorithmId"],
-                "commit": record["commit"], "instanceId": record["instanceId"],
-                "timestamp": record["timestamp"], "status": record["status"],
-                "valid": record["valid"], "visited": record["visited"],
-                "distanceKm": record["distanceKm"], "runtimeMs": record["runtimeMs"],
-                "failureReason": record["failureReason"]})
-            print(f"{record['algorithmId']} on {record['instanceId']}: "
-                  f"{'valid, visited ' + str(record['visited']) if record['valid'] else 'FAILED: ' + str(record['failureReason'])}")
-    index_path.write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
+    run_batch(algorithms, instances, Path(args.instances_dir), Path(args.results_dir))
     return 0
 
 
