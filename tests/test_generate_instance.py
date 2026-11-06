@@ -67,14 +67,16 @@ class GenerateInstanceTest(unittest.TestCase):
         self.assertEqual(
             (inst["seed"], inst["departureMinute"], inst["periodMinutes"],
              inst["deadlineMinute"], inst["speedKmh"]),
-            (1, 360, 480, 840, 40))
+            (1, 360, 1080, 1440, 40))
 
     def test_instance_id_names_every_non_default_parameter(self):
         def iid(*args):
             return self.generate(SMALL, "--seed", "1", "--customers", "2", *args)["instanceId"]
         self.assertEqual(iid(), "n2-seed1")
-        self.assertEqual(iid("--departure", "420"), "n2-seed1-dep420")
+        self.assertEqual(iid("--departure", "300"), "n2-seed1-dep300")
         self.assertEqual(iid("--period", "300"), "n2-seed1-per300")
+        self.assertEqual(iid("--period", "480"), "n2-seed1-per480")
+        self.assertEqual(iid("--period", "1080"), "n2-seed1")
         self.assertEqual(iid("--speed", "50"), "n2-seed1-spd50")
         self.assertEqual(iid("--speed", "42.5", "--departure", "420", "--period", "300"),
                          "n2-seed1-dep420-per300-spd42.5")

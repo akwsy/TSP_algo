@@ -40,7 +40,7 @@ A route that visits nobody (`[0, 0]`, straight home) is valid and scores zero vi
 
   `travelMinutes(i, j) = distanceKm[i][j] / speedKmh * 60`
 
-Default settings: departure 360 (06:00), period 480 minutes (so the deadline is 840, 14:00), speed 40 km/h. Do not hard-code them; read them from the input every time.
+Default settings: departure 360 (06:00), period 1080 minutes (so the deadline is 1440, 24:00), speed 40 km/h. Do not hard-code them; read them from the input every time.
 
 ## 3. Your algorithm folder
 
@@ -110,7 +110,7 @@ The input is one JSON object:
 
 | Field | Meaning |
 |---|---|
-| `instanceId` | Name of this instance, for example `"n4-seed5"` (4 customers, seed 5). When departure, period or speed differ from the defaults (360, 480, 40) they are appended, for example `"n4-seed5-dep420-per300-spd50"`. |
+| `instanceId` | Name of this instance, for example `"n4-seed5"` (4 customers, seed 5). When departure, period or speed differ from the defaults (360, 1080, 40) they are appended, for example `"n4-seed5-dep420-per300-spd50"`. |
 | `seed` | The seed the instance was generated from. Use it to seed any randomness you need. |
 | `departureMinute` | When you leave the depot. |
 | `periodMinutes` | How long you have. |
@@ -195,8 +195,8 @@ This is a real instance produced by the project's graph builder (`--seed 5 --cus
   "instanceId": "n4-seed5",
   "seed": 5,
   "departureMinute": 360,
-  "periodMinutes": 480,
-  "deadlineMinute": 840,
+  "periodMinutes": 1080,
+  "deadlineMinute": 1440,
   "speedKmh": 40.0,
   "locations": [
     {"id": 0, "geonameId": 1735161, "name": "Kuala Lumpur", "lat": 3.1412, "lon": 101.68653,
@@ -221,13 +221,13 @@ This is a real instance produced by the project's graph builder (`--seed 5 --cus
 ```
 <!-- /example:input -->
 
-The deadline is 840 (14:00). Customer 2 opens at 1170 (19:30), after the deadline, so no route can include it.
+The deadline is 1440 (24:00), so every window fits inside the period. Customer 2 opens late, at 1170 (19:30), so a route that visits it spends a long time waiting.
 
 ### Output of the baseline
 
 <!-- example:output -->
 ```json
-{"route": [0, 1, 3, 0], "status": "HEURISTIC", "notes": "nearest-neighbour baseline", "stats": {"customersVisited": 2, "iterations": 9}}
+{"route": [0, 1, 3, 2, 0], "status": "HEURISTIC", "notes": "nearest-neighbour baseline", "stats": {"customersVisited": 3, "iterations": 10}}
 ```
 <!-- /example:output -->
 
@@ -238,16 +238,18 @@ Travel minutes are `km / 40 * 60`, so 1 km takes 1.5 minutes.
 1. Leave the depot at **360** (06:00).
 2. Depot to customer 1: 47.45 km, 71.18 minutes. Arrive at **431.18** (07:11). Window 360 to 630 is open, so no wait. Leave at 431.18.
 3. Customer 1 to customer 3: 92.62 km, 138.94 minutes. Arrive at **570.11** (09:30). Window opens at 630, so **wait 59.89 minutes**. Leave at **630** (10:30), well before the close at 900.
-4. Customer 3 to the depot: 132.26 km, 198.39 minutes. Back at **828.39** (13:48), before the deadline of 840. Valid.
+4. Customer 3 to customer 2: 150.10 km, 225.16 minutes. Arrive at **855.16** (14:15). Window opens at 1170, so **wait 314.84 minutes**. Leave at **1170** (19:30), well before the close at 1440.
+5. Customer 2 to the depot: 63.15 km, 94.73 minutes. Back at **1264.73** (21:04), before the deadline of 1440. Valid.
 
 <!-- example:schedule -->
 | id | name | window | arrive | wait | leave |
 |---|---|---|---|---|---|
 | 1 | Taman Raja Udang | 360 to 630 | 431.18 | 0.00 | 431.18 |
 | 3 | Kampung Sungai Ranggam | 630 to 900 | 570.11 | 59.89 | 630.00 |
+| 2 | Kampung Jeragan | 1170 to 1440 | 855.16 | 314.84 | 1170.00 |
 <!-- /example:schedule -->
 
-Customer 4 was skipped as well: from customer 1 it is 195.85 km (293.77 minutes) away, so the earliest arrival would be about 724.95, after its window closed at 630. (A different algorithm could go to customer 4 first. Finding better routes than the baseline is the point of the exercise.)
+Customer 4 was skipped: from customer 1 it is 195.85 km (293.77 minutes) away, so the earliest arrival would be about 724.95, after its window closed at 630. (A different algorithm could go to customer 4 first. Finding better routes than the baseline is the point of the exercise.)
 
 ### What the harness records
 
@@ -257,18 +259,18 @@ The harness reports these numbers (rounded here to two decimals; the harness kee
 ```json
 {
   "valid": true,
-  "visited": 2,
-  "skipped": [2, 4],
-  "distanceKm": 272.34,
-  "travelMinutes": 408.51,
-  "waitMinutes": 59.89,
-  "totalMinutes": 468.39,
-  "returnMinute": 828.39
+  "visited": 3,
+  "skipped": [4],
+  "distanceKm": 353.33,
+  "travelMinutes": 530.0,
+  "waitMinutes": 374.73,
+  "totalMinutes": 904.73,
+  "returnMinute": 1264.73
 }
 ```
 <!-- /example:result -->
 
-`distanceKm` is 47.45 + 92.62 + 132.26. `totalMinutes` is travel plus waiting: 408.51 + 59.89. The score of this run is **2 visits, 272.34 km**.
+`distanceKm` is 47.45 + 92.62 + 150.10 + 63.15. `totalMinutes` is travel plus waiting: 530.00 + 374.73. The score of this run is **3 visits, 353.33 km**.
 
 ## 9. Running your algorithm locally
 

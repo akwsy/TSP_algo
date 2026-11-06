@@ -49,7 +49,7 @@ python3 site/serve.py --results tests/fixtures/sample-results --algorithms tests
 
 1. "6 a.m. to 12 a.m." means 06:00 to midnight (18 h), four 4.5 h slots.
 2. Default selection: depot Kuala Lumpur, customers a seeded sample of populated places (class `P`) within 150 km, without replacement.
-3. Defaults: departure 06:00, period 480 min, speed 40 km/h.
+3. Defaults: departure 06:00, period 1080 min (06:00 to midnight), speed 40 km/h.
 4. Reported metrics: distance (km), travel time, total time (travel plus waiting).
 5. Experiment sizes 5, 10, 15, 20, 30, 50, 100 with 30 instances each are proposals.
 6. Algorithms are language-agnostic CLI programs (JSON over stdin/stdout); harness in Python, site in plain HTML/JS.
