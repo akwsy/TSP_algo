@@ -145,9 +145,9 @@ export function createRouteMap(instance, opts) {
   const stopLabel = (p) => plain(stopParts(p));
   const legLabel = (l) => { const parts = legParts(l); return parts ? plain(parts) : ""; };
   function render(into, parts) {
-    into.replaceChildren(h("strong", { class: "tip-title" }, parts.title), parts.hours ? h("div", { class: "tip-hours" }, parts.hours) : null,
+    into.replaceChildren(...[h("strong", { class: "tip-title" }, parts.title), parts.hours ? h("div", { class: "tip-hours" }, parts.hours) : null,
       ...parts.rows.map((r) => h("div", { class: "tip-row" }, algorithmSwatch(r.entry), h("strong", {}, r.entry.label ?? r.entry.id), r.text == null ? null : h("span", { class: "tip-text" }, r.text))),
-      parts.facts ? h("dl", { class: "tip-facts" }, parts.facts.flatMap(([k, v]) => [h("dt", {}, k), h("dd", {}, v)])) : null);
+      parts.facts ? h("dl", { class: "tip-facts" }, parts.facts.flatMap(([k, v]) => [h("dt", {}, k), h("dd", {}, v)])) : null].filter(Boolean));
   }
   function place(ev) {
     const fr = frame.getBoundingClientRect(), w = tip.offsetWidth, ht = tip.offsetHeight, gapPx = 16;
@@ -320,13 +320,15 @@ function leafletEngine(stage, hover, style) {
       hit.on("mouseover click", (e) => { lit(true); hover.leg(l, e.originalEvent); });
       hit.on("mousemove", (e) => hover.move(e.originalEvent));
       hit.on("mouseout", () => { lit(false); hover.hide(); });
-      const node = hit.getElement();
-      if (node) {
+      const wire = () => {
+        const node = hit.getElement();
+        if (!node) return;
         node.setAttribute("tabindex", "0"); node.setAttribute("role", "button"); node.setAttribute("aria-label", hover.legLabel(l));
         node.addEventListener("focus", () => { lit(true); hover.leg(l, centreOf(node)); });
         node.addEventListener("blur", () => { lit(false); hover.hide(); });
         node.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); hover.leg(l, centreOf(node)); } });
-      }
+      };
+      hit.on("add", wire); wire();
     });
     const icon = (node, size, cls = "lf-icon") => L.divIcon({ html: node, className: cls, iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
     for (const s of g.shapes) {
@@ -346,15 +348,19 @@ function leafletEngine(stage, hover, style) {
     for (const p of scene.points) {
       const dot = h("span", { class: `lf-dot ${dotClass(p)}`, style: p.depot ? null : `--slot:${colors[p.slot]}` });
       const m = L.marker(ll.get(p.id), { icon: icon(dot, 20), keyboard: true, zIndexOffset: 500 }).addTo(layer);
-      const mel = m.getElement();
-      mel.setAttribute("aria-label", hover.stopLabel(p)); mel.setAttribute("role", "button");
       const side = labelSide({ name: p.name, x: px.get(p.id).x }, size.x);
       if (p.depot || plan.has(p.id)) m.bindTooltip(p.name, { permanent: true, direction: side, offset: [side === "right" ? 6 : -6, 0], className: "lf-label" });
       m.on("click mouseover", (e) => hover.stop(p, e.originalEvent));
       m.on("mousemove", (e) => hover.move(e.originalEvent));
       m.on("mouseout", () => hover.hide());
-      mel.addEventListener("focus", () => hover.stop(p, centreOf(mel)));
-      mel.addEventListener("blur", () => hover.hide());
+      const wire = () => {
+        const mel = m.getElement();
+        if (!mel) return;
+        mel.setAttribute("aria-label", hover.stopLabel(p)); mel.setAttribute("role", "button");
+        mel.addEventListener("focus", () => hover.stop(p, centreOf(mel)));
+        mel.addEventListener("blur", () => hover.hide());
+      };
+      m.on("add", wire); wire();
     }
   }
   const repaint = () => { if (last) paint(last); };
