@@ -43,7 +43,7 @@ class ExperimentCliTest(CliCase):
         agg = self.aggregates()
         self.assertEqual(agg["experiment"], "scaling")
         self.assertEqual(agg["parameters"], {"sizes": [1, 2], "instancesPerSize": 2, "seeds": [1, 2],
-                                             "departureMinute": 360, "periodMinutes": 480,
+                                             "departureMinute": 360, "periodMinutes": 1080,
                                              "speedKmh": 40.0})
         self.assertEqual(agg["sizes"], [1, 2])
         skip = next(g for g in agg["groups"] if g["algorithmId"] == "skip-all" and g["numCustomers"] == 2)

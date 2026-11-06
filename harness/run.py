@@ -13,7 +13,8 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .config import ConfigError, InstanceConfig
+from .config import (ConfigError, DEFAULT_DEPARTURE, DEFAULT_PERIOD, DEFAULT_SPEED,
+                     InstanceConfig)
 from .dataset import DatasetError, load_places
 from .generate_instance import DEFAULT_DATASET
 from .instance import build_instance
@@ -199,9 +200,9 @@ def main(argv=None):
                                  description="Run all algorithms on the same generated instances.")
     ap.add_argument("--seeds", type=int, nargs="+", required=True, help="one instance per seed")
     ap.add_argument("--customers", type=int, default=10)
-    ap.add_argument("--departure", type=int, default=360)
-    ap.add_argument("--period", type=int, default=480)
-    ap.add_argument("--speed", type=float, default=40.0)
+    ap.add_argument("--departure", type=int, default=DEFAULT_DEPARTURE)
+    ap.add_argument("--period", type=int, default=DEFAULT_PERIOD)
+    ap.add_argument("--speed", type=float, default=DEFAULT_SPEED)
     ap.add_argument("--dataset", default=str(DEFAULT_DATASET))
     ap.add_argument("--algorithms-dir", default=str(ROOT / "algorithms"))
     ap.add_argument("--instances-dir", default="instances")
