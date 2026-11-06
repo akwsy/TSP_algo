@@ -16,7 +16,7 @@ from .config import ConfigError, InstanceConfig
 from .dataset import DatasetError, load_places
 from .generate_instance import DEFAULT_DATASET
 from .instance import build_instance
-from .validator import validate_route
+from .validator import failure_result, validate_route
 
 ROOT = Path(__file__).resolve().parent.parent
 RESULT_FIELDS = ("valid", "failureReason", "visited", "skipped", "distanceKm", "travelMinutes",
@@ -73,8 +73,11 @@ def execute(meta, instance):
     limit = meta.get("timeLimitSeconds", 10)
     start = time.perf_counter()
     try:
-        proc = subprocess.run(meta["command"], cwd=meta["_dir"], input=json.dumps({**instance, "timeLimitSeconds": limit}),
-                              capture_output=True, text=True, timeout=limit)
+        proc = subprocess.run(meta["command"], cwd=meta["_dir"], input=json.dumps({**instance, "timeLimitSeconds": limit}).encode("utf-8"),
+                              capture_output=True, timeout=limit)
+    except OSError as exc:
+        runtime_ms = (time.perf_counter() - start) * 1000
+        return None, runtime_ms, f"could not start the command: {exc.strerror or exc}", "", False
     except subprocess.TimeoutExpired as exc:
         runtime_ms = (time.perf_counter() - start) * 1000
         error = f"exceeded the time limit of {limit} s and was killed"
@@ -84,9 +87,9 @@ def execute(meta, instance):
         return output, runtime_ms, error, _text(exc.stderr), True
     runtime_ms = (time.perf_counter() - start) * 1000
     if proc.returncode != 0:
-        return None, runtime_ms, f"exited with code {proc.returncode}", proc.stderr, False
-    output, error = parse_output(proc.stdout)
-    return output, runtime_ms, error, proc.stderr, False
+        return None, runtime_ms, f"exited with code {proc.returncode}", _text(proc.stderr), False
+    output, error = parse_output(_text(proc.stdout))
+    return output, runtime_ms, error, _text(proc.stderr), False
 
 
 def make_record(meta, instance, run_id):
@@ -95,8 +98,7 @@ def make_record(meta, instance, run_id):
     route = output.get("route")
     status = "TIME_LIMIT" if timed_out else output.get("status")
     if error and not (timed_out and route is not None):
-        checked = validate_route(instance, None)
-        checked["failureReason"] = error
+        checked = failure_result(error)
     else:
         checked = validate_route(instance, route)
     record = {

@@ -8,7 +8,7 @@ import test_run
 ROOT = test_run.ROOT
 
 BROKEN = ROOT / "tests" / "fixtures" / "broken" / "solve.py"
-MODES = ("infeasible", "malformed", "bad-status", "bad-types", "crash", "sleep", "partial")
+MODES = ("infeasible", "malformed", "bad-status", "bad-types", "crash", "sleep", "partial", "invalid-utf8")
 
 
 class FailureTest(test_run.CliCase):
@@ -20,6 +20,10 @@ class FailureTest(test_run.CliCase):
             (folder / "algorithm.json").write_text(json.dumps({
                 "id": mode, "displayName": mode, "timeLimitSeconds": 1,
                 "command": [sys.executable, str(BROKEN), mode]}))
+        folder = self.algs / "missing-command"
+        folder.mkdir()
+        (folder / "algorithm.json").write_text(json.dumps({
+            "id": "missing-command", "displayName": "missing", "command": ["/nonexistent/no-such-binary"]}))
         self.run_cli("--seeds", "1")
 
     def rec(self, mode):
@@ -51,6 +55,13 @@ class FailureTest(test_run.CliCase):
         rec = self.assertFailure("crash", "exited with code 3")
         self.assertIn("boom: something went wrong", rec["stderr"])
         self.assertIsNone(rec["route"])
+
+    def test_missing_command_is_a_failure_not_a_crash(self):
+        rec = self.assertFailure("missing-command", "could not start")
+        self.assertIsNone(rec["route"])
+
+    def test_non_utf8_output_is_a_failure_not_a_crash(self):
+        self.assertFailure("invalid-utf8", "not valid JSON")
 
     def test_overrun_is_killed_and_recorded_as_time_limit(self):
         rec = self.assertFailure("sleep", "time limit")

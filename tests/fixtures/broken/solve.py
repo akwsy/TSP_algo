@@ -21,3 +21,8 @@ elif mode == "sleep":
 elif mode == "partial":
     print(json.dumps({"route": [0, 0], "status": "HEURISTIC"}), flush=True)
     time.sleep(30)
+elif mode == "invalid-utf8":
+    sys.stdout.buffer.write(b"\xff\xfe not text")
+    sys.stdout.buffer.flush()
+elif mode == "self-time-limit":
+    print(json.dumps({"route": [0, 0], "status": "TIME_LIMIT"}))
