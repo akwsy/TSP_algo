@@ -16,7 +16,7 @@ public final class TestSuite {
     private static final SolverOptions OPTIONS = SolverOptions.defaults();
     private record Score(int count, double distance) {}
     public static void main(String[] args) throws Exception {
-        inputValidation(); boundaries(); baselineCases(); objectivesAndLimits(); oracleCases(); scenariosAndCli();
+        inputValidation(); boundaries(); baselineCases(); objectivesAndLimits(); oracleCases(); scenariosAndCli(); blockWindows();
         System.out.println("PASS: " + assertions + " assertions; 100 independent subset-oracle cases plus focused fixtures.");
     }
     private static Destination d(long id, double lat, double lon, double open, double close) {
@@ -300,6 +300,92 @@ public final class TestSuite {
             rejects(() -> ScenarioFiles.load(generated, null));
             Files.writeString(generated.resolve("windows.tsv"), "geonameid\topensAt\tclosesAt\n1735161\t0\t10\n1735161\t0\t10\n");
             rejects(() -> ScenarioFiles.load(generated, null));
+        } finally {
+            try (var paths = Files.walk(tmp)) {
+                for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) Files.delete(path);
+            }
+        }
+    }
+    private static Map<Long, double[]> readWindows(Path dir) throws IOException {
+        Map<Long, double[]> result = new LinkedHashMap<>();
+        List<String> lines = Files.readAllLines(dir.resolve("windows.tsv"));
+        for (String line : lines.subList(1, lines.size())) {
+            String[] f = line.split("\t");
+            result.put(Long.parseLong(f[0]), new double[]{Double.parseDouble(f[1]), Double.parseDouble(f[2])});
+        }
+        return result;
+    }
+    private static GenerationOptions blockOptions(int count, long seed, String clock) {
+        return new GenerationOptions(new GeoNamesLoader.Selection(count, "P", "all", 1735161L, "random", seed),
+                40, clock, 120, 30, "blocks");
+    }
+    private static void blockWindows() throws Exception {
+        Path tmp = Files.createTempDirectory("block-tests-");
+        try {
+            StringBuilder rows = new StringBuilder(sourceRow(1735161L, 0, "P", "14", 10000));
+            for (int i = 1; i <= 120; i++) rows.append(sourceRow(2000000L + i, i, "P", "14", i * 100));
+            Path source = tmp.resolve("MY.txt"); Files.writeString(source, rows);
+            Path out = tmp.resolve("blocks");
+            // Mode validation and default.
+            check(GenerationOptions.defaults().windowMode().equals("slack"), "Default window mode is slack");
+            rejects(() -> new GenerationOptions(blockOptions(5, 1, "08:00").selection(), 40, "08:00", 120, 30, "weekly"));
+            rejects(() -> new GenerationOptions(blockOptions(5, 1, "08:00").selection(), 40, "08:00", 120, 30, null));
+            // 08:00: expected offsets per block, depot always open, all four blocks present.
+            ScenarioFiles.generate(source, out, blockOptions(121, 7, "08:00"));
+            var w = readWindows(out);
+            double[] depot = w.get(1735161L);
+            check(depot[0] == 0 && depot[1] == Double.MAX_VALUE, "Depot always open in blocks mode");
+            Set<String> seen = new TreeSet<>();
+            for (var e : w.entrySet()) {
+                if (e.getKey() == 1735161L) continue;
+                double o = e.getValue()[0], c = e.getValue()[1];
+                String pair = o + "," + c;
+                check(Set.of("960.0,1320.0", "0.0,240.0", "240.0,600.0", "600.0,960.0").contains(pair), "08:00 block offsets: " + pair);
+                seen.add(pair);
+            }
+            check(seen.size() == 4, "All four blocks occur: " + seen);
+            // 22:00: blocks 00-06 -> next day, 06-12 -> next day, 12-18 -> next day, 18-24 -> 22:00..24:00 clipped.
+            ScenarioFiles.generate(source, out, blockOptions(121, 7, "22:00"));
+            seen.clear();
+            for (var e : readWindows(out).entrySet()) {
+                if (e.getKey() == 1735161L) continue;
+                String pair = e.getValue()[0] + "," + e.getValue()[1];
+                check(Set.of("120.0,480.0", "480.0,840.0", "840.0,1200.0", "0.0,120.0").contains(pair), "22:00 block offsets: " + pair);
+                seen.add(pair);
+            }
+            check(seen.size() == 4, "All four blocks occur at 22:00: " + seen);
+            // Determinism and seed sensitivity.
+            ScenarioFiles.generate(source, out, blockOptions(30, 5, "08:00"));
+            String first = Files.readString(out.resolve("windows.tsv"));
+            ScenarioFiles.generate(source, out, blockOptions(30, 5, "08:00"));
+            check(Files.readString(out.resolve("windows.tsv")).equals(first), "Block assignment is deterministic by seed");
+            ScenarioFiles.generate(source, out, blockOptions(30, 6, "08:00"));
+            check(!Files.readString(out.resolve("windows.tsv")).equals(first), "Different seed changes block assignment");
+            // Generated blocks scenario loads and records its mode.
+            ScenarioFiles.generate(source, out, blockOptions(30, 5, "08:00"));
+            check(Files.readString(out.resolve("scenario.properties")).contains("windowMode=blocks"), "Mode recorded");
+            check(ScenarioFiles.load(out, null).graph().size() == 30, "Blocks scenario loads");
+            Files.writeString(out.resolve("scenario.properties"), Files.readString(out.resolve("scenario.properties")) + "windowMode=bogus\n");
+            rejects(() -> ScenarioFiles.load(out, null));
+            // Default (slack) mode output is unchanged: no windowMode line and identical to the 5-argument options.
+            var slackA = new GenerationOptions(blockOptions(10, 42, "08:00").selection(), 40, "08:00", 120, 30);
+            var slackB = new GenerationOptions(blockOptions(10, 42, "08:00").selection(), 40, "08:00", 120, 30, "slack");
+            ScenarioFiles.generate(source, out, slackA);
+            String a = Files.readString(out.resolve("windows.tsv")) + Files.readString(out.resolve("scenario.properties"))
+                    + Files.readString(out.resolve("DATA_NOTES.md"));
+            ScenarioFiles.generate(source, out, slackB);
+            String b = Files.readString(out.resolve("windows.tsv")) + Files.readString(out.resolve("scenario.properties"))
+                    + Files.readString(out.resolve("DATA_NOTES.md"));
+            check(a.equals(b) && !a.contains("windowMode"), "Slack mode output has no windowMode marker");
+            // CLI flag.
+            String javaBin = Path.of(System.getProperty("java.home"), "bin", "java").toString();
+            for (String mode : new String[]{"blocks", "bogus"}) {
+                Process p = new ProcessBuilder(javaBin, "-cp", Path.of("out").toAbsolutePath().toString(), "app.Main", "--generate",
+                        source.toString(), "--count", "6", "--window-mode", mode).directory(tmp.toFile()).redirectErrorStream(true).start();
+                String text = new String(p.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+                check(p.waitFor() == (mode.equals("bogus") ? 1 : 0), "CLI --window-mode " + mode + ": " + text);
+            }
+            check(Files.readString(tmp.resolve("data/scenario.properties")).contains("windowMode=blocks"), "CLI blocks mode generated");
         } finally {
             try (var paths = Files.walk(tmp)) {
                 for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) Files.delete(path);

@@ -89,6 +89,19 @@ Generation also accepts `--speed`, `--start-clock`, `--duration-minutes` and
 seed reproduce the selection and windows. The reference witness demonstrates
 window feasibility with sufficient time, not feasibility within the trip budget.
 
+Window mode: `--window-mode slack` (default) builds windows around a shuffled
+reference route as above. `--window-mode blocks` instead gives each non-depot
+location ONE of four fixed clock blocks (00:00-06:00, 06:00-12:00, 12:00-18:00,
+18:00-24:00), chosen by the seeded RNG (same seed, same assignment); the depot
+stays always open. `windows.tsv` stores minutes relative to `startClock`: open =
+blockStart - clock, close = blockEnd - clock; a block ending at or before the
+start clock moves to the next day (+1440), a negative opening is clipped to 0, and
+the closing end is inclusive. The mode is recorded as `windowMode=blocks` in
+`scenario.properties` (absent for slack); other values are rejected. With the
+default 08:00 start and 120 minutes, blocks give mostly all-open or
+all-unreachable locations, so blocks suit longer periods or other start times.
+In blocks mode `reference-tour.txt` is only a shuffled order, not a feasibility witness.
+
 Exact search still caps candidate sets at 15 vertices including depot by default;
 use greedy for larger scenarios. The correctness suite creates its own temporary
 fixtures, so regenerating `data/` does not require rewriting tests. See

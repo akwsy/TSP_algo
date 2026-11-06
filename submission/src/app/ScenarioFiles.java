@@ -17,6 +17,7 @@ public final class ScenarioFiles {
             config.load(reader);
         }
         try {
+            if (config.getProperty("windowMode") != null) GenerationOptions.requireWindowMode(config.getProperty("windowMode"));
             double speed = speedOverride == null ? Double.parseDouble(config.getProperty("speedKmh", "40")) : speedOverride;
             String[] clock = config.getProperty("startClock", "08:00").split(":", -1);
             if (clock.length != 2) throw new IllegalArgumentException("startClock must be HH:mm");
@@ -71,20 +72,36 @@ public final class ScenarioFiles {
         Collections.shuffle(reference, new Random(selection.seed()));
         double[] open = new double[places.size()], close = new double[places.size()];
         close[0] = Double.MAX_VALUE;
-        double time = 0; int previous = 0;
-        for (int v : reference) {
-            time += DestinationGraph.haversine(unbounded.get(previous), unbounded.get(v)) * 60 / options.speedKmh();
-            open[v] = Math.max(0, time - options.windowSlackMinutes());
-            close[v] = time + options.windowSlackMinutes();
-            if (!Double.isFinite(close[v])) throw new IOException("Generated time window overflow");
-            previous = v;
+        boolean blocks = options.windowMode().equals(GenerationOptions.BLOCKS);
+        if (blocks) {
+            // Independent seeded stream so slack-mode randomness is untouched.
+            Random blockRandom = new Random(selection.seed());
+            int clock = Integer.parseInt(options.startClock().substring(0, 2)) * 60
+                    + Integer.parseInt(options.startClock().substring(3));
+            for (int v = 1; v < places.size(); v++) {
+                int start = blockRandom.nextInt(4) * 360, end = start + 360;
+                if (end <= clock) { start += 1440; end += 1440; }
+                open[v] = Math.max(0, start - clock);
+                close[v] = end - clock;
+            }
+        } else {
+            double time = 0; int previous = 0;
+            for (int v : reference) {
+                time += DestinationGraph.haversine(unbounded.get(previous), unbounded.get(v)) * 60 / options.speedKmh();
+                open[v] = Math.max(0, time - options.windowSlackMinutes());
+                close[v] = time + options.windowSlackMinutes();
+                if (!Double.isFinite(close[v])) throw new IOException("Generated time window overflow");
+                previous = v;
+            }
         }
         StringBuilder rows = new StringBuilder(), windows = new StringBuilder("geonameid\topensAt\tclosesAt\n");
         for (int i = 0; i < places.size(); i++) {
             rows.append(places.get(i).rawLine()).append('\n');
             windows.append(places.get(i).id()).append('\t').append(open[i]).append('\t').append(close[i]).append('\n');
         }
-        StringBuilder tour = new StringBuilder("# Generation witness only; neither solver reads this file.\n");
+        StringBuilder tour = new StringBuilder(blocks
+                ? "# Shuffled order only: block windows are independent, so this is NOT a feasibility witness. Neither solver reads this file.\n"
+                : "# Generation witness only; neither solver reads this file.\n");
         tour.append(places.get(0).id());
         for (int v : reference) tour.append(" -> ").append(places.get(v).id());
         tour.append(" -> ").append(places.get(0).id()).append('\n');
@@ -94,7 +111,8 @@ public final class ScenarioFiles {
                 + "\nselectionCount=" + selection.count() + "\nselectionFeatureClass=" + selection.featureClass()
                 + "\nselectionAdmin1=" + selection.admin1() + "\nselectionDepotId=" + selection.depotId()
                 + "\nselectionMethod=" + selection.method() + "\nselectionSeed=" + selection.seed()
-                + "\nwindowSlackMinutes=" + options.windowSlackMinutes() + "\n";
+                + "\nwindowSlackMinutes=" + options.windowSlackMinutes() + "\n"
+                + (blocks ? "windowMode=blocks\n" : "");
         String notes = """
                 # Generated scenario data
 
@@ -111,9 +129,14 @@ public final class ScenarioFiles {
                 + "Selection settings are recorded in scenario.properties. No source-device path is stored.\n\n"
                 + "SIMULATION: Haversine distances, Earth radius 6371.0088 km; constant " + options.speedKmh()
                 + " km/h; origin " + options.startClock() + "; zero service time.\n"
-                + "Windows use a shuffled reference route with the same seed and +/-" + options.windowSlackMinutes()
+                + (blocks
+                ? "Windows use fixed 6-hour blocks of the clock day (00:00-06:00, 06:00-12:00, 12:00-18:00, 18:00-24:00): each customer gets one block chosen by the seeded RNG; the depot is always open.\n"
+                + "Offsets are minutes from " + options.startClock() + "; a block ending at or before the start clock moves to the next day, openings are clipped to zero, closing is inclusive. They are not real appointments.\n"
+                + "With a short period (e.g. 08:00 start, 120 minutes) blocks give mostly all-open or all-unreachable customers; blocks suit longer periods or other start times.\n"
+                + "The reference-tour file is only a shuffled order, not a feasibility witness. Neither solver reads it.\n"
+                : "Windows use a shuffled reference route with the same seed and +/-" + options.windowSlackMinutes()
                 + " minutes slack (openings clipped to zero). They are not real appointments.\n"
-                + "The reference witness satisfies customer windows but may exceed the period. Neither solver reads it.\n"
+                + "The reference witness satisfies customer windows but may exceed the period. Neither solver reads it.\n")
                 + "Trip period: " + options.durationMinutes() + " minutes including waiting and return.\n"
                 + "Maximize customer visits; shorter distance breaks equal-count ties.\n"
                 + "Regeneration replaces these scenario files and resets their settings/windows to the command's options.\n";

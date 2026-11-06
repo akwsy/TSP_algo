@@ -54,7 +54,7 @@ public final class Main {
     }
     private static void generate(String[] args) throws Exception {
         if (args.length < 2) throw new IllegalArgumentException("Use --generate <MY.txt> [selection options]");
-        int count = 10; String featureClass = "P", admin1 = "14", method = "population", startClock = "08:00";
+        int count = 10; String featureClass = "P", admin1 = "14", method = "population", startClock = "08:00", windowMode = "slack";
         long depot = 1735161L, seed = 42; double speed = 40, duration = 120, slack = 30;
         for (int i = 2; i < args.length; i += 2) {
             if (i + 1 >= args.length) throw new IllegalArgumentException("Missing generation value for " + args[i]);
@@ -69,11 +69,12 @@ public final class Main {
                 case "--start-clock" -> startClock = args[i + 1];
                 case "--duration-minutes" -> duration = Double.parseDouble(args[i + 1]);
                 case "--window-slack-minutes" -> slack = Double.parseDouble(args[i + 1]);
+                case "--window-mode" -> windowMode = args[i + 1];
                 default -> throw new IllegalArgumentException("Unknown generation option " + args[i]);
             }
         }
         var selection = new GeoNamesLoader.Selection(count, featureClass, admin1, depot, method, seed);
-        var options = new GenerationOptions(selection, speed, startClock, duration, slack);
+        var options = new GenerationOptions(selection, speed, startClock, duration, slack, windowMode);
         ScenarioFiles.generate(Path.of(args[1]), Path.of("data"), options);
         System.out.printf("Replaced data/: %d destinations including depot (%d potential visits); %s selection, seed %d.%n",
                 count, count - 1, method, seed);
@@ -147,6 +148,8 @@ public final class Main {
                   --seed <integer>         Reproducible selection/window seed (default 42)
                   --speed <km/h> --start-clock <HH:mm> --duration-minutes <minutes>
                   --window-slack-minutes <minutes>  Slack around generated visits (default 30)
+                  --window-mode slack|blocks  slack: windows around a reference route (default);
+                                           blocks: each customer gets one fixed 6-hour clock block
                 """);
     }
 }

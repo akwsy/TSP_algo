@@ -96,7 +96,8 @@ public final class UiServer {
                 var options = new GenerationOptions(selection, number(values, "speedKmh", defaults.speedKmh()),
                         values.getOrDefault("startClock", defaults.startClock()),
                         number(values, "durationMinutes", defaults.durationMinutes()),
-                        number(values, "windowSlackMinutes", defaults.windowSlackMinutes()));
+                        number(values, "windowSlackMinutes", defaults.windowSlackMinutes()),
+                        values.getOrDefault("windowMode", defaults.windowMode()));
                 ScenarioFiles.generate(source, data, options);
                 json(request, 200, ComparisonService.scenario(loadScenario(data, null))); return;
             }
