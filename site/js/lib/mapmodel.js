@@ -84,3 +84,27 @@ export async function chooseEngine(loadLeaflet, timeoutMs = 4000, forceSvg = fal
     clearTimeout(timer);
   }
 }
+
+/**
+ * Everything a map engine needs to draw. `entries` = [{ id, label, run }] for the algorithms currently shown.
+ * A location is `filled` (visited) if any shown route visits it; its `info` says what each shown run did.
+ */
+export function buildScene(instance, entries) {
+  const per = entries.map((e) => ({ e, pts: new Map(mapPoints(instance, e.run).map((p) => [p.id, p])) }));
+  const points = instance.locations.map((l) => {
+    const info = per.map(({ e, pts }) => {
+      const p = pts.get(l.id);
+      if (p.kind === "depot") return null;
+      if (p.kind === "skipped") return `${e.label}: skipped`;
+      const wait = p.wait ? `, waits ${Math.round(p.wait)} min` : ", no wait";
+      return `${e.label}: stop ${p.order}, arrives ${clock(p.arrive)}${wait}`;
+    }).filter(Boolean);
+    const depot = !!l.isDepot;
+    return { id: l.id, name: l.name, lat: l.lat, lon: l.lon, depot, slot: l.slot ?? null,
+      window: windowText(l), filled: !depot && per.some(({ pts }) => pts.get(l.id).kind === "visited"), info };
+  });
+  const lines = per.filter(({ e }) => validRoute(e.run)).map(({ e }) => ({ entry: e.id, ids: e.run.route }));
+  const badges = per.flatMap(({ e, pts }, k) => [...pts.values()].filter((p) => p.kind === "visited")
+    .map((p) => ({ entry: e.id, k, id: p.id, text: String(p.order) })));
+  return { points, lines, badges };
+}

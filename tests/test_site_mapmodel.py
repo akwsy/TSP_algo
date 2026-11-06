@@ -93,5 +93,25 @@ class MapModelTest(unittest.TestCase):
         self.assertEqual(got, ["svg", "svg", "leaflet", "svg"])
 
 
+@unittest.skipUnless(shutil.which("node"), "node not installed")
+class SceneTest(unittest.TestCase):
+    def test_scene_combines_shown_runs(self):
+        other = {"algorithmId": "b", "valid": True, "route": [0, 3, 0], "returnMinute": 500,
+                 "schedule": [{"id": 3, "arriveMinute": 1180, "startMinute": 1180, "leaveMinute": 1180}]}
+        scene = call("buildScene", INST, [{"id": "a", "label": "A", "run": RUN}, {"id": "b", "label": "B", "run": other}])
+        pts = {p["id"]: p for p in scene["points"]}
+        self.assertTrue(pts[3]["filled"] and pts[1]["filled"])
+        self.assertEqual(pts[3]["info"], ["A: skipped", "B: stop 1, arrives 19:40, no wait"])
+        self.assertEqual(pts[2]["info"][0], "A: stop 2, arrives 08:20, waits 130 min")
+        self.assertTrue(pts[0]["depot"] and pts[0]["info"] == [])
+        self.assertEqual([l["ids"] for l in scene["lines"]], [[0, 1, 2, 0], [0, 3, 0]])
+        self.assertEqual(len(scene["badges"]), 3)
+
+    def test_failed_run_draws_no_route_and_nothing_filled(self):
+        scene = call("buildScene", INST, [{"id": "a", "label": "A", "run": {"valid": False, "route": None}}])
+        self.assertEqual(scene["lines"], [])
+        self.assertFalse(any(p["filled"] for p in scene["points"]))
+
+
 if __name__ == "__main__":
     unittest.main()

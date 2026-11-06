@@ -21,7 +21,10 @@ class ServerTest(unittest.TestCase):
         self.results.mkdir()
         (self.results / "index.json").write_text('{"runs": []}')
         (self.results / "x.json").write_text('{"a": 1}')
-        self.server = serve.make_server(0, self.results, ROOT / "algorithms")
+        instances = Path(tmp.name) / "i"
+        instances.mkdir()
+        (instances / "n1-seed1.json").write_text('{"instanceId": "n1-seed1"}')
+        self.server = serve.make_server(0, self.results, ROOT / "algorithms", instances=instances)
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
         self.addCleanup(self.server.server_close)
         self.addCleanup(self.server.shutdown)
@@ -39,6 +42,11 @@ class ServerTest(unittest.TestCase):
     def test_results_path_cannot_escape_folder(self):
         with self.assertRaises(urllib.error.HTTPError):
             self.get("/results/../../README.md")
+
+    def test_serves_instance_files_and_blocks_escape(self):
+        self.assertEqual(json.loads(self.get("/instances/n1-seed1.json")), {"instanceId": "n1-seed1"})
+        with self.assertRaises(urllib.error.HTTPError):
+            self.get("/instances/../../README.md")
 
     def test_algorithms_endpoint_exposes_declared_complexity(self):
         algs = json.loads(self.get("/api/algorithms"))

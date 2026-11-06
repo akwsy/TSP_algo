@@ -3,7 +3,8 @@
   /                 the static site (this folder)
   /results/...      the results folder (default: ./results; use --results to point elsewhere,
                     e.g. tests/fixtures/sample-results)
-  /api/algorithms   each algorithm.json under the algorithms folder, as a JSON list
+  /instances/...    the instances folder (default: ./instances; use --instances), one file per instance
+  /api/algorithms  each algorithm.json under the algorithms folder, as a JSON list
 Standard library only; no network access needed.
 """
 import argparse
@@ -28,16 +29,16 @@ def read_algorithms(folder):
 
 
 class Handler(SimpleHTTPRequestHandler):
-    def __init__(self, *args, results, algorithms, **kw):
-        self.results, self.algorithms = Path(results), Path(algorithms)
+    def __init__(self, *args, results, algorithms, instances, **kw):
+        self.results, self.algorithms, self.instances = Path(results), Path(algorithms), Path(instances)
         super().__init__(*args, directory=str(HERE), **kw)
 
     def translate_path(self, path):
         clean = path.split("?", 1)[0].split("#", 1)[0]
-        if clean.startswith("/results/"):
-            rel = Path(*[p for p in clean[len("/results/"):].split("/") if p not in ("", ".", "..")]) \
-                if clean != "/results/" else Path("index.json")
-            return str(self.results / rel)
+        for prefix, folder in (("/results/", self.results), ("/instances/", self.instances)):
+            if clean.startswith(prefix):
+                parts = [p for p in clean[len(prefix):].split("/") if p not in ("", ".", "..")]
+                return str(folder / (Path(*parts) if parts else Path("index.json")))
         return super().translate_path(path)
 
     def do_GET(self):
@@ -59,17 +60,20 @@ class Handler(SimpleHTTPRequestHandler):
         pass
 
 
-def make_server(port=8000, results=ROOT / "results", algorithms=ROOT / "algorithms", host="127.0.0.1"):
-    return ThreadingHTTPServer((host, port), partial(Handler, results=results, algorithms=algorithms))
+def make_server(port=8000, results=ROOT / "results", algorithms=ROOT / "algorithms", host="127.0.0.1",
+                instances=ROOT / "instances"):
+    return ThreadingHTTPServer((host, port), partial(Handler, results=results, algorithms=algorithms,
+                                                     instances=instances))
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Serve the results website.")
     ap.add_argument("--results", default=str(ROOT / "results"), help="results folder")
     ap.add_argument("--algorithms", default=str(ROOT / "algorithms"), help="algorithms folder")
+    ap.add_argument("--instances", default=str(ROOT / "instances"), help="instances folder")
     ap.add_argument("--port", type=int, default=8000)
     args = ap.parse_args(argv)
-    server = make_server(args.port, args.results, args.algorithms)
+    server = make_server(args.port, args.results, args.algorithms, instances=args.instances)
     print(f"Serving http://127.0.0.1:{server.server_port}/  (results: {args.results})")
     try:
         server.serve_forever()
