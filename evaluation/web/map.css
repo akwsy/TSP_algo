@@ -1,0 +1,67 @@
+/* Map styles. Self-contained so the map does not depend on the page restyle. */
+.graph-wrap { position: relative; background: #f4f6f4; }
+#network { display: block; width: 100%; height: auto; max-height: 560px; touch-action: none; cursor: grab; user-select: none; outline-offset: -2px; }
+#network.panning { cursor: grabbing; }
+.graph-panel > .legend { display: none; }
+
+.graph-edge { stroke: #b9bfba; stroke-width: 1; opacity: .5; vector-effect: non-scaling-stroke; pointer-events: stroke; }
+.route-path { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: .9; vector-effect: non-scaling-stroke; pointer-events: none; }
+.route-path.nearest { stroke: var(--nearest, #c2410c); stroke-dasharray: 8 5; }
+.route-path.greedy { stroke: var(--greedy, #1d6fb8); stroke-dasharray: 3 4; }
+.route-path.exact { stroke: var(--exact, #2e7d32); }
+.route-path.dim { stroke-width: 2; opacity: .18; }
+.route-hit { stroke: transparent; stroke-width: 14; vector-effect: non-scaling-stroke; pointer-events: stroke; fill: none; }
+.route-segment { cursor: help; }
+.route-segment:focus-visible .route-path { stroke-width: 5; opacity: 1; }
+.route-arrow { stroke: #fff; stroke-width: 1; stroke-linejoin: round; }
+.route-arrow.nearest { fill: var(--nearest, #c2410c); }
+.route-arrow.greedy { fill: var(--greedy, #1d6fb8); }
+.route-arrow.exact { fill: var(--exact, #2e7d32); }
+.measurement-line { stroke: #222; stroke-width: 2; stroke-dasharray: 2 4; vector-effect: non-scaling-stroke; pointer-events: none; }
+
+.destination { cursor: pointer; outline: none; }
+.destination circle { fill: #fff; stroke: #666; stroke-width: 2; }
+.destination.status-open circle { fill: #78bf88; stroke: #28643a; }
+.destination.status-closed circle { fill: #ec9b96; stroke: #a12c25; }
+.destination.status-unknown circle { fill: #ddd; stroke: #777; }
+.destination:hover circle, .destination:focus-visible circle { stroke-width: 3.5; }
+.destination .sel-ring { fill: none; stroke: #1553a1; stroke-width: 3; }
+.destination.selected .sel-ring { filter: drop-shadow(0 0 2px #1553a1); }
+.destination:focus-visible .sel-ring, .destination:focus-visible circle { stroke: #1553a1; }
+.destination.skipped circle { fill: #fff; fill-opacity: .55; stroke-dasharray: 2.5 2.5; stroke-width: 1.8; }
+.destination.skipped .skip-x { stroke: #555; stroke-width: 1.5; fill: none; }
+.destination.depot .depot-shape { fill: #222; stroke: #fff; stroke-width: 2; }
+.destination.depot:focus-visible .depot-shape, .destination.depot:hover .depot-shape { stroke: #1553a1; }
+.depot-letter { fill: #fff; font: 700 12px system-ui, sans-serif; pointer-events: none; }
+
+.point-label { display: none; font: 12px system-ui, sans-serif; fill: #222; paint-order: stroke; stroke: #f4f6f4; stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
+.destination.label-on .point-label, .destination:hover .point-label, .destination:focus .point-label, .destination.selected .point-label { display: inline; }
+.destination:hover .point-label, .destination:focus .point-label { font-weight: 600; }
+.destination:hover, .destination:focus { /* bring the hovered marker to the front */ }
+.route-stop circle { fill: #fff; stroke: #333; stroke-width: 1.2; }
+.route-order { fill: #222; font: 700 10px system-ui, sans-serif; }
+
+.scale-line, .scale-tick { stroke: #333; stroke-width: 2; }
+.scale-text { fill: #333; font: 11px system-ui, sans-serif; paint-order: stroke; stroke: #f4f6f4; stroke-width: 3px; }
+
+.map-controls { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 4px; }
+.map-controls button { width: 32px; height: 32px; padding: 0; border: 1px solid #aaa; border-radius: 6px; background: #fff; color: #222; font: 700 18px/1 system-ui, sans-serif; cursor: pointer; }
+.map-controls button:hover { background: #eef3fb; }
+.map-controls button:focus-visible, .map-legend-route:focus-visible { outline: 2px solid #1553a1; outline-offset: 2px; }
+.map-controls button:disabled { opacity: .5; cursor: default; }
+.map-keys { position: absolute; left: 10px; top: 8px; margin: 0; padding: 2px 6px; border-radius: 4px; background: #ffffffcc; color: #444; font-size: 11px; pointer-events: none; opacity: 0; transition: opacity .15s; }
+#network:focus ~ .map-keys, #network:hover ~ .map-keys { opacity: 1; }
+
+.map-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 10px; font-size: 12px; }
+.map-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.map-legend i { display: inline-block; width: 12px; height: 12px; box-sizing: border-box; border-radius: 50%; border: 2px solid #666; background: #fff; }
+.map-legend .lg-depot { border-radius: 3px; background: #222; border-color: #fff; box-shadow: 0 0 0 1px #222; }
+.map-legend .lg-open { background: #78bf88; border-color: #28643a; }
+.map-legend .lg-closed { background: #ec9b96; border-color: #a12c25; }
+.map-legend .lg-skipped { border-style: dashed; background: #fff8; }
+.map-legend .lg-selected { background: #fff; border-color: #1553a1; box-shadow: 0 0 0 2px #1553a155; }
+.map-legend-route { display: inline-flex; align-items: center; gap: 6px; padding: 2px 6px; border: 1px solid transparent; border-radius: 4px; background: none; color: inherit; font: inherit; cursor: pointer; }
+.map-legend-route:hover { border-color: #aaa; }
+.map-legend-route.on { border-color: #1553a1; background: #eef3fb; }
+.map-legend-route svg .route-path { stroke-width: 3; opacity: 1; }
+.map-legend-note { color: #555; }

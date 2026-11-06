@@ -127,52 +127,23 @@ async function generate(event) {
 function drawGraph() {
   const scenario = state.comparison?.scenario || state.scenario;
   if (!scenario) return;
-  const destinations = scenario.destinations, n = destinations.length, svg = $('network');
-  $('graph-empty').hidden = true;
-  const width = Math.max(420, Math.min(1000, svg.clientWidth * 1.3));
-  const left = 65, right = width - 40, screenCenter = (left + right) / 2;
-  const compact = svg.clientWidth < 520;
-  svg.setAttribute('viewBox', `0 0 ${width} 480`);
-  const latitudes = destinations.map(d => d.latitude), longitudes = destinations.map(d => d.longitude);
-  const midLat = (Math.min(...latitudes) + Math.max(...latitudes)) / 2;
-  const cos = Math.max(.001, Math.cos(midLat * Math.PI / 180));
-  const xs = longitudes.map(x => x * cos), ys = latitudes;
-  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-  const scale = Math.min((right - left - 35) / Math.max(maxX - minX, .00001), 330 / Math.max(maxY - minY, .00001));
-  const centerX = (minX + maxX) / 2, centerY = (minY + maxY) / 2;
-  const points = destinations.map(d => [screenCenter + (d.longitude * cos - centerX) * scale, 230 - (d.latitude - centerY) * scale]);
-  state.graphPoints = points; hideHover();
-  let content = '<title>Input destinations plotted by longitude and latitude. Route overlays represent direct travel.</title>';
-  for (let tick = 0; tick <= 5; tick++) { const x = left + (right - left) * tick / 5; content += `<line class="graph-grid" x1="${x}" y1="35" x2="${x}" y2="425"/><text class="axis-label" x="${x}" y="453" text-anchor="middle">${fmt(((x - screenCenter) / scale + centerX) / cos, 3)}° E</text>`; }
-  for (let y = 35; y <= 425; y += 97.5) content += `<line class="graph-grid" x1="${left}" y1="${y}" x2="${right}" y2="${y}"/><text class="axis-label" x="57" y="${y + 3}" text-anchor="end">${fmt(centerY - (y - 230) / scale, 3)}° N</text>`;
-  if ($('show-edges').checked && n <= 50) for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++)
-    content += `<line class="graph-edge" data-edge-from="${i}" data-edge-to="${j}" x1="${points[i][0]}" y1="${points[i][1]}" x2="${points[j][0]}" y2="${points[j][1]}"/>`;
-  const view = $('route-view').value;
-  for (const result of state.comparison?.results || []) if (view === 'all' || view === result.id) {
-    for (let step = 1; step < result.route.length; step++) {
-      const from = result.route[step - 1], to = result.route[step];
-      if (from === to) continue;
-      const [x1, y1] = points[from], [x2, y2] = points[to], visit = result.visits[step];
-      const description = `${result.name}: ${destinations[from].name} to ${destinations[to].name}, ${fmt(visit.legDistanceKm)} km, ${duration(visit.legTravelMinutes)} travel time`;
-      content += `<g class="route-segment" data-leg="${step}" data-algorithm="${result.id}" tabindex="0" role="button" aria-label="${escapeHtml(description)}"><title>${escapeHtml(description)}</title><line class="route-path ${result.id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><line class="route-hit" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/></g>`;
-    }
-  }
-  content += '<line id="measurement-line" class="measurement-line" visibility="hidden"/>';
-  const selectedResult = state.comparison?.results.find(r => r.id === view);
-  destinations.forEach((d, i) => {
-    const [x, y] = points[i], selected = state.selected === i;
-    const window = windowText(d);
-    const status = state.selected === null ? '' : locationStatus(d, state.inspectionTime);
-    content += `<g class="destination${i === 0 ? ' depot' : ''}${status ? ` status-${status.toLowerCase()}` : ''}${selected ? ' selected' : ''}" data-index="${i}" tabindex="0" role="button" aria-pressed="${selected}" aria-label="${escapeHtml(d.name)}, ${escapeHtml(window)}${status ? `, ${status.toLowerCase()} at ${clock(state.inspectionTime)}` : ""}${selected ? ", selected location" : ""}"><title>${escapeHtml(d.name)} · ${escapeHtml(window)}${status ? ` · ${status}` : ""}</title><circle cx="${x}" cy="${y}" r="${i === 0 ? 12 : 6}"/>`;
-    if (i === 0) content += `<text class="depot-letter" x="${x}" y="${y + 3.5}" text-anchor="middle">D</text>`;
-    if ((!compact && n <= 25) || selected || i === 0) content += `<text class="point-label" x="${x + 12}" y="${y - 11}">${escapeHtml(d.name)}</text>`;
-    content += '</g>';
-    if (selectedResult && i !== 0) {
-      const order = selectedResult.route.indexOf(i);
-      if (order >= 1) content += `<circle class="route-stop" pointer-events="none" cx="${x - 10}" cy="${y + 12}" r="9"/><text class="route-order" pointer-events="none" x="${x - 10}" y="${y + 15}" text-anchor="middle">${order}</text>`;
-    }
+  const destinations = scenario.destinations, svg = $('network');
+  $('graph-empty').hidden = true; hideHover();
+  const time = state.selected === null ? Number($('departure').value) : state.inspectionTime;
+  const statusOf = i => Inspection.status(i, destinationWindow(destinations[i]).open, destinationWindow(destinations[i]).close, time).toLowerCase();
+  state.graphPoints = MapView.draw({
+    svg, destinations, results: state.comparison?.results || [], view: $('route-view').value, selected: state.selected,
+    showEdges: $('show-edges').checked, fitKey: destinations.map(d => d.id).join(','),
+    legend: $('map-legend'), algorithms: Object.entries(labels).map(([id, name]) => ({ id, name })),
+    timeNote: `Open/closed at ${clock(time)}${state.selected === null ? ' (departure)' : ''}`,
+    status: statusOf,
+    legDescription: (result, step) => {
+      const from = result.route[step - 1], visit = result.visits[step];
+      return `${result.name}: ${destinations[from].name} to ${destinations[result.route[step]].name}, ${fmt(visit.legDistanceKm)} km, ${duration(visit.legTravelMinutes)} travel time`;
+    },
+    pointTitle: (i, skipped) => `${destinations[i].name} · ${windowText(destinations[i])} · ${statusOf(i)}${skipped ? ' · skipped' : ''}`,
+    pointAria: (i, skipped) => `${destinations[i].name}, ${windowText(destinations[i])}, ${statusOf(i)} at ${clock(time)}${skipped ? ', skipped' : ''}${state.selected === i ? ', selected location' : ''}`
   });
-  svg.innerHTML = content;
 }
 function resetOrigin() {
   state.selected = null; state.inspectionTime = null; hideHover();
@@ -208,11 +179,19 @@ function destinationWindow(d) {
 function conciseTrip(from, to, distance, travel, departure, arrival) {
   return `${from.name} → ${to.name}\nDistance: ${fmt(distance)} km\nTime taken: ${duration(travel)}\nDeparture: ${clock(departure)}\nArrival: ${clock(arrival)}\nWindow: ${windowText(to)}\n${locationStatus(to, arrival)}`;
 }
+function pointDetails(index) {
+  const d = (state.comparison?.scenario || state.scenario).destinations[index], result = inspectionResult();
+  const visit = result?.visits.find(v => v.vertex === index && index !== 0);
+  const lines = [d.name, `Window: ${windowText(d)}`];
+  if (visit) lines.push(`Arrival: ${clock(visit.arrival)}`, `Wait: ${duration(Math.max(0, visit.visitTime - visit.arrival))}`, `${result.name}: ${locationStatus(d, visit.arrival)}`);
+  else lines.push(`${index === 0 ? 'Depot' : result ? 'Not visited by ' + result.name : 'Not visited'}`);
+  return lines.join('\n');
+}
 function hoverText(target) {
   const scenario = state.comparison?.scenario || state.scenario;
   if (!scenario) return '';
   const destinations = scenario.destinations;
-  if (state.selected === null) return 'Click a destination first to select the current location.';
+  if (state.selected === null) return target.hasAttribute('data-index') ? pointDetails(Number(target.dataset.index)) : 'Click a destination first to select the current location.';
   if (!scenario.distanceKm) return 'Restart the UI server and reload this page to load distance measurements.';
   if (target.hasAttribute('data-leg')) {
     const result = state.comparison?.results.find(r => r.id === target.dataset.algorithm);
@@ -237,7 +216,8 @@ function hoverText(target) {
     for (const [key, value] of Object.entries({ x1: fromPoint[0], y1: fromPoint[1], x2: toPoint[0], y2: toPoint[1] })) line.setAttribute(key, value);
     line.setAttribute('visibility', 'visible');
   }
-  return conciseTrip(from, to, distance, travel, departure, arrival);
+  const stop = inspectionResult()?.visits.find(v => v.vertex === toIndex && toIndex !== 0);
+  return conciseTrip(from, to, distance, travel, departure, arrival) + (stop ? `\nRoute arrival: ${clock(stop.arrival)}\nWait: ${duration(Math.max(0, stop.visitTime - stop.arrival))}` : '');
 }
 function inspectHover(target, event) {
   if (!target || !state.scenario || state.busy) { hideHover(); return; }
@@ -331,6 +311,7 @@ $('download').addEventListener('click', () => {
   const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'route-comparison.json'; anchor.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
+MapView.init($('network'), $('map-legend'));
 reload(true);
 
 new ResizeObserver(() => drawGraph()).observe($('network').parentElement);
