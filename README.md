@@ -23,6 +23,15 @@ Harness: Python 3 (standard library only). Website: plain HTML/JS.
 python3 -m unittest discover -s tests
 ```
 
+## Run the website
+
+```
+python3 site/serve.py                      # reads ./results and ./algorithms, http://127.0.0.1:8000/
+python3 site/serve.py --results tests/fixtures/sample-results --algorithms tests/fixtures/sample-algorithms
+```
+
+`results/` is git-ignored; create it with `python3 -m harness.experiment scaling`. The second command shows the committed sample results (including failed runs). No build step, no CDN: it works offline. Pages live in `site/js/pages/` and are listed in `site/js/pages/index.js` (see the comment there to add one). Data logic that is tested lives in `site/js/lib/model.js` (tests need `node`; they skip without it).
+
 ## Unconfirmed assumptions (brief section 12)
 
 1. "6 a.m. to 12 a.m." means 06:00 to midnight (18 h), four 4.5 h slots.
