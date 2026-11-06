@@ -91,12 +91,12 @@ export default {
       if (!shown.length) {
         out.push(h("div", { class: "empty card" }, "No algorithm selected. Tick at least one above."));
       } else if (state.mode === "overlay") {
-        const m = createRouteMap(instance, { entries: shown, forceSvg, height: 480 });
+        const m = createRouteMap(instance, { entries: shown, forceSvg });
         maps.push(m);
         out.push(h("div", { class: "card pad" }, m.el), compareTable(shown));
       } else {
         out.push(h("div", { class: "grid" }, shown.map((e) => {
-          const m = createRouteMap(instance, { entries: [e], forceSvg, height: 340 });
+          const m = createRouteMap(instance, { entries: [e], forceSvg });
           maps.push(m);
           return h("section", { class: "card pad alg-card", "aria-label": e.id },
             h("h2", { class: "alg-title" }, algorithmSwatch(e), e.id),

@@ -81,7 +81,7 @@ export default {
     }
     const idx = algorithmColorIndex([...new Set(runs.map((r) => r.algorithmId))])[rec.algorithmId] ?? 0;
     const entry = { id: rec.algorithmId, label: nameOf(rec.algorithmId), ...entryStyle(idx), run: rec };
-    const map = createRouteMap(instance, { entries: [entry], forceSvg: ctx.params.get("map") === "svg", height: 380 });
+    const map = createRouteMap(instance, { entries: [entry], forceSvg: ctx.params.get("map") === "svg" });
     const steps = routeSteps(instance, rec);
     const head = ["#", "What happens", "Place", "Open from-to", "Arrived", "Waited", "Left", "Km from last stop", "Km so far", "Back on time?"];
     const when = (rec.timestamp || "").slice(0, 16).replace("T", " ");

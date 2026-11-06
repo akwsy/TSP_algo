@@ -167,6 +167,19 @@ class CompareModelTest(unittest.TestCase):
         self.assertEqual(call("labelSide", pts[0], 640), "left")
         self.assertEqual(call("labelSide", {**pts[0], "x": 20}, 640), "right")
 
+    def test_tile_limits_stop_native_zoom_where_the_provider_has_real_tiles(self):
+        # Esri World Terrain Base serves a "Map data not yet available" placeholder from level 10 up, so level 9 is the last real one.
+        lim = node("console.log(JSON.stringify(m.TILE_LIMITS));")
+        self.assertEqual(lim["maxNativeZoom"], 9)
+        self.assertGreater(lim["maxZoom"], lim["maxNativeZoom"])
+        self.assertLessEqual(lim["maxZoom"] - lim["maxNativeZoom"], 4)
+
+    def test_clamp_zoom_stays_inside_the_limits(self):
+        self.assertEqual(call("clampZoom", 99, 1, 13), 13)
+        self.assertEqual(call("clampZoom", -3, 1, 13), 1)
+        self.assertEqual(call("clampZoom", 7.5, 1, 13), 7.5)
+        self.assertEqual(call("clampZoom", None, 1, 13), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
