@@ -15,15 +15,15 @@ function statsList(rec) {
 }
 
 function compareTable(shown) {
-  const head = ["Algorithm", "Visits", "Skipped", "Distance km", "Travel min", "Wait min", "Total min", "Runtime ms"];
+  const head = ["Algorithm", "Skipped", "Travel min", "Wait min", "Runtime ms"];
   return h("div", { class: "card table-wrap spaced" }, h("table", {},
-    h("caption", {}, "Latest run of each shown algorithm on this instance."),
+    h("caption", {}, "More detail for each shown algorithm on this problem (places visited, distance and total time are in the comparison above)."),
     h("thead", {}, h("tr", {}, head.map((t, i) => h("th", { scope: "col", class: i ? null : "l" }, t)))),
     h("tbody", {}, shown.map((e) => {
       const r = e.run;
       const cells = r.valid !== false
-        ? [r.visited, (r.skipped || []).length, fmt(r.distanceKm), fmt(r.travelMinutes), fmt(r.waitMinutes), fmt(r.totalMinutes), fmt(r.runtimeMs)]
-        : [h("span", { class: "badge bad" }, "failed"), "n/a", "n/a", "n/a", "n/a", "n/a", fmt(r.runtimeMs)];
+        ? [(r.skipped || []).length, fmt(r.travelMinutes), fmt(r.waitMinutes), fmt(r.runtimeMs)]
+        : [h("span", { class: "badge bad" }, "failed"), "n/a", "n/a", fmt(r.runtimeMs)];
       return h("tr", {}, h("td", { class: "l" }, algorithmSwatch(e), e.id),
         cells.map((c) => h("td", {}, c)));
     }))));
@@ -40,7 +40,7 @@ export default {
       return ra.numCustomers - rb.numCustomers || ra.seed - rb.seed;
     });
     el.append(h("h1", {}, "Instance explorer"),
-      h("p", { class: "lede" }, "Every algorithm's answer to one instance, on the map and in numbers."));
+      h("p", { class: "lede" }, "Every algorithm's answer to one problem, on the map and in numbers."));
     if (!ids.length) { el.append(h("div", { class: "empty card" }, "No runs recorded yet.")); return; }
 
     const colorIdx = algorithmColorIndex([...new Set(runs.map((r) => r.algorithmId))]);
@@ -109,7 +109,7 @@ export default {
 
     el.append(
       h("div", { class: "toolbar" },
-        select("Instance", ids.map((i) => ({ value: i, label: instanceLabel(i, runs) })), state.id,
+        select("Problem", ids.map((i) => ({ value: i, label: instanceLabel(i, runs) })), state.id,
           (v) => { state.id = v; state.hidden.clear(); sync(); draw(true); }),
         select("Layout", [{ value: "side", label: "Side by side" }, { value: "overlay", label: "Overlaid on one map" }], state.mode,
           (v) => { state.mode = v; sync(); draw(false); })),
