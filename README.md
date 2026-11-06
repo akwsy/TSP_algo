@@ -30,6 +30,15 @@ solvers and shows plain output rows, expandable route tables and a location grap
 Change departure, trip duration, speed or customer windows and compare again.
 Press Ctrl+C in the server terminal to stop. See [evaluation/UI.md](evaluation/UI.md).
 
+## Evaluation tools
+
+- `/evaluation` page in the UI: averaged results over 1,600 seeded scenarios, 21 hand-built boundary cases, and a black-box simulation summary.
+- `./evaluation/benchmark.sh [--scenarios N --seed S --out file]` regenerates the averaged benchmark data.
+- `./evaluation/boundary.sh [--emit <absolute path>]` runs and prints the boundary cases (cases where nearest neighbour or greedy are provably beaten).
+- `evaluation/simulation/`: spec-only black-box simulations; see its README.
+- `--window-mode slack|blocks` on `--generate`: random windows around a reference route (default) or one fixed 6-hour clock block per customer. Blocks suit longer periods.
+- The map supports zoom/pan (wheel, drag, +/-, arrow keys, 0 to reset), numbered route stops with direction arrows and skipped markers.
+
 ## Documentation and layout
 
 - [PROJECT_GUIDE.md](PROJECT_GUIDE.md): project requirements, every repository

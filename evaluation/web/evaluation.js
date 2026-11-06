@@ -76,7 +76,7 @@
     var n = document.getElementById("notice");
     n.textContent = message; n.hidden = false;
   }
-  function mode(m) { return m === "blocks" ? "Block windows (fixed 6-hour slots)" : "Slack windows (built around arrival time)"; }
+  function mode(m) { return m === "blocks" ? "Block windows (fixed 6-hour slots)" : "Slack windows (±30 min around a reference route)"; }
   function hours(minutes) { return minutes % 60 === 0 ? minutes / 60 + " h" : minutes + " min"; }
 
   var AXIS_MAX = 120, CHART_X = 150, CHART_W = 530, ROW_H = 44;
