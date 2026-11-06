@@ -1,70 +1,34 @@
-# I love version control!
-Maximum destinations within a time period
+# Routing Algorithm Test Harness and Results Website
 
-A Java 17-compatible routing project: start at a depot at a specified time, visit
-as many customer destinations as possible within their time windows, and return
-within the trip period. Distance breaks ties between routes with the same visit
-count. Waiting counts toward the period; service time is zero.
+Several people each write a routing algorithm. This repo provides the specification, a graph builder, a test harness that runs and independently validates every algorithm on the same instances, and a static website that shows results and routes on a map. `PROJECT_BRIEF.md` is the source of truth.
 
-## Quick start
+**Problem:** from a depot, depart at a given time and return within a period, visiting as many distinct customers as possible, each within its one time window (4 slots over 06:00-24:00). Ties go to shorter distance.
 
-Install JDK 17 or newer and configure `JAVA_HOME` or put `java` and `javac` on PATH.
-No external libraries or internet access are needed. From the repository root:
+## Layout
 
-```sh
-./submission/run.sh --start-time 08:00 --duration-minutes 120
-./evaluation/test.sh
-./evaluation/compare.sh --start-time 08:00 --duration-minutes 60
+| Path | Contents |
+|---|---|
+| `PROJECT_BRIEF.md` | Full brief (wins over everything else) |
+| `data/` | GeoNames Malaysia dataset (`MY.txt`), field definitions and provenance |
+| `docs/` | Course brief PDF; `docs/ALGORITHM_SPEC.md` will hold the author-facing spec |
+| `harness/` | Python harness (graph builder, validator, runner, aggregator) |
+| `tests/` | Test suite |
+| `algorithms/`, `instances/`, `results/`, `site/` | Created by later tickets |
+
+Harness: Python 3 (standard library only). Website: plain HTML/JS.
+
+## Run the tests
+
+```
+python3 -m unittest discover -s tests
 ```
 
-The shell scripts target a POSIX environment such as Linux, macOS or WSL. See `submission/README.md` for manual Java commands.
+## Unconfirmed assumptions (brief section 12)
 
-## Simple HTML comparison UI
-
-```sh
-./evaluation/ui.sh
-```
-
-Open [http://127.0.0.1:8765](http://127.0.0.1:8765). The page calls the actual Java
-solvers and shows plain output rows, expandable route tables and a location graph.
-Change departure, trip duration, speed or customer windows and compare again.
-Press Ctrl+C in the server terminal to stop. See [evaluation/UI.md](evaluation/UI.md).
-
-## Documentation and layout
-
-- [PROJECT_GUIDE.md](PROJECT_GUIDE.md): project requirements, every repository
-  file, inputs, outputs, algorithm design, limitations and collaboration workflow.
-- [submission/](submission/): graph, greedy insertion and branch-and-bound source,
-  standalone CLI and scenario inputs; no baseline or UI dependencies.
-- [evaluation/](evaluation/): nearest-neighbour baseline, HTML UI/server, tests and
-  comparison tools that reuse the submission algorithms rather than copying them.
-- [docs/](docs/): original project brief, dataset metadata and original Read Me;
-  [SOURCE_FILES.md](docs/SOURCE_FILES.md) inventories and verifies these copies.
-- [submission/inputs/](submission/inputs/): full GeoNames text dataset and the
-  original header-added Excel workbook.
-
-Geographic coordinates come from the provided GeoNames records. Travel times
-and appointment windows are explicitly simulated. The default scenario has a
-depot plus nine potential visits; the depot does not contribute to the visit count.
-
-The default 120-minute demonstration returns 5 visits for nearest neighbour,
-8 for greedy insertion and 9 for exact search. These results concern the supplied simulated scenario only.
-Nearest neighbour is the baseline, greedy insertion is the redesigned heuristic,
-and branch and bound is the exact reference solver.
-
-Generated `out/` directories and `.class` files are ignored by Git. There are no
-hard-coded workstation paths, bundled dependencies or compiled artifacts to push.
-
-## Replace the destination selection
-
-The full GeoNames file is included at `submission/inputs/MY.txt`. Run:
-
-```sh
-./submission/run.sh --generate inputs/MY.txt --count 25 --selection random --seed 42
-./submission/run.sh --algorithm greedy --duration-minutes 180
-```
-
-This replaces the existing `submission/data/` scenario and generates windows for
-every selected customer. The count includes the depot. No expanded data folder is
-created, and the original MY.txt is unchanged. See the Project Guide for region,
-feature-class, depot, clock and window controls.
+1. "6 a.m. to 12 a.m." means 06:00 to midnight (18 h), four 4.5 h slots.
+2. Default selection: depot Kuala Lumpur, customers a seeded sample of populated places (class `P`) within 150 km, without replacement.
+3. Defaults: departure 06:00, period 480 min, speed 40 km/h.
+4. Reported metrics: distance (km), travel time, total time (travel plus waiting).
+5. Experiment sizes 5, 10, 15, 20, 30, 50, 100 with 30 instances each are proposals.
+6. Algorithms are language-agnostic CLI programs (JSON over stdin/stdout); harness in Python, site in plain HTML/JS.
+7. No algorithms are carried over from the old repo (history only).
