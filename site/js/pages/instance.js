@@ -2,8 +2,8 @@ import { h, fmt, select } from "../lib/dom.js";
 import { loadIndex, loadRun } from "../lib/data.js";
 import { loadInstance, ensureMapCss, replaceHashParams } from "../lib/instances.js";
 import { algorithmColorIndex } from "../lib/mapmodel.js";
-import { createRouteMap, algorithmColor, slotLegend } from "../lib/routemap.js";
-import { DASHES, runStats } from "../lib/rundisplay.js";
+import { createRouteMap, entryStyle, algorithmSwatch, slotLegend } from "../lib/routemap.js";
+import { runStats } from "../lib/rundisplay.js";
 
 const instanceLabel = (id, runs) => `${id} (${runs.find((x) => x.instanceId === id).numCustomers} customers)`;
 
@@ -24,7 +24,7 @@ function compareTable(shown) {
       const cells = r.valid !== false
         ? [r.visited, (r.skipped || []).length, fmt(r.distanceKm), fmt(r.travelMinutes), fmt(r.waitMinutes), fmt(r.totalMinutes), fmt(r.runtimeMs)]
         : [h("span", { class: "badge bad" }, "failed"), "n/a", "n/a", "n/a", "n/a", "n/a", fmt(r.runtimeMs)];
-      return h("tr", {}, h("td", { class: "l" }, h("span", { class: "swatch", style: `background:${e.color}` }), e.id),
+      return h("tr", {}, h("td", { class: "l" }, algorithmSwatch(e), e.id),
         cells.map((c) => h("td", {}, c)));
     }))));
 }
@@ -83,10 +83,9 @@ export default {
             if (e.target.checked) state.hidden.delete(a); else state.hidden.add(a);
             sync(); draw(false);
           } }),
-          h("span", { class: "swatch", style: `background:${algorithmColor(colorIdx[a])}` }), a)));
+          algorithmSwatch({ id: a, ...entryStyle(colorIdx[a]) }), a)));
       }
-      const entries = algIds.map((a, i) => ({ id: a, label: a, color: algorithmColor(colorIdx[a]),
-        dash: DASHES[colorIdx[a] % DASHES.length], run: recs[i] }));
+      const entries = algIds.map((a, i) => ({ id: a, label: a, ...entryStyle(colorIdx[a]), run: recs[i] }));
       const shown = entries.filter((e) => !state.hidden.has(e.id));
       const out = [h("p", { class: "meta" }, `${instance.locations.length - 1} customers, departure ${Math.floor(instance.departureMinute / 60)}:00, speed ${instance.speedKmh} km/h.`)];
       if (!shown.length) {
@@ -100,7 +99,7 @@ export default {
           const m = createRouteMap(instance, { entries: [e], forceSvg, height: 340 });
           maps.push(m);
           return h("section", { class: "card pad alg-card", "aria-label": e.id },
-            h("h2", { class: "alg-title" }, h("span", { class: "swatch", style: `background:${e.color}` }), e.id),
+            h("h2", { class: "alg-title" }, algorithmSwatch(e), e.id),
             m.el, statsList(e.run),
             h("a", { href: `#/run?file=${encodeURIComponent(latest.get(e.id).file)}` }, "Step-by-step schedule"));
         })));

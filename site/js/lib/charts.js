@@ -1,5 +1,6 @@
 // Hand-rolled SVG line charts (no library, works offline). Colours come from CSS tokens --s1..--s6 in css/charts.css.
 import { h } from "./dom.js";
+import { algorithmStyle } from "./algstyle.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const svg = (tag, attrs = {}, ...kids) => {
@@ -9,13 +10,14 @@ const svg = (tag, attrs = {}, ...kids) => {
   return el;
 };
 
-const SHAPES = ["circle", "square", "diamond", "triangle", "cross", "circle"];
-/** Identity of an algorithm on every chart: colour, marker shape and dash, fixed by its position in the sorted id list. */
+/** Identity of an algorithm on every chart: colour, marker shape and dash, fixed by its position in the sorted id list
+ *  (shared with the maps, see algstyle.js). */
 export function styleFor(index) {
-  return { color: `var(--s${(index % 6) + 1})`, shape: SHAPES[index % 6], dash: index >= 6 ? "6 3" : null };
+  const s = algorithmStyle(index);
+  return { color: `var(--s${s.colorIndex + 1})`, shape: s.shape, dash: s.dash || null };
 }
 
-function marker(shape, x, y, color, r = 4.5) {
+export function marker(shape, x, y, color, r = 4.5) {
   const common = { fill: color, stroke: "var(--surface)", "stroke-width": 1.5 };
   if (shape === "square") return svg("rect", { x: x - r, y: y - r, width: 2 * r, height: 2 * r, ...common });
   if (shape === "diamond") return svg("path", { d: `M${x} ${y - r - 1}L${x + r + 1} ${y}L${x} ${y + r + 1}L${x - r - 1} ${y}Z`, ...common });

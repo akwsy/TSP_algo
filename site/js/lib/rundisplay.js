@@ -1,7 +1,7 @@
 // Small display helpers shared by the instance explorer and route detail.
 import { fmt } from "./dom.js";
 
-export const DASHES = ["", "9 5", "2 5", "14 4 2 4", "6 3", "1 4"];
+export { DASHES } from "./algstyle.js";
 
 /** [label, value] rows summarising one valid run record. */
 export function runStats(rec) {
