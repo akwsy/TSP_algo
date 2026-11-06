@@ -73,7 +73,7 @@ def execute(meta, instance):
     limit = meta.get("timeLimitSeconds", 10)
     start = time.perf_counter()
     try:
-        proc = subprocess.run(meta["command"], cwd=meta["_dir"], input=json.dumps(instance),
+        proc = subprocess.run(meta["command"], cwd=meta["_dir"], input=json.dumps({**instance, "timeLimitSeconds": limit}),
                               capture_output=True, text=True, timeout=limit)
     except subprocess.TimeoutExpired as exc:
         runtime_ms = (time.perf_counter() - start) * 1000

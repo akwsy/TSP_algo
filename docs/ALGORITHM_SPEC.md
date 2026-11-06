@@ -116,7 +116,7 @@ The input is one JSON object:
 | `periodMinutes` | How long you have. |
 | `deadlineMinute` | `departureMinute + periodMinutes`. You must be back at the depot by then. |
 | `speedKmh` | Constant travel speed. |
-| `timeLimitSeconds` | Listed in the contract so you can plan your search. **The current harness does not send it yet**, so do not rely on it being present; fall back to the value you declared in `algorithm.json`. |
+| `timeLimitSeconds` | The limit declared in your `algorithm.json` (10 if you left it out), added by the harness at run time so you can plan your search. It is not part of the worked example below, which shows the generated instance only. |
 | `locations` | List of locations. See below. |
 | `distanceKm` | Square matrix of distances in km. `distanceKm[i][j]` is the distance from location `i` to location `j`. It is symmetric with zeros on the diagonal. |
 
@@ -227,7 +227,7 @@ The deadline is 840 (14:00). Customer 2 opens at 1170 (19:30), after the deadlin
 
 <!-- example:output -->
 ```json
-{"route": [0, 1, 3, 0], "status": "HEURISTIC", "notes": "nearest-neighbour baseline", "stats": {"customersVisited": 2}}
+{"route": [0, 1, 3, 0], "status": "HEURISTIC", "notes": "nearest-neighbour baseline", "stats": {"customersVisited": 2, "iterations": 9}}
 ```
 <!-- /example:output -->
 
