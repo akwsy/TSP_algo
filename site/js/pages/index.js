@@ -7,6 +7,8 @@ import overview from "./overview.js";
 import failures from "./failures.js";
 import scaling from "./scaling.js";
 import history from "./history.js";
+import instance from "./instance.js";
+import run from "./run.js";
 
-export const pages = [overview, failures, scaling, history];
+export const pages = [overview, scaling, instance, run, history, failures];
 export const defaultPath = "overview";
