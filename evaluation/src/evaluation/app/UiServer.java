@@ -169,10 +169,14 @@ public final class UiServer {
             case "/app.js" -> "app.js";
             case "/inspection.js" -> "inspection.js";
             case "/styles.css" -> "styles.css";
+            case "/evaluation", "/evaluation.html" -> "evaluation.html";
+            case "/evaluation.js" -> "evaluation.js";
+            case "/evaluation-data.json" -> "evaluation-data.json";
             default -> null;
         };
         if (file == null) { json(request, 404, Map.of("error", "Not found")); return; }
-        String type = file.endsWith(".js") ? "text/javascript" : file.endsWith(".css") ? "text/css" : "text/html";
+        String type = file.endsWith(".js") ? "text/javascript" : file.endsWith(".css") ? "text/css"
+                : file.endsWith(".json") ? "application/json" : "text/html";
         send(request, 200, type + "; charset=utf-8", Files.readAllBytes(web.resolve(file)));
     }
     private static void json(HttpExchange request, int status, Object value) throws IOException {

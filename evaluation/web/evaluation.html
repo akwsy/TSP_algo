@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Algorithm evaluation</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/evaluation.js" defer></script>
+</head>
+<body>
+  <main>
+    <p><a href="/">&larr; Back to the comparison tool</a></p>
+    <h1>Algorithm evaluation</h1>
+    <p id="intro">Loading simulation results…</p>
+    <div id="notice" class="notice error" role="alert" hidden></div>
+    <section class="panel" aria-labelledby="summary-title">
+      <h2 id="summary-title">Overall results</h2>
+      <div class="route-table-wrap"><table id="summary-table" class="route-table"></table></div>
+      <p class="caption">Optimal means the same number of visits as the exact solver and no more distance. Visits are shown as a share of the exact solver's total. The distance ratio compares only scenarios where the visit counts matched.</p>
+    </section>
+    <section class="panel" aria-labelledby="chart-title">
+      <h2 id="chart-title">How often each algorithm found the optimum</h2>
+      <svg id="optimal-chart" viewBox="0 0 700 150" role="img" aria-label="Bar chart of the share of scenarios solved optimally by each algorithm"></svg>
+      <h2 id="visits-title">Visits achieved, as a share of the best possible</h2>
+      <svg id="visits-chart" viewBox="0 0 700 150" role="img" aria-label="Bar chart of visits achieved relative to the exact solver"></svg>
+    </section>
+    <section class="panel" aria-labelledby="family-title">
+      <h2 id="family-title">Results by scenario type</h2>
+      <div class="route-table-wrap"><table id="family-table" class="route-table"></table></div>
+      <p class="caption">Cells show the percentage of scenarios solved optimally. Hover a row for visits as a share of the best possible.</p>
+    </section>
+    <section class="panel">
+      <h2>What was tested</h2>
+      <p id="method"></p>
+    </section>
+  </main>
+</body>
+</html>

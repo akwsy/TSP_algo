@@ -1,0 +1,257 @@
+{
+ "scenarios": 240,
+ "excludedFamilies": [
+  "cap",
+  "tl0"
+ ],
+ "summary": [
+  {
+   "id": "nearest",
+   "name": "Nearest neighbour (baseline)",
+   "scenarios": 240,
+   "optimalPct": 60.0,
+   "matchesBestVisitsPct": 72.91666666666667,
+   "visitsPctOfOptimal": 80.58103975535168,
+   "avgDistanceRatio": 1.0314823586067805,
+   "avgRuntimeMs": 1.040116666666667,
+   "maxRuntimeMs": 17.711,
+   "avgStates": 10.025
+  },
+  {
+   "id": "greedy",
+   "name": "Greedy insertion",
+   "scenarios": 240,
+   "optimalPct": 80.0,
+   "matchesBestVisitsPct": 98.33333333333333,
+   "visitsPctOfOptimal": 99.38837920489297,
+   "avgDistanceRatio": 1.0381495864793666,
+   "avgRuntimeMs": 2.0938750000000006,
+   "maxRuntimeMs": 27.265,
+   "avgStates": 26.808333333333334
+  },
+  {
+   "id": "exact",
+   "name": "Branch and bound (exact)",
+   "scenarios": 240,
+   "optimalPct": 100.0,
+   "matchesBestVisitsPct": 100.0,
+   "visitsPctOfOptimal": 100.0,
+   "avgDistanceRatio": 1.0,
+   "avgRuntimeMs": 8.402854166666662,
+   "maxRuntimeMs": 108.449,
+   "avgStates": 884.125
+  }
+ ],
+ "families": [
+  {
+   "family": "cluster",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 12.5,
+    "greedy": 50.0,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 60.273972602739725,
+    "greedy": 98.63013698630137,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "colinear",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 31.25,
+    "greedy": 68.75,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 71.26436781609195,
+    "greedy": 100.0,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "depotonly",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "dupcoord",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 25.0,
+    "greedy": 68.75,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 65.33333333333333,
+    "greedy": 100.0,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "earlywait",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 50.0,
+    "greedy": 87.5,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "eight",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 12.5,
+    "greedy": 25.0,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "exactclose",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "one",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "random",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 50.0,
+    "greedy": 81.25,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 74.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "smallperiod",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "speed",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 50.0,
+    "greedy": 75.0,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 77.27272727272727,
+    "greedy": 97.72727272727273,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "startoff",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 50.0,
+    "greedy": 68.75,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 95.77464788732394,
+    "greedy": 100.0,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "tight",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 18.75,
+    "greedy": 75.0,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 58.0,
+    "greedy": 96.0,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "unreachable",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   }
+  },
+  {
+   "family": "zeroperiod",
+   "scenarios": 16,
+   "optimalPct": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   },
+   "visitsPctOfOptimal": {
+    "nearest": 100.0,
+    "greedy": 100.0,
+    "exact": 100.0
+   }
+  }
+ ]
+}
