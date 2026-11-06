@@ -238,6 +238,16 @@ class HoverDetailsTest(unittest.TestCase):
         g = call("legDetails", SPEC_RUN, SPEC_INST, 2, 0)
         self.assertEqual((g["depart"], g["arrive"], g["travel"], g["opens"], g["to"]), ("19:30", "21:05", "1 h 35 min", "open all day", "Depot"))
 
+    def test_stop_line_wording(self):
+        self.assertEqual(call("stopLine", call("stopTimes", SPEC_RUN, SPEC_INST, 3)), "Arrive 09:30 · Waited 1 h · Leave 10:30")
+        self.assertEqual(call("stopLine", call("stopTimes", SPEC_RUN, SPEC_INST, 0)), "Leave 06:00 · Back 21:05")
+        self.assertEqual(call("stopLine", call("stopTimes", None, SPEC_INST, 3)), "not visited")
+
+    def test_leg_rows_wording(self):
+        rows = call("legRows", call("legDetails", SPEC_RUN, SPEC_INST, 1, 3))
+        self.assertEqual(rows, [["Travel time", "2 h 19 min"], ["Departure", "07:11"], ["Arrival", "09:30 (then waits 1 h)"],
+                                ["Opening hours", "10:30-15:00"], ["Distance", "92.6 km"]])
+
     def test_unknown_leg_is_null(self):
         self.assertIsNone(call("legDetails", SPEC_RUN, SPEC_INST, 1, 2))
 

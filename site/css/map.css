@@ -51,6 +51,24 @@ main:has(.routemap) { max-width: min(1640px, 100%); }
 .map-detail { font-size: .9rem; min-height: 3.4em; padding: 9px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 .map-detail strong { display: block; }
 .map-note { margin: 0; }
+/* Hover / tap / focus details for stops and legs. */
+.map-tip { position: absolute; z-index: 1000; max-width: min(340px, calc(100% - 8px)); pointer-events: none; padding: 9px 12px; font-size: .85rem; line-height: 1.35;
+  color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.28); }
+.map-tip[hidden] { display: none; }
+.tip-title { display: block; font-size: .92rem; }
+.tip-hours { color: var(--muted); margin-bottom: 2px; }
+.tip-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; margin-top: 4px; }
+.tip-row .alg-swatch { margin-right: 0; }
+.tip-text { color: var(--text); font-variant-numeric: tabular-nums; }
+.tip-facts { display: grid; grid-template-columns: auto 1fr; gap: 1px 12px; margin: 6px 0 0; font-variant-numeric: tabular-nums; }
+.tip-facts dt { color: var(--muted); }
+.tip-facts dd { margin: 0; font-weight: 600; }
+.map-detail .tip-row, .map-detail .tip-facts { font-size: .88rem; }
+.leg-hit { cursor: pointer; fill: none; pointer-events: stroke; }
+.leg-hit:focus { outline: none; }
+.map-svg .leg-hit:focus-visible { stroke: var(--focus); stroke-opacity: .45; }
+.leaflet-container path.leg-hit:focus-visible { stroke: var(--focus); stroke-opacity: .5; }
+.map-svg .pt-group:hover .pt { stroke-width: 3; }
 .lf-icon { background: none; border: 0; }
 .lf-dot { display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--slot, #888); border: 2.5px solid #fff;
   box-shadow: 0 0 0 1px rgba(15,20,26,.75), 0 2px 5px rgba(0,0,0,.35); transition: transform .12s; }

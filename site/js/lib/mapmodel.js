@@ -228,6 +228,18 @@ export function stopTimes(run, instance, id) {
     wait: wait > 0 ? `Waited ${formatDuration(wait)}` : "No wait" };
 }
 
+/** One plain line for a stop (from stopTimes), e.g. "Arrive 09:30 · Waited 1 h · Leave 10:30". */
+export function stopLine(t) {
+  if (!t.visited) return "not visited";
+  return t.depot ? `Leave ${t.leave} · Back ${t.back}` : `Arrive ${t.arrive} · ${t.wait} · Leave ${t.leave}`;
+}
+
+/** Label/value rows for a leg (from legDetails). */
+export function legRows(g) {
+  return [["Travel time", g.travel], ["Departure", g.depart], ["Arrival", g.then ? `${g.arrive} (${g.then})` : g.arrive],
+    ["Opening hours", g.opens], ["Distance", g.distance]];
+}
+
 /** The trip between two consecutive stops of a run (null if the run does not go straight from one to the other). */
 export function legDetails(run, instance, fromId, toId) {
   if (!validRoute(run)) return null;
