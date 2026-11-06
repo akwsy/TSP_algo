@@ -1,0 +1,2 @@
+# T6: Evaluation page for benchmark and boundary data (after T2, T3, T4)
+Scope: `evaluation/web/evaluation.html`, `evaluation.js`, plus styling consistent with T4. Show: averaged results per configuration (tables and simple charts, mean with spread), the boundary-case table (expected vs actual per algorithm, highlighting where an algorithm falls short and why), and the existing simulation summary. Plain language, no jargon without a one-line explanation.

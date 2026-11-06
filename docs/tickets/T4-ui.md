@@ -1,0 +1,5 @@
+# T4: Simplify and restyle the web UI
+Scope: `evaluation/web/index.html`, `styles.css`, `app.js` (UI/layout code only, NOT the map/graph drawing which T5 owns), `evaluation.html`, `evaluation.js`.
+
+Goals: simpler, calmer, more aesthetic. Fewer visible controls by default (move advanced options into collapsible sections), clear visual hierarchy, a consistent colour system (keep the nearest/greedy/exact colours), readable typography, good spacing, responsive down to 375px, keyboard and screen-reader accessible, light and dark via prefers-color-scheme. The results should read at a glance: a headline comparison (visits, distance, finish time per algorithm) with route details expandable.
+Constraints: keep every element id that `app.js`, `inspection.js`, `evaluation/tests/UiServerTest.java` and `inspection.test.cjs` use (or update those tests); strict CSP means no inline scripts/styles; no external fonts or libraries. Do not touch the SVG map code beyond keeping its container and ids; T5 is rewriting it. Verify visually in a browser at desktop and 375px and attach no screenshots to the repo.
