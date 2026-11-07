@@ -162,6 +162,7 @@ export function createRouteMap(instance, opts) {
     document.documentElement.classList.toggle("map-locked", on);
     setInert(on);
     finishReveal();
+    engine?.fullscreen?.(on);
     engine?.invalidate?.();
     if (!on && document.activeElement !== full && !el.contains(document.activeElement)) full.focus();
   };
@@ -462,6 +463,10 @@ function leafletEngine(stage, hover, style, hooks) {
   // Wheel zoom only after a click, so scrolling the page past a map never zooms it by accident.
   map.on("click focus", () => map.scrollWheelZoom.enable());
   map.on("mouseout blur", () => map.scrollWheelZoom.disable());
+  // On a touch screen a one-finger drag would otherwise pan the map instead of scrolling the page (the map is most of a screen tall).
+  // The page scrolls natively over it (touch-action stays pan-y); pinch still zooms, and fullscreen turns one-finger panning on.
+  const coarse = typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
+  if (coarse) map.dragging.disable();
   // Real tiles end at maxNativeZoom; deeper zooms upscale them (soft but never blank). A missing tile shows the background.
   L.tileLayer(TILES, { minZoom: TILE_LIMITS.minZoom, maxZoom: TILE_LIMITS.maxZoom, maxNativeZoom: TILE_LIMITS.maxNativeZoom,
     errorTileUrl: BLANK_TILE, className: "base-tiles", attribution: ATTRIBUTION }).addTo(map);
@@ -569,6 +574,7 @@ function leafletEngine(stage, hover, style, hooks) {
       paint(scene);
     },
     invalidate() { map.invalidateSize(); },
+    fullscreen(on) { if (coarse) (on ? map.dragging.enable() : map.dragging.disable()); map.invalidateSize(); },
     destroy() { map.off(); map.remove(); },
   });
 }
