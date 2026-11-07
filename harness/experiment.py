@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from dataclasses import replace
 from pathlib import Path
 
-from .aggregate import aggregate
+from .aggregate import aggregate, aggregate_sessions
 from .config import ConfigError, InstanceConfig
 from .dataset import DatasetError, load_places
 from .experiments import EXPERIMENTS
@@ -24,18 +24,21 @@ from .sessionstore import find_saved_session, read_sessions_index, save_session
 DEFAULTS = InstanceConfig(seed=0)
 
 
-def run_full_sessions(algorithms, instances, records, results_dir, exp, count, reuse=True, rerun=()):
+def run_full_sessions(algorithms, instances, records, results_dir, exp, count, reuse=True, rerun=(), stats=None):
     """Run each algorithm day by day on the first `count` seeds of each size and save one session
     file each (layout and index: harness/session.py, harness/sessionstore.py). Day 1 reuses the
     first-day record. A session already saved for the same algorithm code, instance and experiment
     is reused, not run again (unless reuse is False or the algorithm is in `rerun`).
-    Returns {"reused": {id: n}, "ran": {id: n}}."""
+    Returns the list of sessions (reused and newly run); `stats`, if given, is filled with
+    {"reused": {id: n}, "ran": {id: n}}."""
     chosen = [i for i in instances if i["seed"] <= count]
     (results_dir / "sessions").mkdir(parents=True, exist_ok=True)
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     first_days = {(r["algorithmId"], r["instanceId"]): r for r in records}
     entries = read_sessions_index(results_dir)
-    stats = {"reused": {}, "ran": {}}
+    stats = stats if stats is not None else {}
+    stats.update(reused={}, ran={})
+    sessions = []
     for meta in algorithms:
         for inst in chosen:
             key = (meta["id"], meta["_fingerprint"], instance_hash(inst), exp.name)
@@ -43,6 +46,7 @@ def run_full_sessions(algorithms, instances, records, results_dir, exp, count, r
                      if reuse and meta["id"] not in rerun else None)
             if saved is not None:
                 stats["reused"][meta["id"]] = stats["reused"].get(meta["id"], 0) + 1
+                sessions.append(saved)
                 continue
             stats["ran"][meta["id"]] = stats["ran"].get(meta["id"], 0) + 1
             session = run_session(meta, inst, run_id, first_day=first_days.get((meta["id"], inst["instanceId"])))
@@ -50,7 +54,8 @@ def run_full_sessions(algorithms, instances, records, results_dir, exp, count, r
             entries = save_session(results_dir, entries, session)
             print(f"{meta['id']} until every place is visited on {inst['instanceId']}: "
                   f"{session['outcome']}, {session['days']} days", flush=True)
-    return stats
+            sessions.append(session)
+    return sessions
 
 
 def main(argv=None):
@@ -107,9 +112,10 @@ def main(argv=None):
     if args.full_run_instances < 0:
         print("error: --full-run-instances must not be negative", file=sys.stderr)
         return 2
-    full = run_full_sessions(algorithms, instances, records, Path(args.results_dir), exp,
-                             min(args.full_run_instances, exp.instances_per_size),
-                             reuse=not args.force, rerun=set(args.rerun))
+    full = {}
+    sessions = run_full_sessions(algorithms, instances, records, Path(args.results_dir), exp,
+                                 min(args.full_run_instances, exp.instances_per_size),
+                                 reuse=not args.force, rerun=set(args.rerun), stats=full)
     reused, ran = sum(stats["reused"].values()), sum(stats["ran"].values())
     print(f"Reused {reused} saved runs, ran {ran} new.")
     for meta in algorithms:
@@ -128,6 +134,8 @@ def main(argv=None):
         "sizes": list(exp.sizes), "instancesPerSize": exp.instances_per_size, "seeds": seeds,
         "departureMinute": DEFAULTS.departure_minute, "periodMinutes": DEFAULTS.period_minutes,
         "speedKmh": DEFAULTS.speed_kmh}, **result}
+    if sessions:  # full-run block: see aggregate_sessions (hours, km, ms; own `ranking`/`overall`)
+        result["full"] = aggregate_sessions(sessions)
     out = Path(args.results_dir) / f"aggregates-{exp.name}.json"
     out.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {out}")

@@ -108,3 +108,26 @@ class FullRunTest(CliCase):
         self.assertEqual((s["outcome"], s["stopReason"], s["stopDay"], s["days"]),
                          ("did not finish", "no_progress", 1, 1))
         self.assertIn("day 1", s["explanation"])
+
+    def test_aggregate_file_gets_a_full_block_and_keeps_first_day_keys(self):
+        write_algorithm(self.algs, "nobody", NOBODY)
+        self.go()
+        agg = json.loads((self.tmp / "results" / "aggregates-scaling.json").read_text())
+        for key in ("groups", "bestKnown", "sizes", "algorithms", "parameters"):
+            self.assertIn(key, agg)
+        full = agg["full"]
+        self.assertEqual(full["instancesPerSize"], {"2": 2})
+        g = {x["algorithmId"]: x for x in full["groups"]}
+        self.assertEqual((g["one-per-day"]["finished"], g["one-per-day"]["stopped"]), (2, 0))
+        self.assertEqual(g["nobody"]["stopReasons"], {"no_progress": 2})
+        self.assertIsNone(g["nobody"]["workingHours"]["mean"])
+        sessions = [s for s in self.sessions() if s["algorithmId"] == "one-per-day"]
+        self.assertAlmostEqual(g["one-per-day"]["workingHours"]["mean"],
+                               sum(s["workingMinutes"] for s in sessions) / 2 / 60)
+        self.assertEqual([e["algorithmId"] for e in full["ranking"][0]["entries"]],
+                         ["one-per-day", "nobody"])
+
+    def test_no_full_block_when_full_run_is_skipped(self):
+        self.go("--full-run-instances", "0")
+        agg = json.loads((self.tmp / "results" / "aggregates-scaling.json").read_text())
+        self.assertNotIn("full", agg)

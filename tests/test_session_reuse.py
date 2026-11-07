@@ -60,6 +60,16 @@ class SessionReuseTest(CliCase):
         self.assertIn("Full run: reused 4 saved sessions, ran 0 new.", proc.stdout)
         self.assertIn("  beta: reused 2, ran 0", proc.stdout)
 
+    def test_full_aggregate_is_identical_when_every_session_is_reused(self):
+        agg = self.results / "aggregates-scaling.json"
+        self.go()
+        first = json.loads(agg.read_text())["full"]
+        self.executions()
+        self.go()
+        self.assertEqual(self.executions(), [])
+        self.assertEqual(json.loads(agg.read_text())["full"], first)
+        self.assertTrue(first)
+
     def test_no_duplicates_after_repeated_runs(self):
         self.go()
         files, entries = self.files(), self.sessions_index()
