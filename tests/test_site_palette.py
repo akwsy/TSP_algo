@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 SITE_CSS = Path(__file__).resolve().parent.parent / "site" / "css"
-VALIDATOR = Path("/private/tmp/claude-501/bundled-skills/2.1.317/cb27b312e47a617123e564dd8554309b/dataviz/scripts/validate_palette.js")
+VALIDATOR = Path(__file__).resolve().parent / "tools" / "validate_palette.js"  # vendored from the dataviz skill
 DECL = re.compile(r"--(s[1-6]|surface):\s*(#[0-9a-fA-F]{6})")
 
 
@@ -29,7 +29,6 @@ def run_validator(palette, mode, surface):
 
 
 @unittest.skipUnless(shutil.which("node"), "node not installed")
-@unittest.skipUnless(VALIDATOR.exists(), f"dataviz validate_palette.js not found at {VALIDATOR}")
 class SeriesPaletteTest(unittest.TestCase):
     def setUp(self):
         charts = (SITE_CSS / "charts.css").read_text()
