@@ -95,7 +95,7 @@ Design decisions for the "until every place is visited" view (confirmed with the
 python3 -m unittest discover -s tests
 ```
 
-`tests/test_site_pages.py` loads every website view in headless Google Chrome and fails on any console error, uncaught exception, stray `false`/`null`/`[object` text or horizontal page scroll. It skips when `node` or Chrome is missing. For screenshots at desktop and phone widths in light and dark mode: `node tests/site_smoke.mjs http://127.0.0.1:PORT --matrix --shots DIR`.
+`tests/test_site_pages.py` loads every website view in headless Google Chrome and fails on any console error, uncaught exception, stray `false`/`null`/`[object` text or horizontal page scroll. It skips when `node` or Chrome is missing. For screenshots at desktop and phone widths in light and dark mode: `node tests/site_smoke.mjs http://127.0.0.1:PORT --matrix --shots DIR`. The script also works against real results (`python3 site/serve.py --results results ...`): checks about content that depends on the data (stopped sessions on Failures, the "ranked below" label, the "Not plotted" note, how many days the Day selector offers) are derived from the served data and apply only when the data contains what they check for.
 
 ## Run the website
 
