@@ -2,7 +2,7 @@
 // SVG drawing of the same scene, so the map never goes blank. Force the fallback with ?map=svg on the page URL.
 // The only text on the map is the destination names. Every route is a straight-line path with arrowheads and stop numbers.
 import { h } from "./dom.js";
-import { buildScene, chooseEngine, project, slotColors, laneOffsets, offsetSegment, summaryRows, differenceNotes, labelPlan, labelSide, TILE_LIMITS, stopTimes, stopLine, legDetails, legRows } from "./mapmodel.js";
+import { buildScene, chooseEngine, project, slotColors, laneOffsets, offsetSegment, summaryRows, differenceNotes, labelPlan, labelSide, TILE_LIMITS, labelsVisible, FADED_OPACITY, stopTimes, stopLine, legDetails, legRows } from "./mapmodel.js";
 import { algorithmStyle } from "./algstyle.js";
 import { marker } from "./charts.js";
 
@@ -73,6 +73,7 @@ export function slotLegend() {
     h("span", { class: "key" }, "Opens:", " early ", cols.map((c) => h("span", { class: "dot filled", style: `background:${c}` })), " late"),
     h("span", { class: "key" }, h("span", { class: "dot filled", style: "background:var(--muted)" }), "visited"),
     h("span", { class: "key" }, h("span", { class: "dot hollow" }), "skipped"),
+    h("span", { class: "key" }, h("span", { class: "dot hollow faded", style: `opacity:${FADED_OPACITY}` }), "Faded: no shown route goes here"),
     h("span", { class: "key" }, h("span", { class: "dot depot" }), "depot"));
 }
 
@@ -142,7 +143,8 @@ export function createRouteMap(instance, opts) {
   };
   const plain = (parts) => [parts.title, parts.hours, ...parts.rows.map((r) => r.text == null ? r.entry.label ?? r.entry.id : `${r.entry.label ?? r.entry.id}: ${r.text}`),
     ...(parts.facts || []).map(([k, v]) => `${k} ${v}`)].filter(Boolean).join(". ");
-  const stopLabel = (p) => plain(stopParts(p));
+  const unvisited = (p) => !p.depot && !p.filled && entries.length > 0; // drawn faded: no shown route goes here
+  const stopLabel = (p) => plain(stopParts(p)) + (unvisited(p) ? ". Not visited by any shown route" : "");
   const legLabel = (l) => { const parts = legParts(l); return parts ? plain(parts) : ""; };
   function render(into, parts) {
     into.replaceChildren(...[h("strong", { class: "tip-title" }, parts.title), parts.hours ? h("div", { class: "tip-hours" }, parts.hours) : null,
@@ -163,7 +165,7 @@ export function createRouteMap(instance, opts) {
     leg: (l, ev) => { const parts = legParts(l); if (parts) open(parts, ev); },
     move: (ev) => { if (!tip.hidden) place(ev); },
     hide: () => { tip.hidden = true; },
-    stopLabel, legLabel,
+    stopLabel, legLabel, unvisited,
   };
   const onEsc = (e) => { if (e.key === "Escape") hover.hide(); };
   document.addEventListener("keydown", onEsc);
@@ -270,11 +272,12 @@ function svgEngine(stage, hover, style) {
           ? svg("rect", { x: x - 8, y: y - 8, width: 16, height: 16, class: "pt depot" })
           : svg("circle", { cx: x, cy: y, r: p.filled ? 7 : 6, class: `pt ${dotClass(p)}`, fill: p.filled ? colors[p.slot] : "var(--surface)",
             stroke: p.filled ? "var(--text)" : colors[p.slot], "stroke-width": p.filled ? 1.5 : 3 });
-        const ring = !p.depot && !p.filled ? svg("circle", { cx: x, cy: y, r: 8.5, fill: "none", stroke: "var(--muted)", "stroke-width": 1.2 }) : null;
+        const faded = hover.unvisited(p);
+        const ring = !p.depot && !p.filled ? svg("circle", { cx: x, cy: y, r: 8.5, fill: "none", stroke: faded ? "var(--text)" : "var(--muted)", "stroke-width": faded ? 1.5 : 1.2 }) : null;
         const side = labelSide({ name: p.name, x }, W);
         const text = p.depot || plan.has(p.id)
           ? svg("text", { x: side === "right" ? x + 11 : x - 11, y: y + 4, class: "pt-label", "text-anchor": side === "right" ? "start" : "end" }, p.name) : null;
-        const grp = svg("g", { tabindex: 0, role: "button", "aria-label": label, class: "pt-group" }, ring, mark, text);
+        const grp = svg("g", { tabindex: 0, role: "button", "aria-label": label, class: faded ? "pt-group faded" : "pt-group", opacity: faded ? FADED_OPACITY : null }, ring, mark, text);
         grp.addEventListener("click", (ev) => hover.stop(p, ev));
         grp.addEventListener("mouseenter", (ev) => hover.stop(p, ev));
         grp.addEventListener("mousemove", (ev) => hover.move(ev));
@@ -302,7 +305,7 @@ function leafletEngine(stage, hover, style) {
     errorTileUrl: BLANK_TILE, className: "base-tiles", attribution: ATTRIBUTION }).addTo(map);
   const layer = L.layerGroup().addTo(map);
   const colors = slotColors();
-  let fitted = false, last = null;
+  let fitted = false, last = null, fitZoom = null;
 
   function paint(scene) {
     layer.clearLayers();
@@ -345,11 +348,14 @@ function leafletEngine(stage, hover, style) {
     }
     const size = map.getSize();
     const plan = new Set(labelPlan(scene.points.map((p) => ({ id: p.id, name: p.name, ...px.get(p.id), visited: p.filled })), size.x, size.y));
+    // Names are drawn only once zoomed in past the initial fit (the depot keeps its name as a landmark); hover, tap and focus always give the name.
+    const showNames = labelsVisible(map.getZoom(), fitZoom ?? map.getZoom(), TILE_LIMITS.maxZoom);
     for (const p of scene.points) {
-      const dot = h("span", { class: `lf-dot ${dotClass(p)}`, style: p.depot ? null : `--slot:${colors[p.slot]}` });
+      const faded = hover.unvisited(p);
+      const dot = h("span", { class: `lf-dot ${dotClass(p)}${faded ? " faded" : ""}`, style: p.depot ? null : `--slot:${colors[p.slot]}${faded ? `;opacity:${FADED_OPACITY}` : ""}` });
       const m = L.marker(ll.get(p.id), { icon: icon(dot, 20), keyboard: true, zIndexOffset: 500 }).addTo(layer);
       const side = labelSide({ name: p.name, x: px.get(p.id).x }, size.x);
-      if (p.depot || plan.has(p.id)) m.bindTooltip(p.name, { permanent: true, direction: side, offset: [side === "right" ? 6 : -6, 0], className: "lf-label" });
+      if (p.depot || (showNames && plan.has(p.id))) m.bindTooltip(p.name, { permanent: true, direction: side, offset: [side === "right" ? 6 : -6, 0], className: "lf-label" });
       m.on("click mouseover", (e) => hover.stop(p, e.originalEvent));
       m.on("mousemove", (e) => hover.move(e.originalEvent));
       m.on("mouseout", () => hover.hide());
@@ -369,7 +375,7 @@ function leafletEngine(stage, hover, style) {
   return {
     draw(scene) {
       last = scene;
-      if (!fitted) { map.fitBounds(L.latLngBounds(scene.points.map((p) => [p.lat, p.lon])), { padding: [40, 40] }); fitted = true; }
+      if (!fitted) { map.fitBounds(L.latLngBounds(scene.points.map((p) => [p.lat, p.lon])), { padding: [40, 40] }); fitted = true; fitZoom = map.getZoom(); }
       paint(scene);
     },
     invalidate() { map.invalidateSize(); },
