@@ -49,6 +49,7 @@ function scalingPlots(groups, algs, names, styles) {
 export default {
   path: "scaling",
   title: "Scaling",
+  fullView: "pending",
   async render(el, ctx) {
     const names = await experimentNames();
     if (!names.length) {

@@ -2,6 +2,9 @@ import { h, selectKey, findSelect } from "./lib/dom.js";
 import { pages, defaultPath } from "./pages/index.js";
 import { resolveTheme, nextTheme, motionAllowed } from "./lib/motion.js";
 import { motionOn } from "./lib/fx.js";
+import { getView, onViewChange, viewCountText, comingSoonNote } from "./lib/view.js";
+import { mountViewToggle } from "./lib/viewtoggle.js";
+import { loadAggregate, experimentNames } from "./lib/data.js";
 
 const main = document.getElementById("main");
 const nav = document.getElementById("nav");
@@ -55,6 +58,17 @@ motionBtn.addEventListener("click", () => {
 systemReduce.addEventListener("change", applyMotion);
 applyMotion();
 
+// ---- view toggle: "First day only" / "Until every place is visited" (state and event live in lib/view.js) ----
+const viewToggle = mountViewToggle(document.getElementById("viewtoggle"));
+(async () => {
+  // The count line under each option comes from the first experiment's aggregates; without them the options simply have no count.
+  try {
+    const [name] = await experimentNames();
+    const agg = name ? await loadAggregate(name) : null;
+    if (agg) viewToggle.setCounts({ first: viewCountText("first", agg), full: viewCountText("full", agg) });
+  } catch { /* no results yet */ }
+})();
+
 // ---- router ----
 function parseHash() {
   const [path, query = ""] = location.hash.replace(/^#\/?/, "").split("?");
@@ -83,6 +97,7 @@ async function route() {
   moveInk();
   nav.querySelector("[aria-current]")?.scrollIntoView?.({ inline: "center", block: "nearest" });
   // A filter <select> changed the URL: after the re-render keep keyboard focus on that same select instead of dropping it to <main>.
+  const toggleFocused = document.getElementById("viewtoggle").contains(document.activeElement);
   const keepFocus = document.activeElement instanceof HTMLSelectElement && main.contains(document.activeElement) ? selectKey(document.activeElement) : null;
   if (typeof cleanup === "function") cleanup();
   cleanup = null;
@@ -106,8 +121,16 @@ async function route() {
     void main.offsetWidth;
     main.classList.add("entering");
   }
+  // Pages that cannot show the full-run view yet say so, and show the first-day content.
+  if (page.fullView === "pending" && getView() === "full") {
+    const note = h("p", { class: "view-note", role: "note" }, comingSoonNote(page.title));
+    const title = main.querySelector("h1");
+    if (title) title.after(note); else main.prepend(note);
+  }
   lastPath = path;
-  (findSelect(main, keepFocus) || main).focus({ preventScroll: true });
+  if (!toggleFocused) (findSelect(main, keepFocus) || main).focus({ preventScroll: true });
 }
 addEventListener("hashchange", route);
+// Switching the view re-renders the current page in place (pages without `fullView` do not depend on it and are left alone).
+onViewChange(() => { if (pages.find((p) => p.path === lastPath)?.fullView) route(); });
 route();

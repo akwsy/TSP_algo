@@ -48,6 +48,7 @@ function mapKey() {
 export default {
   path: "run",
   title: "Route detail",
+  fullView: "pending",
   async render(el, ctx) {
     ensureMapCss();
     const [{ runs }, algs] = await Promise.all([loadIndex(), loadAlgorithms()]);

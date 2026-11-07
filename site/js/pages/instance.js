@@ -32,6 +32,7 @@ function compareTable(shown) {
 export default {
   path: "instance",
   title: "Instance explorer",
+  fullView: "pending",
   async render(el, ctx) {
     ensureMapCss();
     const { runs } = await loadIndex();

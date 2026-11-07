@@ -3,6 +3,10 @@
 // and add it to this list. The nav and router are built from it; nothing else changes.
 // Hash routes: #/<path>?key=value (e.g. #/instance?id=n10-seed3). `render` may be async and may
 // return a cleanup function. Use js/lib/data.js to load results and js/lib/dom.js to build DOM.
+// View toggle (lib/view.js): a page that depends on it sets `fullView` on its page object:
+//   "ready"   the page renders getView() === "full" itself (and is re-rendered when the choice changes);
+//   "pending" the page still shows first-day content; the router adds a plain-words "coming to this page" note.
+// Pages without `fullView` ignore the toggle. A ticket that adds the full-run view to a page switches "pending" to "ready".
 import overview from "./overview.js";
 import failures from "./failures.js";
 import scaling from "./scaling.js";
