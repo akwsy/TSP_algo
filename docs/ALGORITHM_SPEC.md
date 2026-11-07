@@ -48,7 +48,20 @@ Travel, waiting and the trip back to the depot all use up the period.
 
 ### Several days
 
-Besides the one-day problem, the harness also measures how long you need to visit every place. Your algorithm is then called **once per day** until everything is visited. Day 1 is exactly the problem above. On each later day you receive only the places not yet visited, renumbered with the depot as id 0 and the customers 1, 2, 3... in their original order, with the same departure, deadline, speed and seed. Do not assume the whole set persists between calls. Return `[0, 0]` only when nothing can be served; a day that visits nobody stops the run.
+Besides the one-day problem, the harness also measures how long you need to visit **every** place. For that, your algorithm is called **once per day** until everything is visited:
+
+- **Day 1 is the normal problem above**: all the places, depart 06:00, back by 24:00.
+- **Each later day** you receive only the places that are still unvisited, plus the depot. The depot is always id 0 and the remaining customers are renumbered 1, 2, 3 ... **in their original order**, so never assume the whole set, or the original ids, persist between calls. The distance matrix is the matching part of the original one.
+- Every day uses the **same seed**, departs at **06:00** and must be back by **24:00**, with the same speed and the same four daily slot windows (a place open 10:30 to 15:00 is open 10:30 to 15:00 every day). One vehicle, one trip per day, each place visited once.
+- Every day's route is checked by the same independent validator as a one-day run.
+
+**What ends a run early.** The run for one instance stops, unfinished, when a day visits no new places while places remain, when 30 days have passed with places still unvisited, or when your program fails on any day (invalid route, crash, unreadable output, or a timeout with no answer). A stopped run shows a plain status such as "Stopped on day 3: the algorithm crashed". The places visited and working hours used so far are shown, but never as a finishing time, and such a run is ranked below algorithms that finished every instance.
+
+**How working hours are counted.** For each day: the time from the 06:00 departure until the vehicle is back at the depot, that is travelling plus waiting for places to open. Nights and idle time at the depot are not counted. On the last day (the one that serves the last remaining place) the count stops when that place is served, not when the vehicle gets home. The total is the sum over days; fewer hours is better. The number of days, the total distance and the total compute time are saved too.
+
+**Saving and reuse.** The result is saved per algorithm and instance and reused until anything in your algorithm folder changes (or you pass `--rerun <id>` or `--force`). The full run covers the first 10 instances of each size (`--full-run-instances N` changes this; 0 skips it).
+
+**Practical tip.** An algorithm that visits nothing on some day will be stopped, so make sure yours visits at least one place whenever one is feasible. With the default 150 km radius every place can be reached and served within a day from the depot, so a sensible algorithm always makes progress.
 
 ### Scoring
 
@@ -373,6 +386,7 @@ This writes the instances to `instances/`, one result file per (algorithm, insta
 - [ ] `route` starts and ends with 0, has no repeats, no depot in the middle; `[0, 0]` if nothing fits.
 - [ ] Every stop respects its window (wait if early, never late) and the return is by `deadlineMinute`.
 - [ ] `status` is `OPTIMAL` only with proof, `TIME_LIMIT` if you stopped early, otherwise `HEURISTIC`.
+- [ ] Visits at least one place whenever one is feasible (a day that visits nothing stops the run until every place is visited); handles a smaller problem with renumbered ids, since later days contain only the unvisited places.
 - [ ] Same input gives the same output; any randomness is seeded from `seed`.
 - [ ] Prints its answer and exits with code 0 before `timeLimitSeconds`.
 - [ ] Stops after a fixed amount of work, not by the clock (or reports `TIME_LIMIT` if a clock cap stopped it).

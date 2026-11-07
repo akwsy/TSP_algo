@@ -4,7 +4,7 @@
     python3 start.py --sizes 5 10 --instances 3   a quick small run
     python3 start.py --full-run-instances 3   examples per size run until every place is visited
     python3 start.py --skip-run            just open the site on existing results
-    python3 start.py --force               re-evaluate everything
+    python3 start.py --force               re-evaluate everything (both views)
     python3 start.py --rerun nearest-neighbour    re-evaluate only these algorithms
 
 Evaluation is incremental: a run already saved in results/ for the same algorithm code

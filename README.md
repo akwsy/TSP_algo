@@ -33,7 +33,8 @@ python3 start.py
 
 1. **Runs the evaluation.** It builds the problem instances, runs every algorithm in `algorithms/` on the same instances, checks each answer independently, and writes the results into `results/`. **Evaluation is incremental:** each algorithm is evaluated only once. A saved run is reused when the algorithm's code (a hash of every file in its folder, including `algorithm.json` and so its time limit), the instance and the settings are unchanged, so running `start.py` again evaluates nothing new and says so ("Reusing 210 saved runs, running 0 new"). Editing one algorithm re-evaluates only that algorithm; adding one evaluates only the new one; extra sizes or instances run only the missing pairs. The first full default run (7 sizes from 5 to 100 customers, 30 instances each) takes about 10 seconds with the baseline algorithm.
 
-   Saved data lives in `results/` and `instances/` (both git-ignored). Delete those folders to start completely fresh. Runtimes are saved with the run, so re-evaluating an algorithm (`--rerun`) refreshes its runtimes; reused runs keep the runtimes measured when they ran. Runs saved by an older version of the harness carry no fingerprint and are re-evaluated once.
+   Saved data lives in `results/` (one file per run, `index.json`, the full-run files in `results/sessions/` with their own `sessions-index.json`, and `aggregates-scaling.json`) and `instances/` (all ignored by version control). Delete those folders to start completely fresh. Runtimes are saved with the run, so re-evaluating an algorithm (`--rerun`) refreshes its runtimes; reused runs keep the runtimes measured when they ran. Runs saved by an older version of the harness carry no fingerprint and are re-evaluated once.
+   `start.py` also runs the second view, **until every place is visited**, on the first 10 examples of each size (see "Full-run evaluation" below). It is saved and reused in the same way, and takes much longer than the first-day run the first time.
 2. **Starts the website** at http://127.0.0.1:8000/ and opens it in your browser. Press Ctrl+C in the terminal to stop it.
 
 Useful options:
@@ -41,20 +42,21 @@ Useful options:
 ```
 python3 start.py --sizes 5 10 --instances 3       # a quick small run first
 python3 start.py --skip-run                       # just open the site on results you already have
-python3 start.py --force                          # re-evaluate everything, ignoring saved runs
-python3 start.py --rerun nearest-neighbour        # re-evaluate only the named algorithms (refreshes their runtimes)
+python3 start.py --full-run-instances 3           # examples per size run until every place is visited (default 10, 0 to skip)
+python3 start.py --force                          # re-evaluate everything (both views), ignoring saved runs
+python3 start.py --rerun nearest-neighbour        # re-evaluate only the named algorithms in both views (refreshes their runtimes)
 python3 start.py --port 8001                      # if port 8000 is busy
 python3 start.py --no-browser                     # do not open a browser window
 ```
 
-**What you see on the website** (top navigation):
+**What you see on the website.** A toggle in the page header switches between **First day only** (30 examples per size, one working day) and **Until every place is visited** (10 examples per size, one day after another). Your choice is remembered and applies to Overview, Scaling, Instance and Route detail. It is a two-option choice you reach with Tab and change with the arrow keys (or click). Top navigation:
 
-- **Overview:** every algorithm side by side with a ranking (most places visited, then shortest distance), its declared complexity, and failure counts. Pick the number of customers from the dropdown.
-- **Scaling:** charts of visits, distance, time and runtime against the number of customers, and how measured runtime and work grow compared with the declared complexity.
-- **Instance:** one problem at a time, showing every algorithm's route on the map for comparison (side by side or overlaid).
-- **Route detail:** one algorithm's run on one example, with the map and a step-by-step table. Choose the algorithm, the example and the number of places from the dropdowns.
-- **History:** results grouped by algorithm version (git commit), to compare an algorithm before and after a change.
-- **Failures:** runs that were invalid, crashed or timed out, with the reason.
+- **Overview:** every algorithm side by side with a ranking, its declared complexity, and failure counts. First day only: most places visited, then shortest distance. Until every place is visited: fewest mean working hours, then shorter distance; algorithms that finished every example come first, the others are listed below as "ranked below: N instances did not finish", with averages over the examples that finished. Pick the number of customers from the dropdown.
+- **Scaling:** First day only: charts of visits, distance, time and runtime against the number of customers, and how measured runtime and work grow compared with the declared complexity (this growth plot appears only in this view). Until every place is visited: working hours, days needed, total distance and total compute time against the number of customers, with spread.
+- **Instance:** one problem at a time, showing every algorithm's route on the map for comparison (side by side or overlaid). In the full-run view a **Day** selector steps through day 1, day 2 and so on; places done on earlier days are shown as done.
+- **Route detail:** one algorithm's run on one example, with the map and a step-by-step table. Choose the algorithm, the example and the number of places from the dropdowns. In the full-run view a **Day** selector shows that day's route and schedule table.
+- **History:** results grouped by algorithm version (git commit), to compare an algorithm before and after a change; full runs are included.
+- **Failures:** runs that were invalid, crashed or timed out, with the reason; in the full run, instances that were stopped, with the day, the plain reason and the progress so far.
 
 **To evaluate your own algorithm:** put it in `algorithms/<your-id>/` following `docs/ALGORITHM_SPEC.md`, commit it, and run `python3 start.py` again. It appears next to the baseline on every page. The same document contains a checklist and instructions for AI coding agents.
 
@@ -75,7 +77,17 @@ python3 -m harness.experiment scaling --sizes 5 10 15 --instances 5     # a quic
 
 This is incremental, with the same `--force` and `--rerun ID [ID ...]` options as `start.py`: it builds the instances into `instances/`, runs every algorithm in `algorithms/` on them (skipping pairs already saved for the same code and instance), validates each answer independently, and writes one JSON record per run plus `index.json` and `aggregates-scaling.json` into `results/`. Use `--results-dir`, `--instances-dir` and `--algorithms-dir` to write elsewhere.
 
-The experiment also runs each algorithm on the first 10 instances of each size **until every place is visited**: day 1 is the normal first-day run, and each later day gives the algorithm only the places still unvisited (leave 06:00, back by 24:00). One file per algorithm and instance is written to `results/sessions/` (layout documented in `harness/session.py`) with the days, the total working hours (travelling plus waiting, nights excluded, last day only until the last place is served) and the total distance and compute time. Use `--full-run-instances N` (default 10, 0 to skip) to change how many instances get this run.
+The experiment also runs each algorithm on the first 10 instances of each size **until every place is visited**: day 1 is the normal first-day run, and each later day gives the algorithm only the places still unvisited (leave 06:00, back by 24:00). One file per algorithm and instance is written to `results/sessions/` (layout documented in `harness/session.py`) with the days, the total working hours (travelling plus waiting, nights excluded, last day only until the last place is served) and the total distance and compute time. Use `--full-run-instances N` (default 10, 0 to skip) to change how many instances get this run. `--force` and `--rerun` re-evaluate the full runs too, and the run is capped at 30 days.
+
+## Full-run evaluation
+
+Design decisions for the "until every place is visited" view (confirmed with the owner except where noted):
+
+- **Same experiment.** It is part of `scaling`, on seeds 1 to 10 of each size (a subset of the 30 first-day instances), with the same sizes. `--full-run-instances N` changes the count (default 10, 0 to skip, never more than `--instances`).
+- **Day loop.** Day 1 is the first-day run (reused from its saved record when present). Each later day the algorithm gets only the unvisited places and the depot (id 0, customers renumbered 1..k in original order), the same seed, departure 06:00, deadline 24:00 and the same four slot windows. Every day is checked by the independent validator.
+- **Working hours.** Per day, the time from the 06:00 departure until back at the depot (travelling plus waiting); nights and idle time at the depot excluded. The last day counts only until the last place is served. The total is the sum.
+- **Caps.** At most 30 days (proposed by the assistant, accepted by the owner). A session stops, unfinished, when a day visits no new places, at the 30-day cap, or on any failure (crash, invalid route, unreadable output, timeout with no answer). Its partial figures are never used as a finishing time and never enter averages or rankings.
+- **Saving.** One file per algorithm and instance in `results/sessions/`, indexed by `results/sessions-index.json`, reused while the algorithm folder, instance, time limit and settings are unchanged. `--force` and `--rerun` apply to both views. Runs saved before this feature have no full-run data until evaluated.
 
 ## Run the tests
 
@@ -100,7 +112,7 @@ python3 site/serve.py --results tests/fixtures/sample-results --algorithms tests
 2. Default selection: depot Kuala Lumpur, customers a seeded sample of populated places (class `P`) within 150 km, without replacement.
 3. Defaults: departure 06:00, period 1080 min (06:00 to midnight), speed 40 km/h.
 4. Reported metrics: distance (km), travel time, total time (travel plus waiting).
-5. Experiment sizes 5, 10, 15, 20, 30, 50, 100 with 30 instances each are proposals.
+5. Experiment sizes 5, 10, 15, 20, 30, 50, 100 with 30 instances each are proposals; the full run uses the first 10 of each.
 6. Algorithms are language-agnostic CLI programs (JSON over stdin/stdout); harness in Python, site in plain HTML/JS.
 7. No algorithms are carried over from the old repo (history only).
 
