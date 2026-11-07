@@ -1,6 +1,7 @@
 import { h, select } from "../lib/dom.js";
 import { loadIndex, loadRun } from "../lib/data.js";
 import { failedRuns, failureKind, shortCommit } from "../lib/model.js";
+import { stagger } from "../lib/fx.js";
 
 const BADGE = { "timed out": "warn", crashed: "bad", invalid: "bad" };
 
@@ -44,7 +45,7 @@ export default {
         select("Kind", kinds.map((k) => ({ value: k, label: k === "all" ? "All kinds" : k })), kind, (v) => go(v, alg)),
         select("Algorithm", algsInList.map((a) => ({ value: a, label: a === "all" ? "All algorithms" : a })), alg, (v) => go(kind, v))),
       h("p", { class: "meta", role: "status" }, `${shown.length} of ${all.length} failed runs`),
-      shown.length ? h("ul", { class: "fail-list" }, shown.map((r, i) => item(r, records[i])))
+      shown.length ? stagger(h("ul", { class: "fail-list" }, shown.map((r, i) => item(r, records[i]))))
         : h("div", { class: "empty card" }, "No failed runs match these filters."));
   },
 };

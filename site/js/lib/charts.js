@@ -55,7 +55,7 @@ export function lineChart(opts) {
   const xs = [...new Set(series.flatMap((s) => s.points.map((p) => p.x)))].sort((a, b) => a - b);
   const ys = series.flatMap((s) => s.points.flatMap((p) => [p.y, p.hi]).filter((v) => typeof v === "number"))
     .concat(guides.flatMap((g) => g.points.map((p) => p.y)));
-  const fig = h("figure", { class: "chart" }, h("figcaption", {}, opts.title));
+  const fig = h("figure", { class: "chart card" }, h("figcaption", {}, opts.title));
   if (!xs.length || !ys.length) {
     fig.append(h("p", { class: "muted chart-empty" }, opts.emptyText || "No data to chart."));
     return fig;
@@ -95,7 +95,7 @@ export function lineChart(opts) {
   root.append(svg("line", { class: "axis", x1: m.l, x2: m.l, y1: m.t, y2: H - m.b }),
     svg("line", { class: "axis", x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b }));
 
-  const marks = svg("g");
+  const marks = svg("g", { class: "marks" }); // drawn in left to right by CSS (charts.css); final state without motion
   for (const g of guides) {
     marks.append(svg("polyline", { class: "guide", fill: "none", stroke: g.style.color, "stroke-width": 1.5, "stroke-dasharray": "2 4",
       points: g.points.map((p) => `${xp(p.x)},${yp(p.y)}`).join(" ") }));
@@ -113,7 +113,7 @@ export function lineChart(opts) {
           stroke: col, "stroke-width": 1.5, fill: "none" }));
       }
     }
-    marks.append(svg("polyline", { fill: "none", stroke: col, "stroke-width": 2, "stroke-linejoin": "round",
+    marks.append(svg("polyline", { class: "series-line", style: `color:${col}`, fill: "none", stroke: col, "stroke-width": 2, "stroke-linejoin": "round",
       "stroke-dasharray": s.style.dash, points: s.points.map((p) => `${xp(p.x)},${yp(p.y)}`).join(" ") }));
     for (const p of s.points) marks.append(marker(s.style.shape, xp(p.x), yp(p.y), col));
   }

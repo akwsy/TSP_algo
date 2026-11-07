@@ -5,6 +5,7 @@ import { algorithmColorIndex, routeSteps, clock, slotColors } from "../lib/mapmo
 import { createRouteMap, entryStyle } from "../lib/routemap.js";
 import { failureKind } from "../lib/model.js";
 import { pickerState, choiceFromFile } from "../lib/runpicker.js";
+import { stagger, countUp } from "../lib/fx.js";
 
 const ROLE = { depart: "Left the depot", stop: "Visit", return: "Back at the depot" };
 const REASON = { "timed out": "ran out of time and was stopped", crashed: "stopped with an error", invalid: "gave a route that breaks the rules" };
@@ -90,14 +91,15 @@ export default {
       rec.valid === false
         ? h("p", { class: "fail-reason" }, h("span", { class: "badge bad" }, "no usable answer"), " ",
           `This algorithm ${REASON[failureKind(rec)]}. Test result: ${rec.failureReason || "run failed"}.`)
-        : h("dl", { class: "stats inline" }, statsRows(rec).flatMap(([k, v]) => [h("dt", {}, k), h("dd", {}, v)])),
+        : h("dl", { class: "stats inline" }, statsRows(rec).map(([k, v]) => h("div", {}, h("dt", {}, k), h("dd", {}, v)))),
       mapKey(), h("div", { class: "card pad" }, map.el),
       steps.length
         ? h("div", { class: "card table-wrap spaced" }, h("table", {},
           h("caption", {}, `Be back by ${clock(instance.deadlineMinute)}. "Waited" is time spent standing by at a place until it opens.`),
           h("thead", {}, h("tr", {}, head.map((t, i) => h("th", { scope: "col", class: i < 4 || i === 9 ? "l" : null }, t)))),
-          h("tbody", {}, steps.map((r) => stepRow(r, instance.deadlineMinute)))))
+          stagger(h("tbody", {}, steps.map((r) => stepRow(r, instance.deadlineMinute))))))
         : h("div", { class: "empty card spaced" }, "This run has no route to show."));
+    body.querySelectorAll(".stats.inline dd").forEach((d, i) => countUp(d, { duration: 700, delay: 80 + i * 40 }));
     return () => map.destroy();
   },
 };
