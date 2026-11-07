@@ -82,6 +82,9 @@ for (const [device, w, hgt, scheme] of MODES) {
     // What each page says in the full-run view: the ranked table with its "did not finish" label, or the plain "coming to this page" note.
     const name = page.split("?")[0];
     if (view === "full" && name === "overview" && !/ranked below: \d+ instances? did(n't| not) finish/.test(entry.mainText)) entry.errors.push("full-run overview lacks the ranked-below label");
+    // Failures and History list full-run sessions in both toggle states (they do not follow the toggle).
+    if (name === "failures" && !(/did not finish every place/.test(entry.mainText) && /stopped on day \d+/i.test(entry.mainText) && /so far, not a finishing time/.test(entry.mainText) && /Example \d+ with \d+ places/.test(entry.mainText) && /Stopped on day \d+:/.test(entry.mainText))) entry.errors.push("Failures lacks a stopped session with its day, explanation and partial figures");
+    if (name === "history" && !/Until every place is visited \(\d+ of \d+ finished\)/.test(entry.mainText)) entry.errors.push("History lacks the full-run sessions group");
     if (view === "full" && ["instance", "run"].includes(name) && !/view is coming to the/.test(entry.mainText)) entry.errors.push("page lacks the full-run coming-soon note");
     if (name === "scaling" && view === "full") {
       if (/view is coming to the/.test(entry.mainText)) entry.errors.push("full-run scaling still shows the coming-soon note");
@@ -90,7 +93,7 @@ for (const [device, w, hgt, scheme] of MODES) {
       if (!/Not plotted: /.test(entry.mainText)) entry.errors.push("full-run scaling lacks the not-plotted note");
     }
     if (name === "scaling" && view === "first" && !/Measured growth against declared complexity/.test(entry.mainText)) entry.errors.push("first-day scaling lacks the complexity plot");
-    if (view === "first" && /coming to the|working hours/.test(entry.mainText)) entry.errors.push("first-day page shows full-run wording");
+    if (view === "first" && !["failures", "history"].includes(name) && /coming to the|working hours/.test(entry.mainText)) entry.errors.push("first-day page shows full-run wording");
     delete entry.mainText;
     if (!entry.h1) entry.errors.push("page rendered no heading");
     if (entry.nan) entry.errors.push("page text contains NaN/undefined");
