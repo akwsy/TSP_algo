@@ -83,6 +83,17 @@ class FailureTest(test_run.CliCase):
         self.assertTrue(self.entry("sleep", 1)["killed"])
         self.assertFalse(self.entry("self-time-limit", 1)["killed"])
 
+    def test_every_failed_record_carries_a_machine_readable_failure_kind(self):
+        kinds = {mode: self.rec(mode)["failureKind"] for mode in
+                 ("infeasible", "malformed", "bad-status", "bad-types", "invalid-utf8", "crash",
+                  "missing-command", "sleep", "partial", "skip-all", "self-time-limit")}
+        self.assertEqual(kinds, {
+            "infeasible": "invalid_route", "malformed": "unreadable_output",
+            "bad-status": "unreadable_output", "bad-types": "unreadable_output",
+            "invalid-utf8": "unreadable_output", "crash": "crashed",
+            "missing-command": "could_not_start", "sleep": "timed_out",
+            "partial": None, "skip-all": None, "self-time-limit": None})  # valid runs: None
+
     def test_good_runs_have_empty_stderr_and_fixture_is_not_a_real_entry(self):
         self.assertEqual(self.rec("skip-all")["stderr"], "")
         real = {p.parent.name for p in (ROOT / "algorithms").glob("*/algorithm.json")}

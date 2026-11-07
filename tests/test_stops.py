@@ -25,12 +25,12 @@ class StopTest(CliCase):
             "id": mode, "displayName": mode, "timeLimitSeconds": limit,
             "command": [sys.executable, str(LATER), mode]}))
 
-    def session(self, alg, env=None, instances="1"):
+    def session(self, alg, extra=(), instances="1"):
         cmd = [sys.executable, "-m", "harness.experiment", "scaling", "--sizes", "2",
-               "--instances", instances, "--dataset", str(self.tmp / "places.txt"),
+               "--instances", instances, *extra, "--dataset", str(self.tmp / "places.txt"),
                "--algorithms-dir", str(self.algs), "--instances-dir", str(self.tmp / "instances"),
                "--results-dir", str(self.tmp / "results")]
-        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, env={**os.environ, **(env or {})})
+        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, proc.stderr)
         files = sorted((self.tmp / "results" / "sessions").glob(f"{alg}__n2-seed1__*.json"))
         return json.loads(files[-1].read_text())
@@ -97,9 +97,9 @@ class StopTest(CliCase):
 
     def test_day_limit_stops_with_places_remaining(self):
         write_algorithm(self.algs, "slow", ONE_PER_DAY)
-        # Test hook: TSP_MAX_DAYS shrinks the cap so no 30 slow runs are needed
-        # (the real default of 30 is asserted in test_session_constants).
-        s = self.session("slow", env={"TSP_MAX_DAYS": "1"})
+        # --max-days shrinks the cap so no 30 slow runs are needed
+        # (the real default of 30 is asserted in test_default_day_limit_is_30).
+        s = self.session("slow", extra=("--max-days", "1"))
         self.assertEqual((s["outcome"], s["stopReason"], s["stopDay"], s["days"]), ("did not finish", "day_limit", 1, 1))
         self.assertEqual(s["explanation"], "Stopped after day 1: 1 place still unvisited (day limit reached)")
         self.assertEqual((s["visitedSoFar"], s["unvisitedAtStop"], s["partialFigures"]), (1, 1, True))
@@ -113,3 +113,23 @@ class StopTest(CliCase):
         write_algorithm(self.algs, "slow", ONE_PER_DAY)
         s = self.session("slow")
         self.assertEqual((s["outcome"], s["partialFigures"], s["unvisitedAtStop"]), ("finished", False, 0))
+
+    def test_max_days_must_be_a_positive_integer_and_is_checked_before_any_work(self):
+        write_algorithm(self.algs, "slow", ONE_PER_DAY)
+        for bad in ("0", "-3", "abc", "1.5"):
+            cmd = [sys.executable, "-m", "harness.experiment", "scaling", "--sizes", "2",
+                   "--instances", "1", "--max-days", bad, "--dataset", str(self.tmp / "places.txt"),
+                   "--algorithms-dir", str(self.algs), "--instances-dir", str(self.tmp / "instances"),
+                   "--results-dir", str(self.tmp / "results")]
+            proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 2, bad)
+            self.assertIn("--max-days", proc.stderr)
+            self.assertFalse((self.tmp / "results").exists(), bad)
+
+    def test_environment_variable_is_ignored(self):
+        write_algorithm(self.algs, "slow", ONE_PER_DAY)
+        for value in ("1", "not-a-number"):
+            os.environ["TSP_MAX_DAYS"] = value
+            self.addCleanup(os.environ.pop, "TSP_MAX_DAYS", None)
+            s = self.session("slow")  # would stop on day 1, or crash, if the variable were read
+            self.assertEqual((s["outcome"], s["days"]), ("finished", 2))

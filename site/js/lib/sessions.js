@@ -1,8 +1,9 @@
 // Listing logic for full-run sessions on the Failures and History pages (no DOM except loadSessions).
-// Data: results/sessions-index.json ({ sessions: [...] }, see harness/sessionstore.py) and the session files
-// it points to (see harness/session.py). A missing index means no sessions. Tested by tests/test_site_sessions.py.
+// Data: results/sessions-index.json ({ sessions: [...] }, see harness/sessionstore.py); its entries carry every
+// figure listed here, so session files (harness/session.py) are fetched only for entries from an older index. A missing index means no sessions. Tested by tests/test_site_sessions.py.
 // Stopped sessions are never turned into a finishing time: their figures are labelled "so far".
 import { failureKind } from "./model.js";
+import { loadSession, loadSessionsIndex } from "./data.js";
 
 export const STOPPED_KIND = "did not finish every place";
 const has = (x) => typeof x === "number" && Number.isFinite(x);
@@ -89,27 +90,23 @@ export function compareFull(sa, sb) {
 
 // ---- browser loading ----
 let cached = null;
+const DETAIL_FIELDS = ["commit", "totalDistanceKm", "explanation"];
 
-/** Index entries merged with their session files (adds commit, totalDistanceKm, explanation). Cached.
- *  Never throws: no index or an unreadable file just means fewer sessions. */
+/** True when an index entry already carries what the pages list (older indexes do not). */
+export const hasDetails = (e) => DETAIL_FIELDS.every((k) => k in e);
+
+/** Sessions for the Failures and History pages, read from sessions-index.json alone (its entries carry commit,
+ *  totalDistanceKm and explanation, see harness/sessionstore.py). Only an entry from an older index that lacks them
+ *  is completed from its session file. Cached. Never throws: no index or an unreadable file means fewer details. */
 export function loadSessions() {
   if (!cached) {
-    cached = (async () => {
-      let idx = null;
+    cached = loadSessionsIndex().then((entries) => Promise.all(entries.map(async (e) => {
+      if (hasDetails(e)) return e;
       try {
-        const res = await fetch("/results/sessions-index.json", { cache: "no-store" });
-        idx = res.ok ? await res.json() : null;
-      } catch { idx = null; }
-      const entries = sessionsOf(idx);
-      return Promise.all(entries.map(async (e) => {
-        try {
-          const url = "/results/" + String(e.file).split("/").map(encodeURIComponent).join("/");
-          const res = await fetch(url, { cache: "no-store" });
-          const rec = res.ok ? await res.json() : null;
-          return rec ? { ...e, commit: rec.commit ?? null, totalDistanceKm: rec.totalDistanceKm, explanation: rec.explanation } : e;
-        } catch { return e; }
-      }));
-    })();
+        const rec = await loadSession(e.file);
+        return { ...e, commit: rec.commit ?? null, totalDistanceKm: rec.totalDistanceKm, explanation: rec.explanation };
+      } catch { return e; }
+    })));
   }
   return cached;
 }

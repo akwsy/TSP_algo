@@ -7,6 +7,8 @@ Saved layout (stable; later tickets build on it). One JSON file per session:
     {
       "algorithmId", "commit", "fingerprint", "instanceId", "instanceHash", "seed",
       "numCustomers", "experiment", "runId", "timestamp",
+      "formatVersion": SESSION_FORMAT_VERSION when the session was run (see below),
+      "maxDays":       the day cap in force when it was run (30 unless --max-days says otherwise),
       "outcome":       "finished" | "did not finish",
       "stopReason":    null when finished, else one of STOP_REASONS (listed below),
       "stopDay":       null when finished, else the day number the session stopped on
@@ -27,7 +29,8 @@ Saved layout (stable; later tickets build on it). One JSON file per session:
       "dayRecords": [ {         one per day, in order
           "day": 1.., "instanceId": "<id>" or "<id>-dayN", "numPlaces": customers given that day,
           "route": [0, ...original place ids..., 0], "status", "killed", "runtimeMs", "stats",
-          "valid", "failureReason", "visited": [original ids newly visited that day],
+          "valid", "failureReason", "failureKind" (one of harness.run.FAILURE_KINDS, null when
+          valid; absent on sessions saved before it existed), "visited": [original ids newly visited that day],
           "distanceKm", "returnMinute", "workingMinutes" (null on a day that failed or visited
           nothing), "schedule": [{id (original), arriveMinute, startMinute, leaveMinute}] } ]
     }
@@ -45,39 +48,56 @@ Stop reasons (STOP_REASONS; stable). Explanation texts, N = day, K = places stil
 A day killed by the time limit that had already printed a complete valid route is scored by the
 runner's normal rules (status TIME_LIMIT, killed true): it is progress if the route is valid and
 visits new places, otherwise no_progress or invalid_route. Only a timeout with no usable route is
-timed_out. The day cap can be lowered for tests with the environment variable TSP_MAX_DAYS
-(default 30).
+timed_out. The day cap is 30 (MAX_DAYS); a different cap can be passed explicitly (run_session's `max_days`,
+the experiment command's advanced `--max-days N`) and is part of the saved-session reuse key.
 
 Day 1 is the ordinary first-day run (a saved first-day record may be passed in and is reused).
 Later days get sub_instance(): only the unvisited places plus the depot (id 0), customers
 renumbered consecutively in original order, same seed, speed, departure and deadline.
 """
-import os
 from datetime import datetime, timezone
 
 from .run import make_record
 
 MAX_DAYS = 30
+# Version of everything that decides what a session's result is, apart from the algorithm code and
+# the instance: the session logic (stop rules, sub-instances, how days are scored), the record
+# layout and the working-hours definition. Bump it whenever one of those changes. It is part of
+# the reuse key (see sessionstore.py), so saved sessions of an older version are run again.
+SESSION_FORMAT_VERSION = 1
 STOP_REASONS = ("no_progress", "day_limit", "crashed", "invalid_route", "unreadable_output",
                 "timed_out", "could_not_start")
 
 
-def day_cap():
-    """The day cap: MAX_DAYS, or TSP_MAX_DAYS from the environment (a test hook)."""
-    return int(os.environ.get("TSP_MAX_DAYS") or MAX_DAYS)
+def _kind_from_text(entry):
+    """Failure kind guessed from the message, for day records saved before `failureKind` existed."""
+    reason = entry["failureReason"] or "unknown failure"
+    if entry["killed"]:
+        return "timed_out"
+    if reason.startswith("could not start"):
+        return "could_not_start"
+    if reason.startswith("exited with code"):
+        return "crashed"
+    if reason.startswith(("output is not", "status must", "unknown status", "stats must")):
+        return "unreadable_output"
+    return "invalid_route"
 
 
 def classify_failure(entry):
-    """(stop reason, explanation phrase) for a day record that gave no usable route."""
+    """(stop reason, explanation phrase) for a day record that gave no usable route.
+
+    Uses the record's `failureKind` (set by the runner; harness/run.py). Only records without it
+    (saved by an older harness) fall back to matching the message text."""
     reason = entry["failureReason"] or "unknown failure"
-    if entry["killed"]:
-        return "timed_out", f"the algorithm ran out of time ({reason}) and gave no usable answer"
-    if reason.startswith("could not start"):
-        return "could_not_start", f"the algorithm could not be started ({reason.split(': ', 1)[-1]})"
-    if reason.startswith("exited with code"):
-        return "crashed", f"the algorithm crashed ({reason})"
-    if reason.startswith(("output is not", "status must", "unknown status", "stats must")):
-        return "unreadable_output", f"the algorithm's output could not be read ({reason})"
+    kind = entry.get("failureKind") or _kind_from_text(entry)
+    if kind == "timed_out":
+        return kind, f"the algorithm ran out of time ({reason}) and gave no usable answer"
+    if kind == "could_not_start":
+        return kind, f"the algorithm could not be started ({reason.split(': ', 1)[-1]})"
+    if kind == "crashed":
+        return kind, f"the algorithm crashed ({reason})"
+    if kind == "unreadable_output":
+        return kind, f"the algorithm's output could not be read ({reason})"
     return "invalid_route", f"the algorithm gave an invalid route ({reason})"
 
 
@@ -115,6 +135,7 @@ def _day_record(day, instance_id, ids, record):
         "route": [back(i) for i in route] if valid else route,
         "status": record["status"], "killed": record["killed"], "runtimeMs": record["runtimeMs"],
         "stats": record["stats"], "valid": valid, "failureReason": record["failureReason"],
+        "failureKind": record.get("failureKind"),
         "visited": [back(s["id"]) for s in record["schedule"]] if valid else [],
         "distanceKm": record["distanceKm"], "returnMinute": record["returnMinute"],
         "schedule": [{**s, "id": back(s["id"])} for s in record["schedule"]] if valid else None,
@@ -127,7 +148,7 @@ def run_session(meta, instance, run_id, first_day=None, max_days=None):
     `first_day` is the saved first-day record for this algorithm and instance, used as day 1
     when given (so nothing is computed twice). Returns the session record (see module doc).
     Seam: ticket 03 decides whether a saved session is reused and indexes it."""
-    max_days = max_days or day_cap()
+    max_days = max_days or MAX_DAYS
     unvisited = set(range(1, len(instance["locations"])))
     days = []
     stop = None
@@ -166,6 +187,7 @@ def run_session(meta, instance, run_id, first_day=None, max_days=None):
         "algorithmId": meta["id"], "commit": meta["_commit"], "fingerprint": meta.get("_fingerprint"),
         "instanceId": instance["instanceId"], "seed": instance.get("seed"),
         "numCustomers": len(instance["locations"]) - 1, "runId": run_id,
+        "formatVersion": SESSION_FORMAT_VERSION, "maxDays": max_days,
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "outcome": "did not finish" if stop else "finished",
         "stopReason": stop[0] if stop else None, "stopDay": stop[1] if stop else None,

@@ -1,7 +1,8 @@
 """Run-until-every-place-is-visited: the multi-day arithmetic as pure functions."""
 import unittest
 
-from harness.session import day_working_minutes, sub_instance, total_working_minutes
+from harness.session import (classify_failure, day_working_minutes, sub_instance,
+                             total_working_minutes)
 
 
 def day(return_minute, starts):
@@ -44,6 +45,33 @@ class SubInstanceTest(unittest.TestCase):
         self.assertEqual((sub["seed"], sub["speedKmh"], sub["departureMinute"], sub["deadlineMinute"]),
                          (1, 40.0, 360, 1440))
         self.assertEqual(sub["instanceId"], "n3-seed1-day2")
+
+
+class ClassifyFailureTest(unittest.TestCase):
+    def entry(self, reason, killed=False, **kind):
+        return {"failureReason": reason, "killed": killed, **kind}
+
+    def test_the_recorded_failure_kind_decides_not_the_message_wording(self):
+        # Messages reworded so no old prefix matches: only the kind can tell.
+        cases = [("invalid_route", "the algorithm gave an invalid route (zorp)"),
+                 ("crashed", "the algorithm crashed (zorp)"),
+                 ("unreadable_output", "the algorithm's output could not be read (zorp)"),
+                 ("could_not_start", "the algorithm could not be started (zorp)")]
+        for kind, text in cases:
+            self.assertEqual(classify_failure(self.entry("zorp", failureKind=kind)), (kind, text))
+        got, phrase = classify_failure(self.entry("zorp", killed=True, failureKind="timed_out"))
+        self.assertEqual((got, phrase), ("timed_out", "the algorithm ran out of time (zorp) and gave no usable answer"))
+
+    def test_the_kind_wins_over_text_that_looks_like_another_kind(self):
+        got, _ = classify_failure(self.entry("exited with code 3", failureKind="invalid_route"))
+        self.assertEqual(got, "invalid_route")
+
+    def test_records_saved_before_the_kind_existed_fall_back_to_the_message(self):
+        self.assertEqual(classify_failure(self.entry("exited with code 3"))[0], "crashed")
+        self.assertEqual(classify_failure(self.entry("could not start the command: x"))[0], "could_not_start")
+        self.assertEqual(classify_failure(self.entry("output is not valid JSON"))[0], "unreadable_output")
+        self.assertEqual(classify_failure(self.entry("route repeats a customer"))[0], "invalid_route")
+        self.assertEqual(classify_failure(self.entry("exceeded the time limit", killed=True))[0], "timed_out")
 
 
 if __name__ == "__main__":

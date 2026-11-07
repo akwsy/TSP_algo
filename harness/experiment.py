@@ -18,19 +18,20 @@ from .experiments import EXPERIMENTS
 from .generate_instance import DEFAULT_DATASET
 from .instance import build_instance
 from .run import ROOT, discover_algorithms, instance_hash, run_batch
-from .session import run_session
-from .sessionstore import find_saved_session, read_sessions_index, save_session
+from . import session as sessionlib
+from .session import MAX_DAYS, run_session
+from .sessionstore import find_saved_session, read_sessions_index, save_session, session_key
 
 DEFAULTS = InstanceConfig(seed=0)
 
 
-def run_full_sessions(algorithms, instances, records, results_dir, exp, count, reuse=True, rerun=(), stats=None):
+def run_full_sessions(algorithms, instances, records, results_dir, exp, count, reuse=True, rerun=(), stats=None, max_days=None):
     """Run each algorithm day by day on the first `count` seeds of each size and save one session
     file each (layout and index: harness/session.py, harness/sessionstore.py). Day 1 reuses the
     first-day record. A session already saved for the same algorithm code, instance and experiment
     is reused, not run again (unless reuse is False or the algorithm is in `rerun`).
     Returns the list of sessions (reused and newly run); `stats`, if given, is filled with
-    {"reused": {id: n}, "ran": {id: n}}."""
+    {"reused": {id: n}, "ran": {id: n}}. `max_days` is the day cap (default MAX_DAYS, 30)."""
     chosen = [i for i in instances if i["seed"] <= count]
     (results_dir / "sessions").mkdir(parents=True, exist_ok=True)
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
@@ -41,7 +42,10 @@ def run_full_sessions(algorithms, instances, records, results_dir, exp, count, r
     sessions = []
     for meta in algorithms:
         for inst in chosen:
-            key = (meta["id"], meta["_fingerprint"], instance_hash(inst), exp.name)
+            key = session_key({
+                "algorithmId": meta["id"], "fingerprint": meta["_fingerprint"],
+                "instanceHash": instance_hash(inst), "experiment": exp.name,
+                "formatVersion": sessionlib.SESSION_FORMAT_VERSION, "maxDays": max_days or MAX_DAYS})
             saved = (find_saved_session(entries, results_dir, key)
                      if reuse and meta["id"] not in rerun else None)
             if saved is not None:
@@ -49,7 +53,8 @@ def run_full_sessions(algorithms, instances, records, results_dir, exp, count, r
                 sessions.append(saved)
                 continue
             stats["ran"][meta["id"]] = stats["ran"].get(meta["id"], 0) + 1
-            session = run_session(meta, inst, run_id, first_day=first_days.get((meta["id"], inst["instanceId"])))
+            session = run_session(meta, inst, run_id, first_day=first_days.get((meta["id"], inst["instanceId"])),
+                                   max_days=max_days)
             session.update(experiment=exp.name, instanceHash=key[2])
             entries = save_session(results_dir, entries, session)
             print(f"{meta['id']} until every place is visited on {inst['instanceId']}: "
@@ -67,6 +72,9 @@ def main(argv=None):
     ap.add_argument("--full-run-instances", type=int, default=10, metavar="N",
                     help="run the first N instances of each size until every place is visited "
                          "(default 10, 0 to skip; never more than --instances)")
+    ap.add_argument("--max-days", type=int, default=MAX_DAYS, metavar="N",
+                    help=f"advanced: stop a session after day N if places are still unvisited "
+                         f"(default {MAX_DAYS}); a different N is re-evaluated, not reused")
     ap.add_argument("--force", action="store_true",
                     help="re-evaluate everything, ignoring saved runs")
     ap.add_argument("--rerun", nargs="+", metavar="ID", default=[],
@@ -77,6 +85,12 @@ def main(argv=None):
     ap.add_argument("--results-dir", default="results")
     args = ap.parse_args(argv)
 
+    if args.max_days < 1:
+        print("error: --max-days must be a positive whole number", file=sys.stderr)
+        return 2
+    if args.full_run_instances < 0:
+        print("error: --full-run-instances must not be negative", file=sys.stderr)
+        return 2
     if args.name not in EXPERIMENTS:
         print(f"error: unknown experiment {args.name!r}; known: {', '.join(EXPERIMENTS)}",
               file=sys.stderr)
@@ -109,13 +123,11 @@ def main(argv=None):
     records = run_batch(algorithms, instances, Path(args.instances_dir), Path(args.results_dir),
                         extra={"experiment": exp.name}, reuse=not args.force,
                         rerun=set(args.rerun), stats=stats)
-    if args.full_run_instances < 0:
-        print("error: --full-run-instances must not be negative", file=sys.stderr)
-        return 2
     full = {}
     sessions = run_full_sessions(algorithms, instances, records, Path(args.results_dir), exp,
                                  min(args.full_run_instances, exp.instances_per_size),
-                                 reuse=not args.force, rerun=set(args.rerun), stats=full)
+                                 reuse=not args.force, rerun=set(args.rerun), stats=full,
+                                 max_days=args.max_days)
     reused, ran = sum(stats["reused"].values()), sum(stats["ran"].values())
     print(f"Reused {reused} saved runs, ran {ran} new.")
     for meta in algorithms:

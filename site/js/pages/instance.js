@@ -1,11 +1,11 @@
 import { h, fmt, select } from "../lib/dom.js";
-import { loadIndex, loadRun } from "../lib/data.js";
+import { loadIndex, loadRun, loadSessionsIndex, loadSession } from "../lib/data.js";
 import { loadInstance, ensureMapCss, replaceHashParams } from "../lib/instances.js";
 import { algorithmColorIndex } from "../lib/mapmodel.js";
 import { createRouteMap, entryStyle, algorithmSwatch, slotLegend } from "../lib/routemap.js";
 import { runStats } from "../lib/rundisplay.js";
 import { getView } from "../lib/view.js";
-import { loadSessionsIndex, loadSession, latestPerAlgorithm, sessionInstanceIds, maxDays, clampDay, dayRun, doneBefore } from "../lib/sessiondays.js";
+import { latestPerAlgorithm, sessionInstanceIds, maxDays, clampDay, dayRun, doneBefore } from "../lib/sessiondays.js";
 import { daySelect, sessionBlock, dayFigures, dayFiguresList, noDayNote } from "../lib/fullview.js";
 
 const instanceLabel = (id, runs) => `${id} (${runs.find((x) => x.instanceId === id).numCustomers} customers)`;

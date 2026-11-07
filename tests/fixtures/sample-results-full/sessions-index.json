@@ -18,7 +18,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 5,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm crashed (exited with code 3)"
     },
     {
       "file": "sessions/broken-crash__n5-seed2__20261107T070435852045Z.json",
@@ -38,7 +41,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 5,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm crashed (exited with code 3)"
     },
     {
       "file": "sessions/broken-crash__n5-seed3__20261107T070435852045Z.json",
@@ -58,7 +64,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 5,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm crashed (exited with code 3)"
     },
     {
       "file": "sessions/broken-crash__n10-seed1__20261107T070435852045Z.json",
@@ -78,7 +87,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 10,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm crashed (exited with code 3)"
     },
     {
       "file": "sessions/broken-crash__n10-seed2__20261107T070435852045Z.json",
@@ -98,7 +110,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 10,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm crashed (exited with code 3)"
     },
     {
       "file": "sessions/broken-crash__n10-seed3__20261107T070435852045Z.json",
@@ -118,7 +133,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 10,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm crashed (exited with code 3)"
     },
     {
       "file": "sessions/broken-crash__n15-seed1__20261107T070435852045Z.json",
@@ -138,7 +156,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 15,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm crashed (exited with code 3)"
     },
     {
       "file": "sessions/broken-crash__n15-seed2__20261107T070435852045Z.json",
@@ -158,7 +179,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 15,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm crashed (exited with code 3)"
     },
     {
       "file": "sessions/broken-crash__n15-seed3__20261107T070435852045Z.json",
@@ -178,7 +202,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 15,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm crashed (exited with code 3)"
     },
     {
       "file": "sessions/broken-infeasible__n5-seed1__20261107T070435852045Z.json",
@@ -198,7 +225,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 5,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm gave an invalid route (route repeats a customer)"
     },
     {
       "file": "sessions/broken-infeasible__n5-seed2__20261107T070435852045Z.json",
@@ -218,7 +248,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 5,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm gave an invalid route (route repeats a customer)"
     },
     {
       "file": "sessions/broken-infeasible__n5-seed3__20261107T070435852045Z.json",
@@ -238,7 +271,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 5,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm gave an invalid route (route repeats a customer)"
     },
     {
       "file": "sessions/broken-infeasible__n10-seed1__20261107T070435852045Z.json",
@@ -258,7 +294,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 10,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm gave an invalid route (route repeats a customer)"
     },
     {
       "file": "sessions/broken-infeasible__n10-seed2__20261107T070435852045Z.json",
@@ -278,7 +317,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 10,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm gave an invalid route (route repeats a customer)"
     },
     {
       "file": "sessions/broken-infeasible__n10-seed3__20261107T070435852045Z.json",
@@ -298,7 +340,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 10,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm gave an invalid route (route repeats a customer)"
     },
     {
       "file": "sessions/broken-infeasible__n15-seed1__20261107T070435852045Z.json",
@@ -318,7 +363,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 15,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm gave an invalid route (route repeats a customer)"
     },
     {
       "file": "sessions/broken-infeasible__n15-seed2__20261107T070435852045Z.json",
@@ -338,7 +386,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 15,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm gave an invalid route (route repeats a customer)"
     },
     {
       "file": "sessions/broken-infeasible__n15-seed3__20261107T070435852045Z.json",
@@ -358,7 +409,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 15,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm gave an invalid route (route repeats a customer)"
     },
     {
       "file": "sessions/broken-sleep__n5-seed1__20261107T070435852045Z.json",
@@ -378,7 +432,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 5,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm ran out of time (exceeded the time limit of 1 s and was killed) and gave no usable answer"
     },
     {
       "file": "sessions/broken-sleep__n5-seed2__20261107T070435852045Z.json",
@@ -398,7 +455,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 5,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm ran out of time (exceeded the time limit of 1 s and was killed) and gave no usable answer"
     },
     {
       "file": "sessions/broken-sleep__n5-seed3__20261107T070435852045Z.json",
@@ -418,7 +478,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 5,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm ran out of time (exceeded the time limit of 1 s and was killed) and gave no usable answer"
     },
     {
       "file": "sessions/broken-sleep__n10-seed1__20261107T070435852045Z.json",
@@ -438,7 +501,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 10,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm ran out of time (exceeded the time limit of 1 s and was killed) and gave no usable answer"
     },
     {
       "file": "sessions/broken-sleep__n10-seed2__20261107T070435852045Z.json",
@@ -458,7 +524,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 10,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm ran out of time (exceeded the time limit of 1 s and was killed) and gave no usable answer"
     },
     {
       "file": "sessions/broken-sleep__n10-seed3__20261107T070435852045Z.json",
@@ -478,7 +547,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 10,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm ran out of time (exceeded the time limit of 1 s and was killed) and gave no usable answer"
     },
     {
       "file": "sessions/broken-sleep__n15-seed1__20261107T070435852045Z.json",
@@ -498,7 +570,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 15,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm ran out of time (exceeded the time limit of 1 s and was killed) and gave no usable answer"
     },
     {
       "file": "sessions/broken-sleep__n15-seed2__20261107T070435852045Z.json",
@@ -518,7 +593,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 15,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm ran out of time (exceeded the time limit of 1 s and was killed) and gave no usable answer"
     },
     {
       "file": "sessions/broken-sleep__n15-seed3__20261107T070435852045Z.json",
@@ -538,7 +616,10 @@
       "visitedSoFar": 0,
       "workingMinutes": 0,
       "unvisitedAtStop": 15,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 0,
+      "explanation": "Stopped on day 1: the algorithm ran out of time (exceeded the time limit of 1 s and was killed) and gave no usable answer"
     },
     {
       "file": "sessions/nearest-neighbour__n5-seed1__20261107T070435852045Z.json",
@@ -558,7 +639,10 @@
       "visitedSoFar": 5,
       "workingMinutes": 2329.4106477233704,
       "unvisitedAtStop": 0,
-      "partialFigures": false
+      "partialFigures": false,
+      "commit": null,
+      "totalDistanceKm": 761.0620643862685,
+      "explanation": null
     },
     {
       "file": "sessions/nearest-neighbour__n5-seed2__20261107T070435852045Z.json",
@@ -578,7 +662,10 @@
       "visitedSoFar": 5,
       "workingMinutes": 1676.623206435555,
       "unvisitedAtStop": 0,
-      "partialFigures": false
+      "partialFigures": false,
+      "commit": null,
+      "totalDistanceKm": 884.3068579937604,
+      "explanation": null
     },
     {
       "file": "sessions/nearest-neighbour__n5-seed3__20261107T070435852045Z.json",
@@ -598,7 +685,10 @@
       "visitedSoFar": 5,
       "workingMinutes": 2334.7155907571832,
       "unvisitedAtStop": 0,
-      "partialFigures": false
+      "partialFigures": false,
+      "commit": null,
+      "totalDistanceKm": 759.2495491244367,
+      "explanation": null
     },
     {
       "file": "sessions/nearest-neighbour__n10-seed1__20261107T070435852045Z.json",
@@ -618,7 +708,10 @@
       "visitedSoFar": 10,
       "workingMinutes": 2757.3041999532916,
       "unvisitedAtStop": 0,
-      "partialFigures": false
+      "partialFigures": false,
+      "commit": null,
+      "totalDistanceKm": 964.0686066859912,
+      "explanation": null
     },
     {
       "file": "sessions/nearest-neighbour__n10-seed2__20261107T070435852045Z.json",
@@ -638,7 +731,10 @@
       "visitedSoFar": 10,
       "workingMinutes": 2773.7935020665363,
       "unvisitedAtStop": 0,
-      "partialFigures": false
+      "partialFigures": false,
+      "commit": null,
+      "totalDistanceKm": 960.3214046333142,
+      "explanation": null
     },
     {
       "file": "sessions/nearest-neighbour__n10-seed3__20261107T070435852045Z.json",
@@ -658,7 +754,10 @@
       "visitedSoFar": 10,
       "workingMinutes": 4057.550930718407,
       "unvisitedAtStop": 0,
-      "partialFigures": false
+      "partialFigures": false,
+      "commit": null,
+      "totalDistanceKm": 1107.8138301782624,
+      "explanation": null
     },
     {
       "file": "sessions/nearest-neighbour__n15-seed1__20261107T070435852045Z.json",
@@ -678,7 +777,10 @@
       "visitedSoFar": 15,
       "workingMinutes": 3268.3051549581887,
       "unvisitedAtStop": 0,
-      "partialFigures": false
+      "partialFigures": false,
+      "commit": null,
+      "totalDistanceKm": 1475.1974805384637,
+      "explanation": null
     },
     {
       "file": "sessions/nearest-neighbour__n15-seed2__20261107T070435852045Z.json",
@@ -698,7 +800,10 @@
       "visitedSoFar": 15,
       "workingMinutes": 6057.483020380961,
       "unvisitedAtStop": 0,
-      "partialFigures": false
+      "partialFigures": false,
+      "commit": null,
+      "totalDistanceKm": 2045.0972503471726,
+      "explanation": null
     },
     {
       "file": "sessions/nearest-neighbour__n15-seed3__20261107T070435852045Z.json",
@@ -718,7 +823,10 @@
       "visitedSoFar": 13,
       "workingMinutes": 4083.36505197574,
       "unvisitedAtStop": 2,
-      "partialFigures": true
+      "partialFigures": true,
+      "commit": null,
+      "totalDistanceKm": 1717.8116753148536,
+      "explanation": "Stopped on day 6: the algorithm visited no new places (2 still unvisited)"
     }
   ]
 }

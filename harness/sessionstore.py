@@ -6,29 +6,42 @@ tickets read it):
 
     {"sessions": [ {"file": "sessions/<name>.json",   path relative to the results dir
                     "runId", "algorithmId", "instanceId", "numCustomers", "seed", "experiment",
-                    "fingerprint", "instanceHash", "timestamp", "outcome", "stopReason",
-                    "stopDay", "days", "visitedSoFar", "workingMinutes", "unvisitedAtStop",
-                    "partialFigures"} ] }
+                    "fingerprint", "instanceHash", "formatVersion", "maxDays", "timestamp",
+                    "outcome", "stopReason", "stopDay", "days", "visitedSoFar", "workingMinutes",
+                    "unvisitedAtStop", "partialFigures",
+                    "commit", "totalDistanceKm", "explanation"} ] }
+
+commit, totalDistanceKm and explanation are copied from the session file so the Failures and
+History pages can list sessions from this index alone, without fetching every session file.
+They are display fields, not part of the reuse key. Entries written before they existed lack
+them; the pages then fall back to fetching that session's file.
 
 The session files themselves are described in harness/session.py.
 
 Reuse key: algorithmId + fingerprint (hash of every file in the algorithm folder, so the time
-limit in algorithm.json counts) + instanceHash + experiment. Only indexed sessions are ever
-reused; a session file without a matching index entry (e.g. written before this index existed)
-is not. Saving a session deletes every older file with the same key and replaces its index
-entry, so a key never has duplicates. Sessions of other algorithm versions stay (History).
+limit in algorithm.json counts) + instanceHash + experiment + formatVersion (SESSION_FORMAT_VERSION
+in harness/session.py: session logic, record layout, working-hours definition) + maxDays (the
+effective day cap). Changing any of them runs the session again. Entries written before
+formatVersion and maxDays existed lack them, so they are never reused (they stay as history).
+Only indexed sessions are ever reused; a session file without a matching index entry (e.g.
+written before this index existed) is not. Saving a session deletes every older file with the
+same key (found through the index, without opening other session files) and replaces its
+index entry, so a key never has duplicates. Unindexed leftover files of the same algorithm and
+instance are removed too. Sessions of other algorithm versions stay (History).
 """
 import json
 
 from .run import write_index
 
 INDEX_FIELDS = ("runId", "algorithmId", "instanceId", "numCustomers", "seed", "experiment",
-                "fingerprint", "instanceHash", "timestamp", "outcome", "stopReason", "stopDay",
-                "days", "visitedSoFar", "workingMinutes", "unvisitedAtStop", "partialFigures")
+                "fingerprint", "instanceHash", "formatVersion", "maxDays", "timestamp", "outcome",
+                "stopReason", "stopDay", "days", "visitedSoFar", "workingMinutes", "unvisitedAtStop",
+                "partialFigures", "commit", "totalDistanceKm", "explanation")
 
 
 def session_key(s):
-    return (s.get("algorithmId"), s.get("fingerprint"), s.get("instanceHash"), s.get("experiment"))
+    return (s.get("algorithmId"), s.get("fingerprint"), s.get("instanceHash"), s.get("experiment"),
+            s.get("formatVersion"), s.get("maxDays"))
 
 
 def read_sessions_index(results_dir):
@@ -53,14 +66,22 @@ def find_saved_session(entries, results_dir, key):
 
 def save_session(results_dir, entries, session):
     """Write the session file, drop older files and index entries with the same key, append the
-    new entry and rewrite the index atomically. Returns the updated entries."""
+    new entry and rewrite the index atomically. Returns the updated entries.
+
+    Older files are found through the index entries (their `file` path), plus unindexed leftover
+    files of the same algorithm and instance found by file name; no session file is opened."""
     out = results_dir / "sessions"
     key = session_key(session)
-    for old in out.glob("*.json"):
+    stale = {e["file"] for e in entries if session_key(e) == key}
+    indexed = {e["file"] for e in entries}
+    prefix = f"{session['algorithmId']}__{session['instanceId']}__"
+    if out.is_dir():
+        stale |= {f"sessions/{p.name}" for p in out.iterdir()
+                  if p.name.startswith(prefix) and p.suffix == ".json"} - indexed
+    for rel in stale:
         try:
-            if session_key(json.loads(old.read_text(encoding="utf-8"))) == key:
-                old.unlink()
-        except (OSError, ValueError):
+            (results_dir / rel).unlink()
+        except OSError:
             pass
     name = f"{session['algorithmId']}__{session['instanceId']}__{session['runId']}.json"
     (out / name).write_text(json.dumps(session, indent=2) + "\n", encoding="utf-8")

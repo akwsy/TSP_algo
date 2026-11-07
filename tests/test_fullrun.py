@@ -55,6 +55,19 @@ class FullRunTest(CliCase):
         self.go("--full-run-instances", "0")
         self.assertEqual(self.sessions() if (self.tmp / "results" / "sessions").exists() else [], [])
 
+    def test_negative_full_run_instances_is_rejected_before_any_work(self):
+        cmd = [sys.executable, "-m", "harness.experiment", "scaling", "--sizes", "2", "--instances", "2",
+               "--full-run-instances", "-1", "--dataset", str(self.tmp / "places.txt"),
+               "--algorithms-dir", str(self.algs), "--instances-dir", str(self.tmp / "instances"),
+               "--results-dir", str(self.tmp / "results")]
+        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
+                              env={**os.environ, "RUN_LOG": str(self.log)})
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn("--full-run-instances", proc.stderr)
+        self.assertFalse((self.tmp / "results").exists())
+        self.assertFalse((self.tmp / "instances").exists())
+        self.assertFalse(self.log.exists())  # the algorithm was never run
+
     def test_two_days_when_one_place_is_visited_per_day(self):
         self.go()
         s = next(s for s in self.sessions() if s["instanceId"] == "n2-seed1")
