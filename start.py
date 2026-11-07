@@ -2,6 +2,7 @@
 
     python3 start.py                       full default run, then the site
     python3 start.py --sizes 5 10 --instances 3   a quick small run
+    python3 start.py --full-run-instances 3   examples per size run until every place is visited
     python3 start.py --skip-run            just open the site on existing results
     python3 start.py --force               re-evaluate everything
     python3 start.py --rerun nearest-neighbour    re-evaluate only these algorithms
@@ -40,6 +41,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description="Run all algorithms, then serve the results website.")
     ap.add_argument("--sizes", type=int, nargs="+", help="numbers of places to test (default: 5 10 15 20 30 50 100)")
     ap.add_argument("--instances", type=int, help="examples per size (default: 30)")
+    ap.add_argument("--full-run-instances", type=int, metavar="N",
+                    help="examples per size run until every place is visited (default: 10, 0 to skip)")
     ap.add_argument("--force", action="store_true", help="re-evaluate everything, ignoring saved runs")
     ap.add_argument("--rerun", nargs="+", metavar="ID", default=[],
                     help="re-evaluate only these algorithms (by id), ignoring their saved runs")
@@ -54,6 +57,8 @@ def main(argv=None):
             cmd += ["--sizes", *map(str, args.sizes)]
         if args.instances is not None:
             cmd += ["--instances", str(args.instances)]
+        if args.full_run_instances is not None:
+            cmd += ["--full-run-instances", str(args.full_run_instances)]
         if args.force:
             cmd.append("--force")
         if args.rerun:

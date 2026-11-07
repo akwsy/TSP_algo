@@ -75,6 +75,8 @@ python3 -m harness.experiment scaling --sizes 5 10 15 --instances 5     # a quic
 
 This is incremental, with the same `--force` and `--rerun ID [ID ...]` options as `start.py`: it builds the instances into `instances/`, runs every algorithm in `algorithms/` on them (skipping pairs already saved for the same code and instance), validates each answer independently, and writes one JSON record per run plus `index.json` and `aggregates-scaling.json` into `results/`. Use `--results-dir`, `--instances-dir` and `--algorithms-dir` to write elsewhere.
 
+The experiment also runs each algorithm on the first 10 instances of each size **until every place is visited**: day 1 is the normal first-day run, and each later day gives the algorithm only the places still unvisited (leave 06:00, back by 24:00). One file per algorithm and instance is written to `results/sessions/` (layout documented in `harness/session.py`) with the days, the total working hours (travelling plus waiting, nights excluded, last day only until the last place is served) and the total distance and compute time. Use `--full-run-instances N` (default 10, 0 to skip) to change how many instances get this run.
+
 ## Run the tests
 
 ```

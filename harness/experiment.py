@@ -7,6 +7,7 @@ per-run results tagged with the experiment name, and writes
 import argparse
 import json
 import sys
+from datetime import datetime, timezone
 from dataclasses import replace
 from pathlib import Path
 
@@ -16,9 +17,29 @@ from .dataset import DatasetError, load_places
 from .experiments import EXPERIMENTS
 from .generate_instance import DEFAULT_DATASET
 from .instance import build_instance
-from .run import ROOT, discover_algorithms, run_batch
+from .run import ROOT, discover_algorithms, instance_hash, run_batch
+from .session import run_session
 
 DEFAULTS = InstanceConfig(seed=0)
+
+
+def run_full_sessions(algorithms, instances, records, results_dir, exp, count):
+    """Run each algorithm day by day on the first `count` seeds of each size and save one session
+    file each (layout: harness/session.py). Day 1 reuses the first-day record. Ticket 03 will add
+    reuse of saved sessions here."""
+    chosen = [i for i in instances if i["seed"] <= count]
+    out = results_dir / "sessions"
+    out.mkdir(parents=True, exist_ok=True)
+    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    first_days = {(r["algorithmId"], r["instanceId"]): r for r in records}
+    for meta in algorithms:
+        for inst in chosen:
+            session = run_session(meta, inst, run_id, first_day=first_days.get((meta["id"], inst["instanceId"])))
+            session.update(experiment=exp.name, instanceHash=instance_hash(inst))
+            name = f"{meta['id']}__{inst['instanceId']}__{run_id}.json"
+            (out / name).write_text(json.dumps(session, indent=2) + "\n", encoding="utf-8")
+            print(f"{meta['id']} until every place is visited on {inst['instanceId']}: "
+                  f"{session['outcome']}, {session['days']} days", flush=True)
 
 
 def main(argv=None):
@@ -27,6 +48,9 @@ def main(argv=None):
     ap.add_argument("name", help="experiment name: " + ", ".join(EXPERIMENTS))
     ap.add_argument("--sizes", type=int, nargs="+", help="customer counts (default: the experiment's)")
     ap.add_argument("--instances", type=int, help="instances (seeds 1..N) per size")
+    ap.add_argument("--full-run-instances", type=int, default=10, metavar="N",
+                    help="run the first N instances of each size until every place is visited "
+                         "(default 10, 0 to skip; never more than --instances)")
     ap.add_argument("--force", action="store_true",
                     help="re-evaluate everything, ignoring saved runs")
     ap.add_argument("--rerun", nargs="+", metavar="ID", default=[],
@@ -69,6 +93,11 @@ def main(argv=None):
     records = run_batch(algorithms, instances, Path(args.instances_dir), Path(args.results_dir),
                         extra={"experiment": exp.name}, reuse=not args.force,
                         rerun=set(args.rerun), stats=stats)
+    if args.full_run_instances < 0:
+        print("error: --full-run-instances must not be negative", file=sys.stderr)
+        return 2
+    run_full_sessions(algorithms, instances, records, Path(args.results_dir), exp,
+                      min(args.full_run_instances, exp.instances_per_size))
     reused, ran = sum(stats["reused"].values()), sum(stats["ran"].values())
     print(f"Reused {reused} saved runs, ran {ran} new.")
     for meta in algorithms:
