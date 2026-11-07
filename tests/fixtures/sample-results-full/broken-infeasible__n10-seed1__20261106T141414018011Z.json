@@ -1,0 +1,30 @@
+{
+  "algorithmId": "broken-infeasible",
+  "commit": null,
+  "instanceId": "n10-seed1",
+  "seed": 1,
+  "numCustomers": 10,
+  "runId": "20261106T141414018011Z",
+  "timestamp": "2026-11-06T14:14:14+00:00",
+  "status": "HEURISTIC",
+  "route": [
+    0,
+    1,
+    1,
+    0
+  ],
+  "runtimeMs": 14.241917000617832,
+  "stats": null,
+  "stderr": "",
+  "valid": false,
+  "failureReason": "route repeats a customer",
+  "visited": null,
+  "skipped": null,
+  "distanceKm": null,
+  "travelMinutes": null,
+  "waitMinutes": null,
+  "totalMinutes": null,
+  "returnMinute": null,
+  "schedule": null,
+  "experiment": "scaling"
+}
