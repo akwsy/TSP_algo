@@ -1,0 +1,10 @@
+{
+  "id": "iterated-local-search",
+  "displayName": "Iterated local search",
+  "author": "Ben",
+  "description": "Builds a route by inserting the customer and position that push the schedule back the least (time shift, not distance), using cached forward slack for O(1) feasibility checks. It then repeatedly removes a sweeping window of consecutive visits and reinserts greedily, keeping the best route by visits, then distance. Deterministic: no random numbers, stops on a stall limit or a fixed work budget.",
+  "complexity": { "time": "O(I * u * m^2)", "space": "O(n^2)" },
+  "exact": false,
+  "command": ["python3", "solve.py"],
+  "timeLimitSeconds": 10
+}
