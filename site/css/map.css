@@ -31,7 +31,10 @@ main:has(.routemap) { max-width: min(1640px, 100%); }
 .map-stage { width: 100%; height: clamp(460px, 74vh, 940px); border-radius: 12px; overflow: hidden; border: 1px solid var(--line);
   background: color-mix(in srgb, var(--bg) 88%, var(--line)); position: relative; isolation: isolate; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px -12px rgba(0,0,0,.18); }
 .alg-card .map-stage { height: clamp(420px, 62vh, 760px); }
-.map-full { position: absolute; top: 10px; left: 56px; z-index: 800; font: 600 .8rem var(--font); color: var(--text); background: var(--surface);
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.map-caption { margin: 0; }
+/* Top right, clear of the Leaflet zoom buttons (top left) at every width. */
+.map-full { position: absolute; top: 10px; right: 10px; z-index: 800; font: 600 .8rem var(--font); color: var(--text); background: var(--surface);
   border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; min-height: 32px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.18); }
 .map-full:hover { border-color: var(--control); }
 .routemap.is-full { position: fixed; inset: 0; z-index: 2000; background: var(--bg); padding: 10px; grid-template-rows: auto 1fr auto auto; }
@@ -110,5 +113,4 @@ main:has(.routemap) { max-width: min(1640px, 100%); }
   .pad { padding: 10px; }
   .grid { grid-template-columns: 1fr; }
   .map-stage, .alg-card .map-stage { height: clamp(420px, 68vh, 640px); border-radius: 10px; }
-  .map-full { left: 10px; top: 56px; }
 }
