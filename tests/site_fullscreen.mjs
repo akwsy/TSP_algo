@@ -54,8 +54,11 @@ for (const [name, query] of [["leaflet", ""], ["svg", "&map=svg"]]) {
       const ev = async (expr) => (await s("Runtime.evaluate", { expression: expr, returnByValue: true, awaitPromise: true })).result.value;
       for (let i = 0; i < 60 && !(await ev(`!!document.querySelector(".map-full")`)); i++) await sleep(100);
       await ev(`document.querySelector(".map-full").scrollIntoView({ block: "center" })`);
-      await sleep(150);
-      const [cx, cy] = await ev(`(() => { const q = document.querySelector(".map-full").getBoundingClientRect(); return [q.left + q.width / 2, q.top + q.height / 2]; })()`);
+      // Click where the button is once it has stopped moving (the page's entrance animation and scroll settle), as a visitor would.
+      const where = `(() => { const q = document.querySelector(".map-full").getBoundingClientRect(); return [Math.round(q.left + q.width / 2), Math.round(q.top + q.height / 2)]; })()`;
+      let [cx, cy] = await ev(where);
+      for (let i = 0; i < 40; i++) { await sleep(100); const [nx, ny] = await ev(where); if (nx === cx && ny === cy) break; [cx, cy] = [nx, ny]; }
+      await s("Input.dispatchMouseEvent", { type: "mouseMoved", x: cx, y: cy });
       for (const type of ["mousePressed", "mouseReleased"]) await s("Input.dispatchMouseEvent", { type, x: cx, y: cy, button: "left", clickCount: 1 });
       await sleep(900);
       const on = JSON.parse(await ev(STATE));

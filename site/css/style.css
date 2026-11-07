@@ -122,7 +122,7 @@ option { background: var(--surface); color: var(--text); }
     linear-gradient(var(--accent), var(--accent)) 100% 100% / 12px 1px no-repeat, linear-gradient(var(--accent), var(--accent)) 100% 100% / 1px 12px no-repeat; }
 /* The hover glow is a pseudo-element that fades in (opacity is composited). Transitioning box-shadow itself repainted a 44px blur on
    every card the pointer crossed while scrolling: measured 4x the raster time on the Scaling page. */
-.card::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; opacity: 0; border: 1px solid var(--line-strong);
+.card::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; opacity: 0; border: 1px solid var(--line-strong); will-change: opacity;
   box-shadow: 0 0 0 1px var(--glow), 0 18px 44px -24px var(--glow-strong); transition: opacity var(--t-mid); }
 .card:hover::after { opacity: 1; }
 .table-wrap { overflow-x: auto; }
