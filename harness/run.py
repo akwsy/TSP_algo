@@ -5,6 +5,7 @@ instances, validates each answer, and writes one result JSON per run plus
 results/index.json.
 """
 import argparse
+import hashlib
 import json
 import os
 import subprocess
@@ -158,10 +159,48 @@ def write_index(path, index):
     os.replace(tmp, path)
 
 
-def run_batch(algorithms, instances, instances_dir, results_dir, extra=None):
+IGNORED_NAMES = {"__pycache__", ".DS_Store", ".git"}
+
+
+def algorithm_fingerprint(folder):
+    """Content hash of every file in the algorithm folder (relative path + bytes, so renames and
+    algorithm.json edits count too). Bytecode caches and OS metadata are ignored."""
+    folder = Path(folder)
+    digest = hashlib.sha256()
+    for path in sorted(p for p in folder.rglob("*") if p.is_file()
+                       and not IGNORED_NAMES & set(p.relative_to(folder).parts) and p.suffix != ".pyc"):
+        digest.update(path.relative_to(folder).as_posix().encode("utf-8") + b"\0")
+        digest.update(hashlib.sha256(path.read_bytes()).digest())
+    return digest.hexdigest()
+
+
+def instance_hash(instance):
+    return hashlib.sha256(json.dumps(instance, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def _find_saved(index, results_dir, meta, fingerprint, ihash, extra):
+    """Latest saved record for this exact algorithm code, instance and tag, or None."""
+    for entry in reversed(index["runs"]):
+        if (entry.get("fingerprint") == fingerprint and entry.get("instanceHash") == ihash
+                and entry["algorithmId"] == meta["id"]
+                and all(entry.get(k) == v for k, v in (extra or {}).items())):
+            try:
+                return json.loads((results_dir / entry["file"]).read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+    return None
+
+
+def run_batch(algorithms, instances, instances_dir, results_dir, extra=None, reuse=False,
+              rerun=(), stats=None):
     """Run every algorithm on every instance; write instances, one result file per run and
     results/index.json. `extra` (e.g. {"experiment": "scaling"}) is added to each record and
-    index entry. Returns the list of records."""
+    index entry. Returns the list of records.
+
+    With reuse=True a pair already saved with the same algorithm fingerprint, instance hash and
+    tag is not run again: its stored record is returned and nothing is appended to the index.
+    Algorithms whose id is in `rerun` are always re-run. `stats`, if given, is filled with
+    {"reused": {id: n}, "ran": {id: n}, "legacy": n}."""
     instances_dir.mkdir(parents=True, exist_ok=True)
     results_dir.mkdir(parents=True, exist_ok=True)
     for inst in instances:
@@ -172,25 +211,53 @@ def run_batch(algorithms, instances, instances_dir, results_dir, extra=None):
     index = json.loads(index_path.read_text(encoding="utf-8")) if index_path.exists() else {"runs": []}
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     records = []
+    stats = stats if stats is not None else {}
+    stats.update(reused={}, ran={}, legacy=0)
+    hashes = {inst["instanceId"]: instance_hash(inst) for inst in instances}
+    if reuse:
+        stats["legacy"] = sum(1 for e in index["runs"] if "fingerprint" not in e
+                              and any(e["algorithmId"] == m["id"] for m in algorithms))
+    plan = []
     for meta in algorithms:
+        meta["_fingerprint"] = algorithm_fingerprint(meta["_dir"])
         for inst in instances:
-            record = make_record(meta, inst, run_id)
-            record.update(extra or {})
-            records.append(record)
-            name = f"{record['algorithmId']}__{record['instanceId']}__{run_id}.json"
-            (results_dir / name).write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
-            index["runs"].append({
-                "file": name, "runId": run_id, "algorithmId": record["algorithmId"],
-                "commit": record["commit"], "instanceId": record["instanceId"],
-                "numCustomers": record["numCustomers"], "seed": record["seed"],
-                "timestamp": record["timestamp"], "status": record["status"], "killed": record["killed"],
-                "valid": record["valid"], "visited": record["visited"],
-                "distanceKm": record["distanceKm"], "runtimeMs": record["runtimeMs"],
-                "failureReason": record["failureReason"], **(extra or {})})
-            write_index(index_path, index)  # after every run, so an interrupted batch stays consistent
-            print(f"{record['algorithmId']} on {record['instanceId']}: "
-                  f"{'valid, visited ' + str(record['visited']) if record['valid'] else 'FAILED: ' + str(record['failureReason'])}",
-                  flush=True)
+            ihash = hashes[inst["instanceId"]]
+            saved = (_find_saved(index, results_dir, meta, meta["_fingerprint"], ihash, extra)
+                     if reuse and meta["id"] not in rerun else None)
+            plan.append((meta, inst, ihash, saved))
+    if reuse:
+        n_saved = sum(1 for p in plan if p[3] is not None)
+        print(f"Reusing {n_saved} saved runs, running {len(plan) - n_saved} new.", flush=True)
+    for meta, inst, ihash, saved in plan:
+        if saved is not None:
+            records.append(saved)
+            stats["reused"][meta["id"]] = stats["reused"].get(meta["id"], 0) + 1
+            continue
+        stats["ran"][meta["id"]] = stats["ran"].get(meta["id"], 0) + 1
+        record = make_record(meta, inst, run_id)
+        record.update(fingerprint=meta["_fingerprint"], instanceHash=ihash)
+        record.update(extra or {})
+        records.append(record)
+        name = f"{record['algorithmId']}__{record['instanceId']}__{run_id}.json"
+        (results_dir / name).write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+        # A forced re-run of identical code supersedes its older entry (the file stays on disk);
+        # entries for other code versions are kept: they are the History page's before/after.
+        index["runs"] = [e for e in index["runs"] if not (
+            e.get("fingerprint") == meta["_fingerprint"] and e.get("instanceHash") == ihash
+            and e["algorithmId"] == meta["id"] and all(e.get(k) == v for k, v in (extra or {}).items()))]
+        index["runs"].append({
+            "file": name, "runId": run_id, "algorithmId": record["algorithmId"],
+            "commit": record["commit"], "instanceId": record["instanceId"],
+            "numCustomers": record["numCustomers"], "seed": record["seed"],
+            "timestamp": record["timestamp"], "status": record["status"], "killed": record["killed"],
+            "valid": record["valid"], "visited": record["visited"],
+            "distanceKm": record["distanceKm"], "runtimeMs": record["runtimeMs"],
+            "failureReason": record["failureReason"], "fingerprint": record["fingerprint"],
+            "instanceHash": ihash, **(extra or {})})
+        write_index(index_path, index)  # after every run, so an interrupted batch stays consistent
+        print(f"{record['algorithmId']} on {record['instanceId']}: "
+              f"{'valid, visited ' + str(record['visited']) if record['valid'] else 'FAILED: ' + str(record['failureReason'])}",
+              flush=True)
     write_index(index_path, index)
     return records
 

@@ -318,6 +318,8 @@ python3 -m harness.generate_instance --seed 5 --customers 4 --out instances/n4-s
 
 Other options: `--departure` (minute), `--period` (minutes), `--speed` (km/h). Departure plus period may not exceed 1440.
 
+**Evaluation is incremental.** `python3 start.py` evaluates each algorithm once: results are saved in `results/` together with a hash of every file in your folder, and reused while nothing changes. Editing any file in your folder (including `algorithm.json`) re-evaluates only your algorithm; `python3 start.py --rerun <your-id>` forces it, `--force` re-evaluates everything.
+
 **Run your program on it by hand**, from your folder, exactly as the harness does:
 
 ```
