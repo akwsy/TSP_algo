@@ -78,14 +78,23 @@ for (const [device, w, hgt, scheme] of MODES) {
     const url = view === "full" && page.startsWith("instance") ? "instance?id=n10-seed4" : page;
     await s("Page.navigate", { url: `${base}/#/${url}` });
     await new Promise((r) => setTimeout(r, waitMs));
-    const { result } = await s("Runtime.evaluate", { expression: "JSON.stringify({mainText: document.querySelector('main')?.innerText || '', toggle: [...document.querySelectorAll('#viewtoggle [role=radiogroup] [role=radio]')].map((b) => b.getAttribute('aria-checked')).join(), h1: document.querySelector('main h1')?.textContent, nan: /NaN|undefined|\\bfalse\\b|\\bnull\\b|\\[object/.test(document.body.innerText), hscroll: document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('main *, header *')].some((e) => !e.closest('.table-wrap, #nav, pre, .leaflet-container, svg') && e.getBoundingClientRect().right > document.documentElement.clientWidth + 1)})", returnByValue: true });
+    const { result } = await s("Runtime.evaluate", { expression: "JSON.stringify({mainText: document.querySelector('main')?.innerText || '', toggle: [...document.querySelectorAll('#viewtoggle [role=radiogroup] [role=radio]')].map((b) => b.getAttribute('aria-checked')).join(), h1: document.querySelector('main h1')?.textContent, svgCharts: document.querySelectorAll('main figure.chart svg.chart-svg').length, nan: /NaN|undefined|\\bfalse\\b|\\bnull\\b|\\[object/.test(document.body.innerText), hscroll: document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('main *, header *')].some((e) => !e.closest('.table-wrap, #nav, pre, .leaflet-container, svg') && e.getBoundingClientRect().right > document.documentElement.clientWidth + 1)})", returnByValue: true });
     Object.assign(entry, JSON.parse(result.value));
     if (entry.toggle !== (view === "full" ? "false,true" : "true,false")) entry.errors.push(`view toggle state is ${entry.toggle}, expected the ${view} view selected`);
     // What each page says in the full-run view: the ranked table with its "did not finish" label, or the plain "coming to this page" note.
     const name = page.split("?")[0];
     if (view === "full" && name === "overview" && !/ranked below: \d+ instances? did(n't| not) finish/.test(entry.mainText)) entry.errors.push("full-run overview lacks the ranked-below label");
-    if (view === "full" && ["scaling"].includes(name) && !/view is coming to the/.test(entry.mainText)) entry.errors.push("page lacks the full-run coming-soon note");
-    if (view === "first" && /coming to the|working hours/.test(entry.mainText)) entry.errors.push("first-day page shows full-run wording");
+    // Failures and History list full-run sessions in both toggle states (they do not follow the toggle).
+    if (name === "failures" && !(/did not finish every place/.test(entry.mainText) && /stopped on day \d+/i.test(entry.mainText) && /so far, not a finishing time/.test(entry.mainText) && /Example \d+ with \d+ places/.test(entry.mainText) && /Stopped on day \d+:/.test(entry.mainText))) entry.errors.push("Failures lacks a stopped session with its day, explanation and partial figures");
+    if (name === "history" && !/Until every place is visited \(\d+ of \d+ finished\)/.test(entry.mainText)) entry.errors.push("History lacks the full-run sessions group");
+    if (name === "scaling" && view === "full") {
+      if (/view is coming to the/.test(entry.mainText)) entry.errors.push("full-run scaling still shows the coming-soon note");
+      if (entry.svgCharts !== 4) entry.errors.push(`full-run scaling shows ${entry.svgCharts} charts, expected 4`);
+      if (/log-log|declared complexity/i.test(entry.mainText)) entry.errors.push("full-run scaling shows the complexity plot");
+      if (!/Not plotted: /.test(entry.mainText)) entry.errors.push("full-run scaling lacks the not-plotted note");
+    }
+    if (name === "scaling" && view === "first" && !/Measured growth against declared complexity/.test(entry.mainText)) entry.errors.push("first-day scaling lacks the complexity plot");
+    if (view === "first" && !["failures", "history"].includes(name) && /coming to the|working hours/.test(entry.mainText)) entry.errors.push("first-day page shows full-run wording");
     if (view === "full" && ["instance", "run"].includes(name)) {
       if (/view is coming to the/.test(entry.mainText)) entry.errors.push("full-run page still shows the coming-soon note");
       // The day selector: right options, and choosing Day 2 changes the map and (Route detail) the schedule table.

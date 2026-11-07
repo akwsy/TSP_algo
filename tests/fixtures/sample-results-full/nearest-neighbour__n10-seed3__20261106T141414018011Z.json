@@ -1,0 +1,54 @@
+{
+  "algorithmId": "nearest-neighbour",
+  "commit": "2918102ce3635fb1f03659d1e3c1a474a802c4eb",
+  "instanceId": "n10-seed3",
+  "seed": 3,
+  "numCustomers": 10,
+  "runId": "20261106T141414018011Z",
+  "timestamp": "2026-11-06T14:14:23+00:00",
+  "status": "HEURISTIC",
+  "route": [
+    0,
+    9,
+    4,
+    0
+  ],
+  "runtimeMs": 14.25349999772152,
+  "stats": {
+    "customersVisited": 2
+  },
+  "stderr": "",
+  "valid": true,
+  "failureReason": null,
+  "visited": 2,
+  "skipped": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    10
+  ],
+  "distanceKm": 71.71643989776892,
+  "travelMinutes": 107.57465984665339,
+  "waitMinutes": 241.17666050075326,
+  "totalMinutes": 348.75132034740665,
+  "returnMinute": 708.7513203474066,
+  "schedule": [
+    {
+      "id": 9,
+      "arriveMinute": 388.82333949924674,
+      "startMinute": 630,
+      "leaveMinute": 630
+    },
+    {
+      "id": 4,
+      "arriveMinute": 666.5225658743954,
+      "startMinute": 666.5225658743954,
+      "leaveMinute": 666.5225658743954
+    }
+  ],
+  "experiment": "scaling"
+}

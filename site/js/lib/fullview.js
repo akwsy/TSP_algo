@@ -1,7 +1,7 @@
 // Small DOM pieces shared by the Instance explorer and Route detail in the "Until every place is visited" view.
-// The decisions (which days exist, what is done, what the words say) live in sessions.js; this only lays them out.
+// The decisions (which days exist, what is done, what the words say) live in sessiondays.js; this only lays them out.
 import { h, fmt, select } from "./dom.js";
-import { dayOptions, dayEnding, sessionSummary } from "./sessions.js";
+import { dayOptions, dayEnding, sessionSummary } from "./sessiondays.js";
 import { clock } from "./mapmodel.js";
 
 /** The day dropdown: a native select named "Day" ("Day 1", "Day 2", ...), so the keyboard and screen readers just work. */

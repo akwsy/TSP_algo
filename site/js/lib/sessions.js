@@ -1,100 +1,115 @@
-// Pure logic for the "Until every place is visited" views (no DOM). Tested by tests/test_site_sessions.py.
-// A session (harness/session.py) is one algorithm on one instance, day by day. Its day records use the ORIGINAL
-// place ids, so they draw on the original instance with the same map code as a first-day run.
-// A "completed day" has a valid route that visited new places; a stopped session's last day usually is not one.
+// Listing logic for full-run sessions on the Failures and History pages (no DOM except loadSessions).
+// Data: results/sessions-index.json ({ sessions: [...] }, see harness/sessionstore.py) and the session files
+// it points to (see harness/session.py). A missing index means no sessions. Tested by tests/test_site_sessions.py.
+// Stopped sessions are never turned into a finishing time: their figures are labelled "so far".
+import { failureKind } from "./model.js";
 
-const completed = (d) => d.valid !== false && Array.isArray(d.route) && d.route.length > 1 && (d.visited || []).length > 0;
-const completedDays = (s) => (s?.dayRecords || []).filter(completed);
+export const STOPPED_KIND = "did not finish every place";
+const has = (x) => typeof x === "number" && Number.isFinite(x);
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
+const round1 = (x) => Math.round(x * 10) / 10;
 
-/** How many days the session completed (what the day selector offers). */
-export const dayCount = (s) => completedDays(s).length;
+/** Sessions from a parsed sessions-index.json; empty when the file is absent or malformed. */
+export const sessionsOf = (idx) => (Array.isArray(idx?.sessions) ? idx.sessions : []);
 
-/** Longest session among those shown. */
-export const maxDays = (sessions) => Math.max(0, ...sessions.map(dayCount));
+export const isStopped = (s) => s.outcome === "did not finish";
 
-/** [{ value: 1, label: "Day 1" }, ...] */
-export const dayOptions = (n) => Array.from({ length: n }, (_, i) => ({ value: i + 1, label: `Day ${i + 1}` }));
+export const exampleWords = (s) => `Example ${s.seed} with ${plural(s.numCustomers, "place")}`;
 
-/** A day number from the URL forced into 1..max (anything unreadable is Day 1). */
-export function clampDay(day, max) {
-  const n = Math.trunc(Number(day));
-  return Number.isFinite(n) && n >= 1 ? Math.min(n, Math.max(1, max)) : 1;
+export const hoursOf = (minutes) => (has(minutes) ? minutes / 60 : null);
+
+/** "3 of 5 places visited so far, 2.5 working hours so far (so far, not a finishing time)" */
+export function partialText(s) {
+  const hrs = hoursOf(s.workingMinutes);
+  return `${s.visitedSoFar} of ${plural(s.numCustomers, "place")} visited so far, ${hrs == null ? "no" : round1(hrs)} working hours so far (so far, not a finishing time)`;
 }
 
-const dayRecord = (s, day) => completedDays(s).find((d) => d.day === day) || null;
-
-/** Place ids visited on days before `day`, sorted. */
-export function doneBefore(s, day) {
-  return completedDays(s).filter((d) => d.day < day).flatMap((d) => d.visited).sort((a, b) => a - b);
+/** One list for the Failures page: failed first-day runs plus stopped sessions, newest first. */
+export function mergeFailures(runs, sessions) {
+  const items = [
+    ...runs.map((r) => ({ type: "run", kind: failureKind(r), algorithmId: r.algorithmId, timestamp: r.timestamp || "", run: r })),
+    ...sessions.filter(isStopped).map((s) => ({ type: "session", kind: STOPPED_KIND, algorithmId: s.algorithmId, timestamp: s.timestamp || "", session: s })),
+  ];
+  return items.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
 }
 
-/** Customer ids not yet visited when `day` starts, sorted. */
-export function stillToVisit(instance, s, day) {
-  const done = new Set(doneBefore(s, day));
-  return instance.locations.filter((l) => !l.isDepot && !done.has(l.id)).map((l) => l.id).sort((a, b) => a - b);
-}
+export const kindsOf = (items) => ["all", ...[...new Set(items.map((i) => i.kind))].sort()];
+export const algorithmsOf = (items) => ["all", ...new Set(items.map((i) => i.algorithmId))];
+export const filterItems = (items, kind, alg) =>
+  items.filter((i) => (kind === "all" || i.kind === kind) && (alg === "all" || i.algorithmId === alg));
 
-/** A day as the map's run input (route and schedule in original ids), or null when the session has no such day. */
-export function dayRun(instance, s, day) {
-  const d = dayRecord(s, day);
-  if (!d) return null;
-  return { algorithmId: s.algorithmId, valid: true, route: d.route, schedule: d.schedule, returnMinute: d.returnMinute,
-    visited: d.visited.length, distanceKm: d.distanceKm, totalMinutes: d.returnMinute - instance.departureMinute,
-    workingMinutes: d.workingMinutes, runtimeMs: d.runtimeMs };
-}
-
-/** Why a session has no route for `day`: null when it has one, else plain words. */
-export function dayEnding(s, day) {
-  const n = dayCount(s);
-  if (day <= n) return null;
-  if (s.outcome === "finished") return `finished on day ${n}`;
-  return n ? `stopped after day ${n}, did not finish` : "stopped before finishing a day, did not finish";
-}
-
-const num = (x) => String(Math.round(x * 10) / 10);
-const hours = (min) => { const h = Math.round(min / 6) / 10; return `${num(h)} ${h === 1 ? "hour" : "hours"}`; };
-
-/** Plain-words figures for a session. Stopped sessions never show a finishing time: their figures say "so far". */
-export function sessionSummary(s) {
-  if (s.outcome === "finished") {
-    return { finished: true, explanation: null, note: null,
-      rows: [["Working time", hours(s.workingMinutes)], ["Days", String(s.days)], ["Distance", `${num(s.totalDistanceKm)} km`]] };
+/** Sessions grouped like groupRunsByCommit (same key shape), newest first, each saved file once.
+ *  Each session needs `commit` (from its session file; absent means "no commit recorded"). */
+export function groupSessionsByVersion(sessions) {
+  const map = new Map();
+  const seen = new Set();
+  for (const s of sessions) {
+    if (seen.has(s.file)) continue;
+    seen.add(s.file);
+    const commit = s.commit || null;
+    const key = `${s.algorithmId}\u0000${commit ?? ""}`;
+    if (!map.has(key)) map.set(key, { key, algorithmId: s.algorithmId, commit, sessions: [], finished: 0, first: s.timestamp, last: s.timestamp });
+    const g = map.get(key);
+    g.sessions.push(s);
+    if (!isStopped(s)) g.finished += 1;
+    if (s.timestamp < g.first) g.first = s.timestamp;
+    if (s.timestamp > g.last) g.last = s.timestamp;
   }
-  return { finished: false, explanation: s.explanation, note: "so far, not a finishing time",
-    rows: [["Days completed", String(dayCount(s))], ["Places visited so far", `${s.visitedSoFar} of ${s.numCustomers}`],
-      ["Working time so far", hours(s.workingMinutes)], ["Distance so far", `${num(s.totalDistanceKm)} km`]] };
+  return [...map.values()].sort((a, b) => b.last.localeCompare(a.last) || a.algorithmId.localeCompare(b.algorithmId));
 }
 
-/** Newest session of each algorithm on one problem, in algorithm order. */
-export function latestPerAlgorithm(entries, instanceId) {
-  const best = new Map();
-  for (const e of entries.filter((x) => x.instanceId === instanceId)) {
-    const old = best.get(e.algorithmId);
-    if (!old || (e.timestamp || "") >= (old.timestamp || "")) best.set(e.algorithmId, e);
+/** Before/after for two versions' sessions, over examples both versions ran. Means (working hours, days, distance)
+ *  use only examples both finished; stopped sessions are counted, never averaged. A repeated example uses its latest. */
+export function compareFull(sa, sb) {
+  const latest = (list) => {
+    const m = new Map();
+    for (const s of list) {
+      const p = m.get(s.instanceId);
+      if (!p || s.timestamp > p.timestamp) m.set(s.instanceId, s);
+    }
+    return m;
+  };
+  const a = latest(sa), b = latest(sb);
+  const shared = [...a.keys()].filter((id) => b.has(id)).sort();
+  const both = shared.filter((id) => !isStopped(a.get(id)) && !isStopped(b.get(id)));
+  const metric = (get) => {
+    const ids = both.filter((id) => has(get(a.get(id))) && has(get(b.get(id))));
+    const ma = mean(ids.map((id) => get(a.get(id)))), mb = mean(ids.map((id) => get(b.get(id))));
+    return { a: ma, b: mb, delta: ma == null ? null : mb - ma, n: ids.length };
+  };
+  return {
+    shared: shared.length, both: both.length,
+    finishedA: shared.filter((id) => !isStopped(a.get(id))).length,
+    finishedB: shared.filter((id) => !isStopped(b.get(id))).length,
+    hours: metric((s) => hoursOf(s.workingMinutes)), days: metric((s) => s.days),
+    distanceKm: metric((s) => s.totalDistanceKm),
+  };
+}
+
+// ---- browser loading ----
+let cached = null;
+
+/** Index entries merged with their session files (adds commit, totalDistanceKm, explanation). Cached.
+ *  Never throws: no index or an unreadable file just means fewer sessions. */
+export function loadSessions() {
+  if (!cached) {
+    cached = (async () => {
+      let idx = null;
+      try {
+        const res = await fetch("/results/sessions-index.json", { cache: "no-store" });
+        idx = res.ok ? await res.json() : null;
+      } catch { idx = null; }
+      const entries = sessionsOf(idx);
+      return Promise.all(entries.map(async (e) => {
+        try {
+          const url = "/results/" + String(e.file).split("/").map(encodeURIComponent).join("/");
+          const res = await fetch(url, { cache: "no-store" });
+          const rec = res.ok ? await res.json() : null;
+          return rec ? { ...e, commit: rec.commit ?? null, totalDistanceKm: rec.totalDistanceKm, explanation: rec.explanation } : e;
+        } catch { return e; }
+      }));
+    })();
   }
-  return [...best.values()].sort((a, b) => a.algorithmId.localeCompare(b.algorithmId));
+  return cached;
 }
-
-/** Problems that have a session, smallest first. */
-export function sessionInstanceIds(entries) {
-  const seen = new Map(entries.map((e) => [e.instanceId, e]));
-  return [...seen.values()].sort((a, b) => a.numCustomers - b.numCustomers || a.seed - b.seed).map((e) => e.instanceId);
-}
-
-// ---- loading (browser only; cached like lib/data.js) ----
-const cache = new Map();
-const once = (key, load) => { if (!cache.has(key)) cache.set(key, load()); return cache.get(key); };
-const path = (file) => file.split("/").map(encodeURIComponent).join("/");
-
-/** results/sessions-index.json entries, or [] when no full runs were saved. */
-export const loadSessionsIndex = () => once("index", async () => {
-  const res = await fetch("/results/sessions-index.json", { cache: "no-store" });
-  return res.ok ? (await res.json()).sessions || [] : [];
-});
-
-/** One session file; `file` comes from the sessions index. */
-export const loadSession = (file) => once("s:" + file, async () => {
-  const res = await fetch(`/results/${path(file)}`, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Could not load ${file} (${res.status}).`);
-  return res.json();
-});

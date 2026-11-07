@@ -1,90 +1,96 @@
-"""Full-run day logic (site/js/lib/sessions.js), run under node. Expected values are hand-worked."""
+"""Full-run session listing logic (site/js/lib/sessions.js), run under node. Skipped when node is missing."""
 import json
 import shutil
 import subprocess
 import unittest
 from pathlib import Path
 
-MODEL = Path(__file__).resolve().parent.parent / "site" / "js" / "lib" / "sessions.js"
+ROOT = Path(__file__).resolve().parent.parent
+MODULE = ROOT / "site" / "js" / "lib" / "sessions.js"
 
 
 def call(fn, *args):
-    script = (f"import * as m from {json.dumps(MODEL.as_uri())};"
+    script = (f"import * as m from {json.dumps(MODULE.as_uri())};"
               f"console.log(JSON.stringify(m[{json.dumps(fn)}](...{json.dumps(list(args))})));")
-    out = subprocess.run(["node", "--input-type=module", "-e", script], capture_output=True, text=True, check=True)
+    out = subprocess.run(["node", "--input-type=module", "-e", script],
+                         capture_output=True, text=True, check=True)
     return json.loads(out.stdout)
 
 
-def day(n, visited, valid=True, ret=600):
-    route = [0, *visited, 0] if valid else None
-    sched = [{"id": v, "arriveMinute": 400 + i * 10, "startMinute": 420 + i * 10, "leaveMinute": 425 + i * 10}
-             for i, v in enumerate(visited)] if valid else None
-    return {"day": n, "route": route, "schedule": sched, "visited": visited if valid else [], "valid": valid,
-            "returnMinute": ret, "distanceKm": 12.0 * len(visited), "workingMinutes": 240 if visited else None}
+def sess(alg="a", inst="n5-seed1", n=5, seed=1, outcome="did not finish", ts="2026-01-02T10:00:00+00:00",
+         file=None, minutes=90, visited=3, day=2, days=2, dist=10.0, reason="no_progress", commit=None):
+    done = outcome == "finished"
+    return {"file": file or f"sessions/{alg}__{inst}__{ts}.json", "algorithmId": alg, "instanceId": inst,
+            "numCustomers": n, "seed": seed, "timestamp": ts, "outcome": outcome, "commit": commit,
+            "stopReason": None if done else reason, "stopDay": None if done else day, "days": days,
+            "visitedSoFar": n if done else visited, "workingMinutes": minutes,
+            "unvisitedAtStop": 0 if done else n - visited, "totalDistanceKm": dist}
 
 
-INST = {"departureMinute": 360, "deadlineMinute": 1440,
-        "locations": [{"id": i, "name": f"P{i}", "isDepot": i == 0} for i in range(6)]}
-FINISHED = {"outcome": "finished", "days": 3, "numCustomers": 5, "workingMinutes": 450, "totalDistanceKm": 60.0,
-            "algorithmId": "a", "dayRecords": [day(1, [2, 4]), day(2, [1]), day(3, [3, 5])]}
-STOPPED = {"outcome": "did not finish", "days": 3, "numCustomers": 5, "stopDay": 3, "stopReason": "no_progress",
-           "explanation": "Stopped on day 3: the algorithm visited no new places (2 still unvisited)",
-           "visitedSoFar": 3, "workingMinutes": 180, "totalDistanceKm": 36.0, "unvisitedAtStop": 2,
-           "algorithmId": "b", "dayRecords": [day(1, [2, 4]), day(2, [1]), day(3, [], ret=None)]}
-CRASHED = {**STOPPED, "days": 1, "stopDay": 1, "explanation": "Stopped on day 1: the algorithm crashed (exited with code 3)",
-           "dayRecords": [day(1, [], valid=False)], "visitedSoFar": 0}
+def run(alg, inst, ts, valid=False, reason="exited with code 1"):
+    return {"algorithmId": alg, "instanceId": inst, "timestamp": ts, "valid": valid, "failureReason": reason,
+            "file": f"{alg}__{inst}.json"}
 
 
 @unittest.skipUnless(shutil.which("node"), "node not installed")
-class SessionDaysTest(unittest.TestCase):
-    def test_day_options_are_exactly_the_completed_days(self):
-        self.assertEqual(call("dayCount", FINISHED), 3)
-        self.assertEqual(call("dayCount", STOPPED), 2)  # the day that visited nothing was not completed
-        self.assertEqual(call("dayCount", CRASHED), 0)
-        self.assertEqual(call("dayOptions", 2), [{"value": 1, "label": "Day 1"}, {"value": 2, "label": "Day 2"}])
-        self.assertEqual(call("maxDays", [FINISHED, STOPPED]), 3)
-        self.assertEqual(call("clampDay", 9, 3), 3)
-        self.assertEqual(call("clampDay", "x", 3), 1)
+class SessionsTest(unittest.TestCase):
+    def test_missing_index_is_empty(self):
+        self.assertEqual(call("sessionsOf", None), [])
+        self.assertEqual(call("sessionsOf", {}), [])
 
-    def test_earlier_days_are_done_and_the_rest_still_to_visit(self):
-        self.assertEqual(call("doneBefore", FINISHED, 1), [])
-        self.assertEqual(call("doneBefore", FINISHED, 3), [1, 2, 4])
-        self.assertEqual(call("stillToVisit", INST, FINISHED, 1), [1, 2, 3, 4, 5])
-        self.assertEqual(call("stillToVisit", INST, FINISHED, 3), [3, 5])
+    def test_example_words_have_no_jargon(self):
+        self.assertEqual(call("exampleWords", sess(seed=3, n=10)), "Example 3 with 10 places")
+        self.assertEqual(call("exampleWords", sess(seed=1, n=1)), "Example 1 with 1 place")
 
-    def test_day_run_is_map_input_in_original_ids(self):
-        r = call("dayRun", INST, FINISHED, 3)
-        self.assertEqual(r["route"], [0, 3, 5, 0])
-        self.assertEqual(r["visited"], 2)
-        self.assertEqual(r["schedule"][0]["id"], 3)
-        self.assertEqual(r["returnMinute"], 600)
-        self.assertEqual(r["totalMinutes"], 240)  # back at 10:00 after leaving at 06:00
-        self.assertEqual(call("dayRun", INST, FINISHED, 4), None)
+    def test_partial_text_converts_minutes_and_is_labelled(self):
+        t = call("partialText", sess(visited=3, n=5, minutes=150))
+        self.assertEqual(t, "3 of 5 places visited so far, 2.5 working hours so far (so far, not a finishing time)")
 
-    def test_a_day_the_session_does_not_have_says_why(self):
-        self.assertEqual(call("dayEnding", FINISHED, 2), None)
-        self.assertEqual(call("dayEnding", FINISHED, 4), "finished on day 3")
-        self.assertEqual(call("dayEnding", STOPPED, 3), "stopped after day 2, did not finish")
-        self.assertEqual(call("dayEnding", CRASHED, 1), "stopped before finishing a day, did not finish")
+    def test_merge_lists_stopped_only_and_sorts_newest_first(self):
+        runs = [run("a", "n5-seed1", "2026-01-01T00:00:00+00:00")]
+        ss = [sess(ts="2026-01-03T00:00:00+00:00"), sess(outcome="finished", inst="n5-seed2")]
+        items = call("mergeFailures", runs, ss)
+        self.assertEqual([i["type"] for i in items], ["session", "run"])
+        self.assertEqual(items[0]["kind"], "did not finish every place")
+        self.assertEqual(items[1]["kind"], "crashed")
 
-    def test_summary_of_finished_and_stopped_sessions(self):
-        s = call("sessionSummary", FINISHED)
-        self.assertEqual(s["finished"], True)
-        self.assertEqual(s["rows"], [["Working time", "7.5 hours"], ["Days", "3"], ["Distance", "60 km"]])
-        t = call("sessionSummary", STOPPED)
-        self.assertEqual(t["finished"], False)
-        self.assertEqual(t["explanation"], STOPPED["explanation"])
-        self.assertEqual(t["rows"], [["Days completed", "2"], ["Places visited so far", "3 of 5"],
-                                     ["Working time so far", "3 hours"], ["Distance so far", "36 km"]])
-        self.assertEqual(t["note"], "so far, not a finishing time")
+    def test_filter_by_kind_and_algorithm(self):
+        items = call("mergeFailures", [run("a", "i", "2026-01-01T00:00:00+00:00")],
+                     [sess(alg="b"), sess(alg="a", inst="n5-seed2", ts="2026-01-04T00:00:00+00:00")])
+        self.assertEqual(len(call("filterItems", items, "did not finish every place", "all")), 2)
+        self.assertEqual(len(call("filterItems", items, "all", "a")), 2)
+        self.assertEqual(len(call("filterItems", items, "crashed", "b")), 0)
+        self.assertEqual(call("kindsOf", items), ["all", "crashed", "did not finish every place"])
 
-    def test_picking_sessions_for_a_problem(self):
-        idx = [{"instanceId": "n10-seed4", "algorithmId": "b", "numCustomers": 10, "seed": 4, "timestamp": "1", "file": "x"},
-               {"instanceId": "n10-seed4", "algorithmId": "b", "numCustomers": 10, "seed": 4, "timestamp": "2", "file": "y"},
-               {"instanceId": "n10-seed4", "algorithmId": "a", "numCustomers": 10, "seed": 4, "timestamp": "1", "file": "z"},
-               {"instanceId": "n5-seed2", "algorithmId": "a", "numCustomers": 5, "seed": 2, "timestamp": "1", "file": "w"}]
-        self.assertEqual([e["file"] for e in call("latestPerAlgorithm", idx, "n10-seed4")], ["z", "y"])
-        self.assertEqual(call("sessionInstanceIds", idx), ["n5-seed2", "n10-seed4"])
+    def test_group_by_version_without_duplicates(self):
+        s1 = sess(file="sessions/x.json", commit="abc")
+        groups = call("groupSessionsByVersion", [s1, s1, sess(file="sessions/y.json", inst="n5-seed2", commit="abc")])
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(len(groups[0]["sessions"]), 2)
+        self.assertEqual(groups[0]["commit"], "abc")
+        self.assertEqual(groups[0]["key"], "a\u0000abc")
+
+    def test_group_without_commit_is_unrecorded(self):
+        g = call("groupSessionsByVersion", [sess(file="sessions/x.json")])
+        self.assertEqual((g[0]["commit"], g[0]["key"]), (None, "a\u0000"))
+
+    def test_compare_uses_only_examples_both_finished(self):
+        def fin(inst, m, dist, days):
+            return sess(inst=inst, outcome="finished", minutes=m, days=days, dist=dist)
+        a = [fin("n5-seed1", 60, 10, 1), fin("n5-seed2", 120, 20, 2), sess(inst="n5-seed3")]
+        b = [fin("n5-seed1", 120, 14, 2), sess(inst="n5-seed2"), fin("n5-seed3", 30, 1, 1)]
+        c = call("compareFull", a, b)
+        self.assertEqual(c["shared"], 3)
+        self.assertEqual((c["finishedA"], c["finishedB"]), (2, 2))
+        self.assertEqual(c["both"], 1)
+        self.assertEqual((c["hours"]["a"], c["hours"]["b"]), (1.0, 2.0))
+        self.assertEqual((c["days"]["a"], c["days"]["b"]), (1, 2))
+        self.assertEqual((c["distanceKm"]["a"], c["distanceKm"]["b"]), (10, 14))
+
+    def test_compare_with_no_common_finish_has_no_means(self):
+        c = call("compareFull", [sess(inst="i")], [sess(inst="i")])
+        self.assertEqual(c["both"], 0)
+        self.assertIsNone(c["hours"]["a"])
 
 
 if __name__ == "__main__":

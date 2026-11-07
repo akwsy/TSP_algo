@@ -62,5 +62,5 @@ Instance explorer and Route detail read saved sessions (`results/sessions-index.
 map and the schedule table together. On the map a place visited on the chosen day is filled and numbered, a place done on an
 earlier day is a muted disc with a tick ("done on an earlier day"), and every other place is faded ("still to visit").
 An algorithm with fewer days shows "Finished on day K" or "Stopped after day K, did not finish"; a stopped session shows its
-plain-words explanation and figures marked "so far, not a finishing time". Logic: `site/js/lib/sessions.js`
-(tested by `tests/test_site_sessions.py`); layout: `site/js/lib/fullview.js`.
+plain-words explanation and figures marked "so far, not a finishing time". Logic: `site/js/lib/sessiondays.js`
+(tested by `tests/test_site_sessiondays.py`); layout: `site/js/lib/fullview.js`.

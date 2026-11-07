@@ -5,7 +5,7 @@ import { algorithmColorIndex } from "../lib/mapmodel.js";
 import { createRouteMap, entryStyle, algorithmSwatch, slotLegend } from "../lib/routemap.js";
 import { runStats } from "../lib/rundisplay.js";
 import { getView } from "../lib/view.js";
-import { loadSessionsIndex, loadSession, latestPerAlgorithm, sessionInstanceIds, maxDays, clampDay, dayRun, doneBefore } from "../lib/sessions.js";
+import { loadSessionsIndex, loadSession, latestPerAlgorithm, sessionInstanceIds, maxDays, clampDay, dayRun, doneBefore } from "../lib/sessiondays.js";
 import { daySelect, sessionBlock, dayFigures, dayFiguresList, noDayNote } from "../lib/fullview.js";
 
 const instanceLabel = (id, runs) => `${id} (${runs.find((x) => x.instanceId === id).numCustomers} customers)`;
