@@ -83,7 +83,10 @@ for (const [device, w, hgt, scheme] of MODES) {
     const name = page.split("?")[0];
     if (view === "full" && name === "overview" && !/ranked below: \d+ instances? did(n't| not) finish/.test(entry.mainText)) entry.errors.push("full-run overview lacks the ranked-below label");
     if (view === "full" && ["scaling", "instance", "run"].includes(name) && !/view is coming to the/.test(entry.mainText)) entry.errors.push("page lacks the full-run coming-soon note");
-    if (view === "first" && /coming to the|working hours/.test(entry.mainText)) entry.errors.push("first-day page shows full-run wording");
+    // Failures and History list full-run sessions in both toggle states (they do not follow the toggle).
+    if (name === "failures" && !(/did not finish every place/.test(entry.mainText) && /stopped on day \d+/i.test(entry.mainText) && /so far, not a finishing time/.test(entry.mainText) && /Example \d+ with \d+ places/.test(entry.mainText) && /Stopped on day \d+:/.test(entry.mainText))) entry.errors.push("Failures lacks a stopped session with its day, explanation and partial figures");
+    if (name === "history" && !/Until every place is visited \(\d+ of \d+ finished\)/.test(entry.mainText)) entry.errors.push("History lacks the full-run sessions group");
+    if (view === "first" && !["failures", "history"].includes(name) && /coming to the|working hours/.test(entry.mainText)) entry.errors.push("first-day page shows full-run wording");
     delete entry.mainText;
     if (!entry.h1) entry.errors.push("page rendered no heading");
     if (entry.nan) entry.errors.push("page text contains NaN/undefined");
