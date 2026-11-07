@@ -64,3 +64,9 @@ earlier day is a muted disc with a tick ("done on an earlier day"), and every ot
 An algorithm with fewer days shows "Finished on day K" or "Stopped after day K, did not finish"; a stopped session shows its
 plain-words explanation and figures marked "so far, not a finishing time". Logic: `site/js/lib/sessiondays.js`
 (tested by `tests/test_site_sessiondays.py`); layout: `site/js/lib/fullview.js`.
+
+## View toggle ("First day only" / "Until every place is visited")
+
+One two-button group in the header (a labelled group; the current view is marked pressed, Tab reaches it, Enter or Space
+switches). The choice is stored in `localStorage` (inside try/catch) and applies to Overview, Scaling, Instance and Route
+detail; each view names its instance count in plain words. Logic: `site/js/lib/view.js`.
