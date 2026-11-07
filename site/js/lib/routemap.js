@@ -151,7 +151,10 @@ export function createRouteMap(instance, opts) {
       for (const sib of n.parentElement?.children ?? []) if (sib !== n && !["SCRIPT", "LINK", "STYLE"].includes(sib.tagName)) { sib.inert = true; inerted.push(sib); }
     }
   };
-  const setFull = (on) => {
+  // Fullscreen. Preferred: the browser Fullscreen API on the figure, which puts it in the top layer so no ancestor can clip or
+  // re-anchor it. Fallback (iPhone Safari has no element fullscreen, or the request is refused): the CSS-fixed overlay, for which
+  // style.css switches off ancestor entrance animations (a transform on an ancestor would make it the containing block).
+  const setFullUi = (on) => {
     el.classList.toggle("is-full", on);
     full.setAttribute("aria-pressed", String(on));
     full.textContent = on ? "Exit fullscreen" : "Fullscreen";
@@ -162,9 +165,20 @@ export function createRouteMap(instance, opts) {
     engine?.invalidate?.();
     if (!on && document.activeElement !== full && !el.contains(document.activeElement)) full.focus();
   };
+  const setFull = (on) => {
+    if (on === el.classList.contains("is-full")) return;
+    setFullUi(on);
+    if (on) { if (el.requestFullscreen) { try { Promise.resolve(el.requestFullscreen()).catch(() => {}); } catch { /* CSS overlay stays */ } } }
+    else if (document.fullscreenElement === el) document.exitFullscreen().catch(() => {});
+  };
   full.addEventListener("click", () => setFull(!el.classList.contains("is-full")));
   const onKey = (e) => { if (e.key === "Escape" && el.classList.contains("is-full")) { setFull(false); full.focus(); } };
   document.addEventListener("keydown", onKey);
+  // The browser can leave fullscreen by itself (Esc, a gesture): follow it. Size changes (enter, exit, rotate) refit the map.
+  const onFsChange = () => { if (!document.fullscreenElement && el.classList.contains("is-full")) setFullUi(false); engine?.invalidate?.(); };
+  document.addEventListener("fullscreenchange", onFsChange);
+  const sized = typeof ResizeObserver === "function" ? new ResizeObserver(() => engine?.invalidate?.()) : null;
+  sized?.observe(stage);
   let dead = false;
 
   // What a hover, tap or keyboard focus shows. Times come from the model (stopTimes / legDetails); this only lays them out.
@@ -328,7 +342,7 @@ export function createRouteMap(instance, opts) {
     ready,
     setEntries(next) { finishReveal(); entries = next; drawPanel(); drawCaption(); if (engine) engine.draw(scene()); paintReplay(); },
     replay: () => startReveal(),
-    destroy() { dead = true; finishReveal(); seen?.disconnect(); window.removeEventListener("motionchange", onMotion); setInert(false); document.removeEventListener("keydown", onKey); document.removeEventListener("keydown", onEsc); document.documentElement.classList.remove("map-locked"); engine?.destroy(); },
+    destroy() { dead = true; finishReveal(); seen?.disconnect(); window.removeEventListener("motionchange", onMotion); setInert(false); document.removeEventListener("keydown", onKey); document.removeEventListener("keydown", onEsc); document.removeEventListener("fullscreenchange", onFsChange); sized?.disconnect(); if (document.fullscreenElement === el) document.exitFullscreen().catch(() => {}); document.documentElement.classList.remove("map-locked"); engine?.destroy(); },
   };
 }
 

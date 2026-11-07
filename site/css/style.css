@@ -180,9 +180,12 @@ pre { margin: 8px 0 0; padding: 12px 14px; background: var(--bg); border: 1px so
 @keyframes slide-in { from { opacity: 0; transform: translateX(-14px); } }
 @keyframes fade-slide { from { opacity: 0; transform: translateY(6px); } }
 /* A new view assembles panel by panel (each child of <main> gets --i from JS). */
-main.entering > * { animation: rise var(--t-slow) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 70ms); }
+main.entering > * { animation: rise var(--t-slow) var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 70ms); }
 /* Rows of a ranking or list slide in in their order. */
-.stagger > * { animation: slide-in 520ms var(--ease-out) both; animation-delay: calc(120ms + var(--i, 0) * 45ms); }
+.stagger > * { animation: slide-in 520ms var(--ease-out) backwards; animation-delay: calc(120ms + var(--i, 0) * 45ms); }
+/* A transform (even a running or filling one) on an ancestor becomes the containing block of position:fixed descendants, so the
+   CSS fullscreen map overlay would be clipped to its panel. While it is open nothing above it may animate. */
+.map-locked main.entering > *, .map-locked .stagger > * { animation: none; }
 details[open] > :not(summary) { animation: fade-slide var(--t-mid) var(--ease-out); }
 /* Reduced motion: from the system or the header toggle. Everything lands in its final state at once. */
 @media (prefers-reduced-motion: reduce) {
