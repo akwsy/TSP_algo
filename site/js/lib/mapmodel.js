@@ -188,6 +188,25 @@ export function labelPlan(points, w, h) {
   return keep;
 }
 
+/** Names appear one zoom level past the initial fit, but never beyond what the map can reach. */
+export function labelsVisible(zoom, fitZoom, maxZoom) {
+  return zoom >= Math.min(fitZoom + 1, maxZoom);
+}
+
+/** Opacity of destinations that no shown route visits. */
+export const FADED_OPACITY = 0.55;
+
+/** WCAG contrast of `fg` drawn at `opacity` over `bg` (both #rrggbb). */
+export function contrastRatio(fg, bg, opacity = 1) {
+  const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const lin = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  const lum = (c) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+  const f = rgb(fg), b = rgb(bg);
+  const eff = f.map((v, i) => Math.round(v * opacity + b[i] * (1 - opacity)));
+  const [hi, lo] = [lum(eff), lum(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+}
+
 /**
  * Esri World Terrain Base: the service advertises levels 0-13, but from level 10 up it returns a grey "Map data not yet available"
  * placeholder (checked against the live service), so level 9 is the last real tile. Beyond it Leaflet upscales level 9 tiles up to 4x (level 11); 16x (level 13) looked too pixelated.

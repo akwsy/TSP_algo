@@ -1,5 +1,6 @@
 """Map and route-detail logic (site/js/lib/mapmodel.js), run under node. Expected values are hand-worked."""
 import json
+import re
 import shutil
 import subprocess
 import unittest
@@ -166,6 +167,29 @@ class CompareModelTest(unittest.TestCase):
         self.assertEqual(call("labelPlan", pts, 640, 480), [1])
         self.assertEqual(call("labelSide", pts[0], 640), "left")
         self.assertEqual(call("labelSide", {**pts[0], "x": 20}, 640), "right")
+
+    def test_labels_show_one_zoom_level_past_the_initial_fit(self):
+        self.assertFalse(call("labelsVisible", 6, 6, 11))
+        self.assertTrue(call("labelsVisible", 7, 6, 11))
+        self.assertTrue(call("labelsVisible", 9, 6, 11))
+        self.assertFalse(call("labelsVisible", 5, 6, 11))
+
+    def test_labels_threshold_is_always_reachable_within_max_zoom(self):
+        self.assertTrue(call("labelsVisible", 11, 11, 11))
+        self.assertTrue(call("labelsVisible", 11, 12, 11))
+        self.assertFalse(call("labelsVisible", 10, 11, 11))
+
+    def test_faded_outline_keeps_three_to_one_contrast_in_both_themes(self):
+        css = (MODEL.parent.parent.parent / "css" / "style.css").read_text()
+        light = dict(re.findall(r"--(bg|text):\s*(#[0-9a-f]{6})", css.split(':root[data-theme="dark"]')[0]))
+        dark = dict(re.findall(r"--(bg|text):\s*(#[0-9a-f]{6})", css.split(':root[data-theme="dark"]')[1].split("}")[0]))
+        opacity = node("console.log(m.FADED_OPACITY)")
+        self.assertTrue(0.4 <= opacity <= 0.6)
+        for theme in (light, dark):
+            self.assertGreaterEqual(call("contrastRatio", theme["text"], theme["bg"], opacity), 3.0)
+        # worked values: black on white is 21:1; black at half opacity is #808080 on white, 3.95:1
+        self.assertAlmostEqual(call("contrastRatio", "#000000", "#ffffff", 1), 21, places=1)
+        self.assertAlmostEqual(call("contrastRatio", "#000000", "#ffffff", 0.5), 3.95, places=1)
 
     def test_tile_limits_stop_native_zoom_where_the_provider_has_real_tiles(self):
         # Esri World Terrain Base serves a "Map data not yet available" placeholder from level 10 up, so level 9 is the last real one.

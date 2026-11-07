@@ -69,6 +69,10 @@ main:has(.routemap) { max-width: min(1640px, 100%); }
 .map-svg .leg-hit:focus-visible { stroke: var(--focus); stroke-opacity: .45; }
 .leaflet-container path.leg-hit:focus-visible { stroke: var(--focus); stroke-opacity: .5; }
 .map-svg .pt-group:hover .pt { stroke-width: 3; }
+/* Faded = no shown route visits it. Opacity itself is set from FADED_OPACITY in JS; full strength again on hover and focus. */
+.map-svg .pt-group.faded:hover > *, .map-svg .pt-group.faded:focus-visible > * { opacity: 1 !important; }
+.lf-dot.faded { box-shadow: 0 0 0 1.5px var(--text); }
+.leaflet-marker-icon:hover .lf-dot.faded, .leaflet-marker-icon:focus-visible .lf-dot.faded { opacity: 1 !important; }
 .lf-icon { background: none; border: 0; }
 .lf-dot { display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--slot, #888); border: 2.5px solid #fff;
   box-shadow: 0 0 0 1px rgba(15,20,26,.75), 0 2px 5px rgba(0,0,0,.35); transition: transform .12s; }
