@@ -46,6 +46,10 @@ Each customer has one **time window**, an opening minute and a closing minute. Y
 
 Travel, waiting and the trip back to the depot all use up the period.
 
+### Several days
+
+Besides the one-day problem, the harness also measures how long you need to visit every place. Your algorithm is then called **once per day** until everything is visited. Day 1 is exactly the problem above. On each later day you receive only the places not yet visited, renumbered with the depot as id 0 and the customers 1, 2, 3... in their original order, with the same departure, deadline, speed and seed. Do not assume the whole set persists between calls. Return `[0, 0]` only when nothing can be served; a day that visits nobody stops the run.
+
 ### Scoring
 
 1. **More customers visited is better.** This is the main criterion. The depot does not count.
