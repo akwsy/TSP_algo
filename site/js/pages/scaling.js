@@ -2,6 +2,9 @@ import { h, fmt, select } from "../lib/dom.js";
 import { loadAggregate, loadAlgorithms, experimentNames } from "../lib/data.js";
 import { buildSeries, logLogSeries, declaredExponent } from "../lib/scaling.js";
 import { lineChart, styleFor } from "../lib/charts.js";
+import { getView, viewLabel, viewCountText } from "../lib/view.js";
+import { hasFull } from "../lib/fullrun.js";
+import { fullSeries, maxMean, computeUnit, stoppedNotes } from "../lib/fullscaling.js";
 
 const METRICS = [
   { key: "visited", title: "Customers visited", yLabel: "Mean customers visited" },
@@ -46,10 +49,53 @@ function scalingPlots(groups, algs, names, styles) {
     mk("work", "Measured work vs declared complexity (log-log)", "Mean work count (log scale)", true));
 }
 
+// ---- "Until every place is visited": four charts from the full-run aggregates (fullscaling.js) ----
+function renderFull(el, ctx, { names, exp, agg, algs }) {
+  const title = h("h1", {}, "Scaling");
+  const toolbar = names.length > 1 ? [h("div", { class: "toolbar" }, select("Experiment", names.map((n) => ({ value: n, label: n })), exp,
+    (v) => ctx.navigate(`scaling?experiment=${encodeURIComponent(v)}`)))] : [];
+  if (!hasFull(agg)) {
+    el.append(title, h("p", { class: "lede" }, "How long each algorithm needs to visit every place, as the number of customers grows."), ...toolbar,
+      h("div", { class: "empty card", role: "status" },
+        "The \"", viewLabel("full"), "\" results have not been produced yet. Run ", h("code", {}, "python3 start.py"),
+        " to make them, then reload this page."));
+    return;
+  }
+  const full = agg.full;
+  const ids = [...new Set(full.groups.map((g) => g.algorithmId))].sort();
+  const styles = Object.fromEntries(ids.map((id, i) => [id, styleFor(i)]));
+  const nameOf = Object.fromEntries(ids.map((id) => [id, algs[id]?.displayName || id]));
+  const unit = computeUnit(maxMean(full.groups, "totalRuntimeMs"));
+  const METRICS_FULL = [
+    { key: "workingHours", title: "Working hours needed (headline)", yLabel: "Mean working hours", scale: 1 },
+    { key: "days", title: "Days needed", yLabel: "Mean days", scale: 1 },
+    { key: "totalDistanceKm", title: "Total distance", yLabel: "Mean distance (km)", scale: 1 },
+    { key: "totalRuntimeMs", title: `Total compute time (${unit.label})`, yLabel: `Mean compute time (${unit.label})`, scale: unit.factor },
+  ];
+  const charts = METRICS_FULL.map((m) => {
+    const fig = lineChart({ title: m.title, yLabel: m.yLabel,
+      series: fullSeries(full, m.key, m.scale).map((s) => ({ ...s, id: s.algorithmId, name: nameOf[s.algorithmId], style: styles[s.algorithmId] })),
+      emptyText: "No example finished, so there is nothing to chart." });
+    fig.append(h("p", { class: "chart-note" }, "Band or bars: one sample standard deviation across the examples that finished. Shown only where at least 2 finished."));
+    return fig;
+  });
+  const notes = stoppedNotes(full, nameOf);
+  el.append(title,
+    h("p", { class: "lede" }, "How long each algorithm needs to visit every place, as the number of customers grows. Working hours are travelling plus waiting, with nights left out. Hover a chart or use the left and right arrow keys to read values."),
+    ...toolbar,
+    h("div", { class: "chart-grid" }, charts),
+    notes.length
+      ? h("div", { class: "card stopped-notes", role: "note" }, h("h2", {}, "Examples that did not finish"),
+          h("ul", {}, notes.map((n) => h("li", {}, n))),
+          h("p", { class: "meta" }, "These examples are never drawn as a time. A size where none finished has no point."))
+      : h("p", { class: "meta" }, "Every example finished, so every size has a point."),
+    h("p", { class: "meta" }, `Experiment ${exp}: ${viewLabel("full")}, ${viewCountText("full", agg)}.`));
+}
+
 export default {
   path: "scaling",
   title: "Scaling",
-  fullView: "pending",
+  fullView: "ready",
   async render(el, ctx) {
     const names = await experimentNames();
     if (!names.length) {
@@ -61,6 +107,7 @@ export default {
     const agg = await loadAggregate(exp);
     if (!agg) throw new Error(`No aggregates-${exp}.json found next to the run results.`);
     const algs = await loadAlgorithms();
+    if (getView() === "full") return renderFull(el, ctx, { names, exp, agg, algs });
     const ids = [...new Set(agg.groups.map((g) => g.algorithmId))].sort();
     const styles = Object.fromEntries(ids.map((id, i) => [id, styleFor(i)]));
     const nameOf = (id) => algs[id]?.displayName || id;
