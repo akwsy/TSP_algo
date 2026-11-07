@@ -132,7 +132,6 @@ tbody tr { transition: background-color var(--t-fast); }
 tbody tr:hover td, tbody tr:hover th { background: color-mix(in srgb, var(--accent) 7%, transparent); }
 tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
 tr.best td { background: color-mix(in srgb, var(--ok) 9%, transparent); }
-tr.best td:first-child { box-shadow: inset 2px 0 0 var(--ok); }
 .rank { width: 3.5em; font: 700 1.35rem/1 var(--mono) !important; color: var(--accent); }
 tr.best .rank { color: var(--ok); text-shadow: 0 0 calc(var(--glow-r) * 5) color-mix(in srgb, var(--ok) 60%, transparent); }
 .name small { display: block; color: var(--muted); font: 400 .78rem var(--mono); margin-top: 2px; }

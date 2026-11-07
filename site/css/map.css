@@ -49,8 +49,8 @@ main:has(.routemap) { max-width: min(1640px, 100%); }
   transition: border-color var(--t-fast), box-shadow var(--t-fast); }
 .map-btn:hover, .map-full:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--glow), 0 0 18px -4px var(--glow-strong); }
 .map-btn[hidden] { display: none; }
-.map-replay:not(.playing)::before { content: ""; display: inline-block; width: 0; height: 0; margin-right: 8px; vertical-align: 0;
-  border-left: 8px solid var(--accent); border-top: 5px solid transparent; border-bottom: 5px solid transparent; }
+.map-replay:not(.playing)::before { content: ""; display: inline-block; width: 8px; height: 10px; margin-right: 8px; vertical-align: -1px;
+  background: var(--accent); clip-path: polygon(0 0, 100% 50%, 0 100%); }
 .map-hud { position: absolute; left: 12px; bottom: 12px; z-index: 800; font: 600 .72rem var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--text);
   background: color-mix(in srgb, var(--surface) 90%, transparent); border: 1px solid var(--line-strong); padding: 6px 10px; border-radius: var(--radius);
   box-shadow: 0 0 0 1px var(--glow); pointer-events: none; animation: fade-slide var(--t-fast) var(--ease-out); }
