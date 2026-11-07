@@ -22,6 +22,10 @@ from .instance import build_instance
 from .validator import failure_result, validate_route
 
 ROOT = Path(__file__).resolve().parent.parent
+# Why a run produced no scorable route, recorded as `failureKind` next to the plain-text
+# `failureReason` (None on a valid run). Consumers (harness/session.py) rely on the kind, not on
+# the wording of the reason.
+FAILURE_KINDS = ("invalid_route", "crashed", "unreadable_output", "timed_out", "could_not_start")
 RESULT_FIELDS = ("valid", "failureReason", "visited", "skipped", "distanceKm", "travelMinutes",
                  "waitMinutes", "totalMinutes", "returnMinute", "schedule")
 
@@ -101,7 +105,9 @@ def parse_output(stdout):
 
 
 def execute(meta, instance):
-    """Run the algorithm once; return (output dict or None, runtimeMs, error or None, stderr, timedOut)."""
+    """Run the algorithm once; return (output dict or None, runtimeMs, error or None, stderr,
+    timedOut, error kind or None). The kind is one of FAILURE_KINDS and is set exactly when
+    there is an error."""
     limit = meta.get("timeLimitSeconds", 10)
     start = time.perf_counter()
     try:
@@ -109,30 +115,33 @@ def execute(meta, instance):
                               capture_output=True, timeout=limit)
     except OSError as exc:
         runtime_ms = (time.perf_counter() - start) * 1000
-        return None, runtime_ms, f"could not start the command: {exc.strerror or exc}", "", False
+        return None, runtime_ms, f"could not start the command: {exc.strerror or exc}", "", False, "could_not_start"
     except subprocess.TimeoutExpired as exc:
         runtime_ms = (time.perf_counter() - start) * 1000
         error = f"exceeded the time limit of {limit} s and was killed"
         output, _ = parse_output(_text(exc.stdout)) if _text(exc.stdout).strip() else (None, None)
         if output is not None:
             output["status"] = "TIME_LIMIT"
-        return output, runtime_ms, error, _text(exc.stderr), True
+        return output, runtime_ms, error, _text(exc.stderr), True, "timed_out"
     runtime_ms = (time.perf_counter() - start) * 1000
     if proc.returncode != 0:
-        return None, runtime_ms, f"exited with code {proc.returncode}", _text(proc.stderr), False
+        return None, runtime_ms, f"exited with code {proc.returncode}", _text(proc.stderr), False, "crashed"
     output, error = parse_output(_text(proc.stdout))
-    return output, runtime_ms, error, _text(proc.stderr), False
+    return output, runtime_ms, error, _text(proc.stderr), False, ("unreadable_output" if error else None)
 
 
 def make_record(meta, instance, run_id):
-    output, runtime_ms, error, stderr, timed_out = execute(meta, instance)
+    output, runtime_ms, error, stderr, timed_out, error_kind = execute(meta, instance)
     output = output or {}
     route = output.get("route")
     status = "TIME_LIMIT" if timed_out else output.get("status")
     if error and not (timed_out and route is not None):
         checked = failure_result(error)
+        kind = error_kind
     else:
         checked = validate_route(instance, route)
+        # A killed run with a bad route still counts as a timeout (as it always has).
+        kind = None if checked["valid"] else ("timed_out" if timed_out else "invalid_route")
     record = {
         "algorithmId": meta["id"],
         "commit": meta["_commit"],
@@ -149,6 +158,7 @@ def make_record(meta, instance, run_id):
         "stderr": stderr,
     }
     record.update({k: checked[k] for k in RESULT_FIELDS})
+    record["failureKind"] = kind
     return record
 
 

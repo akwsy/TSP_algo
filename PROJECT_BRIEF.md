@@ -209,7 +209,7 @@ Re-running is **manual**: one documented command runs everything, and one comman
 {
   "runId": "...", "experiment": "scaling", "algorithmId": "greedy-insertion",
   "algorithmCommit": "abc1234", "instanceId": "n10-seed42", "seed": 42, "numCustomers": 10,
-  "status": "HEURISTIC", "valid": true, "failureReason": null,
+  "status": "HEURISTIC", "valid": true, "failureReason": null, "failureKind": null,
   "route": [0, 3, 1, 0],
   "visited": 2, "skipped": [2, 4],
   "distanceKm": 91.4,

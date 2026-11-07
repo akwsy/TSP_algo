@@ -29,7 +29,8 @@ Saved layout (stable; later tickets build on it). One JSON file per session:
       "dayRecords": [ {         one per day, in order
           "day": 1.., "instanceId": "<id>" or "<id>-dayN", "numPlaces": customers given that day,
           "route": [0, ...original place ids..., 0], "status", "killed", "runtimeMs", "stats",
-          "valid", "failureReason", "visited": [original ids newly visited that day],
+          "valid", "failureReason", "failureKind" (one of harness.run.FAILURE_KINDS, null when
+          valid; absent on sessions saved before it existed), "visited": [original ids newly visited that day],
           "distanceKm", "returnMinute", "workingMinutes" (null on a day that failed or visited
           nothing), "schedule": [{id (original), arriveMinute, startMinute, leaveMinute}] } ]
     }
@@ -68,17 +69,35 @@ STOP_REASONS = ("no_progress", "day_limit", "crashed", "invalid_route", "unreada
                 "timed_out", "could_not_start")
 
 
-def classify_failure(entry):
-    """(stop reason, explanation phrase) for a day record that gave no usable route."""
+def _kind_from_text(entry):
+    """Failure kind guessed from the message, for day records saved before `failureKind` existed."""
     reason = entry["failureReason"] or "unknown failure"
     if entry["killed"]:
-        return "timed_out", f"the algorithm ran out of time ({reason}) and gave no usable answer"
+        return "timed_out"
     if reason.startswith("could not start"):
-        return "could_not_start", f"the algorithm could not be started ({reason.split(': ', 1)[-1]})"
+        return "could_not_start"
     if reason.startswith("exited with code"):
-        return "crashed", f"the algorithm crashed ({reason})"
+        return "crashed"
     if reason.startswith(("output is not", "status must", "unknown status", "stats must")):
-        return "unreadable_output", f"the algorithm's output could not be read ({reason})"
+        return "unreadable_output"
+    return "invalid_route"
+
+
+def classify_failure(entry):
+    """(stop reason, explanation phrase) for a day record that gave no usable route.
+
+    Uses the record's `failureKind` (set by the runner; harness/run.py). Only records without it
+    (saved by an older harness) fall back to matching the message text."""
+    reason = entry["failureReason"] or "unknown failure"
+    kind = entry.get("failureKind") or _kind_from_text(entry)
+    if kind == "timed_out":
+        return kind, f"the algorithm ran out of time ({reason}) and gave no usable answer"
+    if kind == "could_not_start":
+        return kind, f"the algorithm could not be started ({reason.split(': ', 1)[-1]})"
+    if kind == "crashed":
+        return kind, f"the algorithm crashed ({reason})"
+    if kind == "unreadable_output":
+        return kind, f"the algorithm's output could not be read ({reason})"
     return "invalid_route", f"the algorithm gave an invalid route ({reason})"
 
 
@@ -116,6 +135,7 @@ def _day_record(day, instance_id, ids, record):
         "route": [back(i) for i in route] if valid else route,
         "status": record["status"], "killed": record["killed"], "runtimeMs": record["runtimeMs"],
         "stats": record["stats"], "valid": valid, "failureReason": record["failureReason"],
+        "failureKind": record.get("failureKind"),
         "visited": [back(s["id"]) for s in record["schedule"]] if valid else [],
         "distanceKm": record["distanceKm"], "returnMinute": record["returnMinute"],
         "schedule": [{**s, "id": back(s["id"])} for s in record["schedule"]] if valid else None,
