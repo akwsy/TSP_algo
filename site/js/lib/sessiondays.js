@@ -80,21 +80,3 @@ export function sessionInstanceIds(entries) {
   const seen = new Map(entries.map((e) => [e.instanceId, e]));
   return [...seen.values()].sort((a, b) => a.numCustomers - b.numCustomers || a.seed - b.seed).map((e) => e.instanceId);
 }
-
-// ---- loading (browser only; cached like lib/data.js) ----
-const cache = new Map();
-const once = (key, load) => { if (!cache.has(key)) cache.set(key, load()); return cache.get(key); };
-const path = (file) => file.split("/").map(encodeURIComponent).join("/");
-
-/** results/sessions-index.json entries, or [] when no full runs were saved. */
-export const loadSessionsIndex = () => once("index", async () => {
-  const res = await fetch("/results/sessions-index.json", { cache: "no-store" });
-  return res.ok ? (await res.json()).sessions || [] : [];
-});
-
-/** One session file; `file` comes from the sessions index. */
-export const loadSession = (file) => once("s:" + file, async () => {
-  const res = await fetch(`/results/${path(file)}`, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Could not load ${file} (${res.status}).`);
-  return res.json();
-});

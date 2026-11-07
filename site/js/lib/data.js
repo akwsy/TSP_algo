@@ -29,6 +29,24 @@ export const loadAggregate = (experiment) =>
 /** One full run record (route, schedule, stderr...). `file` comes from the index. */
 export const loadRun = (file) => once("run:" + file, () => getJson(`/results/${encodeURIComponent(file)}`));
 
+/** results/sessions-index.json entries (see harness/sessionstore.py). Never throws: no index, an unreadable or
+ *  malformed one all mean [] (no full runs saved). Every page shares this one fetch. */
+export const loadSessionsIndex = () => once("sessions-index", async () => {
+  try {
+    const res = await fetch("/results/sessions-index.json", { cache: "no-store" });
+    const sessions = res.ok ? (await res.json())?.sessions : null;
+    return Array.isArray(sessions) ? sessions : [];
+  } catch { return []; }
+});
+
+/** One full-run session file (see harness/session.py); `file` comes from the sessions index. Cached. Unlike the
+ *  index, a missing file is an error: this throws a clear Error that callers can catch. */
+export const loadSession = (file) => once("session:" + file, async () => {
+  const res = await fetch(`/results/${file.split("/").map(encodeURIComponent).join("/")}`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Could not load ${file} (${res.status}).`);
+  return res.json();
+});
+
 export async function experimentNames() {
   const { runs } = await loadIndex();
   return [...new Set(runs.map((r) => r.experiment).filter(Boolean))].sort();

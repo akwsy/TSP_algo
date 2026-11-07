@@ -16,6 +16,7 @@ const files = {json.dumps(files)};
 const fetched = [];
 globalThis.fetch = async (url) => {{
   fetched.push(url);
+  if (files[url] === null) throw new TypeError("network down");
   if (!(url in files)) return {{ ok: false, status: 404, json: async () => ({{}}) }};
   return {{ ok: true, status: 200, json: async () => files[url] }};
 }};
@@ -64,6 +65,48 @@ class SessionIndexOnlyTest(unittest.TestCase):
     def test_no_index_means_no_sessions(self):
         out = run_node('return await (await lib("sessions.js")).loadSessions();', {})
         self.assertEqual(out["result"], [])
+
+
+@unittest.skipUnless(shutil.which("node"), "node not installed")
+class SharedLoadersTest(unittest.TestCase):
+    """One cached sessions-index loader and one cached session-file loader (lib/data.js) for every page."""
+
+    def test_index_loader_returns_entries_and_is_cached(self):
+        files = {INDEX: {"sessions": [entry("one")]}}
+        out = run_node('const d = await lib("data.js"); return [await d.loadSessionsIndex(), await d.loadSessionsIndex()];', files)
+        self.assertEqual(out["result"], [[entry("one")], [entry("one")]])
+        self.assertEqual(out["fetched"], [INDEX])
+
+    def test_index_loader_never_throws_missing_malformed_or_unreachable_means_empty(self):
+        for files in ({}, {INDEX: None}, {INDEX: {"sessions": "nope"}}, {INDEX: {}}):
+            out = run_node('return await (await lib("data.js")).loadSessionsIndex();', files)
+            self.assertEqual(out["result"], [], files)
+
+    def test_session_loader_returns_the_file_and_is_cached(self):
+        files = {"/results/sessions/a%20b.json": {"days": 2}}
+        out = run_node('const d = await lib("data.js"); return [await d.loadSession("sessions/a b.json"), await d.loadSession("sessions/a b.json")];', files)
+        self.assertEqual(out["result"], [{"days": 2}, {"days": 2}])
+        self.assertEqual(out["fetched"], ["/results/sessions/a%20b.json"])
+
+    def test_a_missing_session_file_throws_a_clear_error_callers_can_catch(self):
+        out = run_node("""try { await (await lib("data.js")).loadSession("sessions/gone.json"); return "no error"; }
+                          catch (e) { return e.message; }""", {})
+        self.assertIn("sessions/gone.json", out["result"])
+        self.assertIn("404", out["result"])
+
+    def test_the_failures_and_history_loader_shares_the_same_index_fetch(self):
+        files = {INDEX: {"sessions": [entry("one", **DETAILS)]}}
+        out = run_node("""const d = await lib("data.js"); const s = await lib("sessions.js");
+                          await d.loadSessionsIndex(); return (await s.loadSessions()).length;""", files)
+        self.assertEqual(out["result"], 1)
+        self.assertEqual(out["fetched"], [INDEX])
+
+    def test_the_old_entry_fallback_uses_the_shared_session_loader_cache(self):
+        files = {INDEX: {"sessions": [entry("old")]},
+                 "/results/sessions/old.json": {"commit": "zzz", "totalDistanceKm": 3, "explanation": "E"}}
+        out = run_node("""const d = await lib("data.js"); const s = await lib("sessions.js");
+                          await s.loadSessions(); await d.loadSession("sessions/old.json"); return 1;""", files)
+        self.assertEqual(out["fetched"], [INDEX, "/results/sessions/old.json"])
 
 
 if __name__ == "__main__":

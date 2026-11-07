@@ -1,8 +1,8 @@
 import { h, fmt, select } from "../lib/dom.js";
-import { loadIndex, loadRun, loadAlgorithms } from "../lib/data.js";
+import { loadIndex, loadRun, loadAlgorithms, loadSessionsIndex, loadSession } from "../lib/data.js";
 import { loadInstance, ensureMapCss, replaceHashParams } from "../lib/instances.js";
 import { getView } from "../lib/view.js";
-import { loadSessionsIndex, loadSession, dayCount, clampDay, dayRun, doneBefore } from "../lib/sessiondays.js";
+import { dayCount, clampDay, dayRun, doneBefore } from "../lib/sessiondays.js";
 import { daySelect, sessionBlock, dayFiguresList, noDayNote } from "../lib/fullview.js";
 import { algorithmColorIndex, routeSteps, clock, slotColors } from "../lib/mapmodel.js";
 import { createRouteMap, entryStyle, slotLegend } from "../lib/routemap.js";
