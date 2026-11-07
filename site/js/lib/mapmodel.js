@@ -9,10 +9,9 @@ export function clock(min) {
 
 export const windowText = (loc) => loc.isDepot ? "open all day" : `${clock(loc.opensAt)}-${clock(loc.closesAt)}`;
 
-// Slot fills are an ordered light-to-dark ramp (early to late in the day); every dot also gets a
-// strong outline, and visited versus skipped never relies on colour alone (filled vs hollow).
-const SLOT_COLORS = ["#fde725", "#35b779", "#31688e", "#440154"];
-export const slotColors = () => [...SLOT_COLORS];
+// Slot colours (early to late in the day) are theme tokens --slot-1..4 in charts.css, each at least 3:1 against the page in both
+// themes. Visited versus skipped never relies on colour alone (filled vs hollow), and the slot also has a number (1 to 4).
+export const slotColors = () => [1, 2, 3, 4].map((n) => `var(--slot-${n})`);
 
 /** Stable colour slot per algorithm: index in sorted id order (site palette is --s1..--s6). */
 export function algorithmColorIndex(ids) {

@@ -70,7 +70,7 @@ function svg(tag, attrs = {}, ...kids) {
 export function slotLegend() {
   const cols = slotColors();
   return h("p", { class: "legend", "aria-label": "Map key" },
-    h("span", { class: "key" }, "Opens:", " early ", cols.map((c) => h("span", { class: "dot filled", style: `background:${c}` })), " late"),
+    h("span", { class: "key" }, "Opens:", " early ", cols.map((c, i) => h("span", { class: "key" }, h("span", { class: "dot filled", style: `background:${c}` }), String(i + 1))), " late"),
     h("span", { class: "key" }, h("span", { class: "dot filled", style: "background:var(--muted)" }), "visited"),
     h("span", { class: "key" }, h("span", { class: "dot hollow" }), "skipped"),
     h("span", { class: "key" }, h("span", { class: "dot hollow faded", style: `opacity:${FADED_OPACITY}` }), "Faded: no shown route goes here"),
@@ -135,7 +135,7 @@ export function createRouteMap(instance, opts) {
 
   // What a hover, tap or keyboard focus shows. Times come from the model (stopTimes / legDetails); this only lays them out.
   const byEntry = (id) => entries.find((e) => e.id === id) || { id, label: id };
-  const stopParts = (p) => ({ title: `${p.name}${p.depot ? " (depot)" : ""}`, hours: p.depot ? null : `Open ${p.window}`,
+  const stopParts = (p) => ({ title: `${p.name}${p.depot ? " (depot)" : ""}`, hours: p.depot ? null : `Open ${p.window}${p.slot == null ? "" : ` (slot ${p.slot + 1} of 4)`}`,
     rows: entries.map((e) => ({ entry: e, text: stopLine(stopTimes(e.run, instance, p.id)) })) });
   const legParts = (l) => {
     const e = byEntry(l.entry), g = legDetails(e.run, instance, l.from, l.to);
@@ -219,7 +219,7 @@ function arrowPath(x, y, angle, color) {
 
 function badgeNode(x, y, text, color) {
   return svg("g", { class: "badge-g", "aria-hidden": "true" },
-    svg("circle", { cx: x, cy: y, r: 7.5, fill: color, stroke: "var(--surface)", "stroke-width": 1.5 }),
+    svg("circle", { cx: x, cy: y, r: 8, fill: "var(--surface)", stroke: color, "stroke-width": 2 }),
     svg("text", { x, y: y + 3.5, "text-anchor": "middle", class: "badge-t" }, text));
 }
 
@@ -344,7 +344,7 @@ function leafletEngine(stage, hover, style) {
       L.marker(back(a), { interactive: false, keyboard: false, icon: icon(glyph, 14) }).addTo(layer);
     }
     for (const b of g.badges) {
-      const badge = h("span", { class: "lf-badge", style: `background:${b.color}` }, b.text);
+      const badge = h("span", { class: "lf-badge", style: `--ring:${b.color}` }, b.text);
       L.marker(back(b), { interactive: false, keyboard: false, icon: icon(badge, 16) }).addTo(layer);
     }
     const size = map.getSize();

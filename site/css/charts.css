@@ -3,10 +3,12 @@
 :root {
   --s1: #2a78d6; --s2: #e0602a; --s3: #0c9684; --s4: #b88200; --s5: #d9588c; --s6: #6250d6;
   --up: var(--ok); --down: var(--bad);
+  /* Opening-time (slot) colours, early to late. Each is at least 3:1 against the surface and page in this theme (tests/test_site_contrast.py). */
+  --slot-1: #8a6d00; --slot-2: #1f7a5a; --slot-3: #2a6fa0; --slot-4: #6a1b9a;
 }
-:root[data-theme="dark"] { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9; }
+:root[data-theme="dark"] { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9; --slot-1: #fde725; --slot-2: #5ec962; --slot-3: #3fa0c9; --slot-4: #b08cf0; }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9; }
+  :root:not([data-theme="light"]) { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #9085e9; --slot-1: #fde725; --slot-2: #5ec962; --slot-3: #3fa0c9; --slot-4: #b08cf0; }
 }
 .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: var(--gap); }
 .chart { margin: 0; padding: 14px 14px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); min-width: 0; }

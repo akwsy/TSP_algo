@@ -38,7 +38,7 @@ function statsRows(rec) {
 function mapKey() {
   const names = ["06:00-10:30", "10:30-15:00", "15:00-19:30", "19:30-24:00"];
   return h("ul", { class: "legend", "aria-label": "Map key" },
-    slotColors().map((c, i) => h("li", {}, h("span", { class: "dot filled", style: `background:${c}` }), `Open ${names[i]}`)),
+    slotColors().map((c, i) => h("li", {}, h("span", { class: "dot filled", style: `background:${c}` }), `Slot ${i + 1}: open ${names[i]}`)),
     h("li", {}, h("span", { class: "dot filled", style: "background:var(--muted)" }), "Filled: visited"),
     h("li", {}, h("span", { class: "dot hollow" }), "Hollow: skipped"),
     h("li", {}, h("span", { class: "dot depot" }), "Square: depot"));

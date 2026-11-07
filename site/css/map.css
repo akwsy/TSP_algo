@@ -47,7 +47,7 @@ main:has(.routemap) { max-width: min(1640px, 100%); }
 .map-svg .pt-group { cursor: pointer; }
 .map-svg .pt-group:focus-visible { outline: none; }
 .map-svg .pt-group:focus-visible .pt { stroke: var(--focus); stroke-width: 4; }
-.badge-t { font: 700 10px var(--font); fill: #fff; paint-order: stroke; stroke: rgba(0,0,0,.45); stroke-width: 1.2px; }
+.badge-t { font: 700 10px var(--font); fill: var(--text); }
 .map-detail { font-size: .9rem; min-height: 3.4em; padding: 9px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 .map-detail strong { display: block; }
 .map-note { margin: 0; }
@@ -74,13 +74,14 @@ main:has(.routemap) { max-width: min(1640px, 100%); }
 .lf-dot.faded { box-shadow: 0 0 0 1.5px var(--text); }
 .leaflet-marker-icon:hover .lf-dot.faded, .leaflet-marker-icon:focus-visible .lf-dot.faded { opacity: 1 !important; }
 .lf-icon { background: none; border: 0; }
-.lf-dot { display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--slot, #888); border: 2.5px solid #fff;
-  box-shadow: 0 0 0 1px rgba(15,20,26,.75), 0 2px 5px rgba(0,0,0,.35); transition: transform .12s; }
-.lf-dot.hollow { background: #fff; border: 4px solid var(--slot, #888); box-shadow: 0 0 0 1px rgba(15,20,26,.55), 0 2px 5px rgba(0,0,0,.3); }
-.lf-dot.depot { width: 22px; height: 22px; border-radius: 5px; background: #1b1f24; border: 2.5px solid #fff; box-shadow: 0 0 0 1px rgba(15,20,26,.75), 0 2px 6px rgba(0,0,0,.4); position: relative; }
-.lf-dot.depot::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #fff; }
+.lf-dot { display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--slot, #888); border: 2.5px solid var(--surface);
+  box-shadow: 0 0 0 1.5px var(--text), 0 2px 5px rgba(0,0,0,.35); transition: transform .12s; }
+.lf-dot.hollow { background: var(--surface); border: 4px solid var(--slot, #888); box-shadow: 0 0 0 1.5px var(--text), 0 2px 5px rgba(0,0,0,.3); }
+.lf-dot.depot { width: 22px; height: 22px; border-radius: 5px; background: var(--text); border: 2.5px solid var(--surface); box-shadow: 0 0 0 1.5px var(--text), 0 2px 6px rgba(0,0,0,.4); position: relative; }
+.lf-dot.depot::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--surface); }
 .leaflet-marker-icon:hover .lf-dot { transform: scale(1.18); }
-.lf-badge { display: block; width: 18px; height: 18px; border-radius: 50%; color: #fff; font: 700 11px/15px var(--font); text-align: center; text-shadow: 0 0 2px rgba(0,0,0,.6); border: 1.5px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.35); }
+/* Stop numbers: the theme text colour on a surface disc, ringed in the algorithm colour (the ring is set inline). */
+.lf-badge { display: block; width: 18px; height: 18px; border-radius: 50%; background: var(--surface); color: var(--text); font: 700 11px/14px var(--font); text-align: center; border: 2px solid var(--ring, var(--text)); box-shadow: 0 1px 3px rgba(0,0,0,.35); }
 .leaflet-marker-icon:focus-visible .lf-dot { outline: 3px solid var(--focus); outline-offset: 3px; }
 .map-summary { display: grid; gap: 6px; }
 .map-summary[hidden] { display: none; }
