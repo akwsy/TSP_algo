@@ -75,7 +75,8 @@ for (const [device, w, hgt, scheme] of MODES) {
     // The site is dark by default whatever the OS says; choose the theme the way a visitor would (the stored theme button choice).
     await s("Page.addScriptToEvaluateOnNewDocument", { source: `try { localStorage.setItem("theme", ${JSON.stringify(scheme)}); localStorage.setItem("view", ${JSON.stringify(view)}); } catch (e) {}` });
     // The full view lists sessions, and the sample sessions are on other problems than the first-day runs.
-    const url = view === "full" && page.startsWith("instance") ? "instance?id=n10-seed4" : page;
+    const url = view === "full" && page.startsWith("instance") ? "instance?id=n10-seed4"
+      : view === "full" && page === "run" ? "run?algorithm=greedy-insertion-cached&example=4&places=10" : page;
     await s("Page.navigate", { url: `${base}/#/${url}` });
     await new Promise((r) => setTimeout(r, waitMs));
     const { result } = await s("Runtime.evaluate", { expression: "JSON.stringify({mainText: document.querySelector('main')?.innerText || '', toggle: [...document.querySelectorAll('#viewtoggle [role=radiogroup] [role=radio]')].map((b) => b.getAttribute('aria-checked')).join(), h1: document.querySelector('main h1')?.textContent, svgCharts: document.querySelectorAll('main figure.chart svg.chart-svg').length, nan: /NaN|undefined|\\bfalse\\b|\\bnull\\b|\\[object/.test(document.body.innerText), hscroll: document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('main *, header *')].some((e) => !e.closest('.table-wrap, #nav, pre, .leaflet-container, svg') && e.getBoundingClientRect().right > document.documentElement.clientWidth + 1)})", returnByValue: true });

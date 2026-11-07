@@ -1,0 +1,43 @@
+{
+  "algorithmId": "broken-crash",
+  "commit": null,
+  "fingerprint": "e8433c0f185847a73be8c5d89710b1757b0e5cbc9a530ae4c4c42f094a84e621",
+  "instanceId": "n5-seed1",
+  "seed": 1,
+  "numCustomers": 5,
+  "runId": "20261107T070435852045Z",
+  "timestamp": "2026-11-07T07:04:35+00:00",
+  "outcome": "did not finish",
+  "stopReason": "crashed",
+  "stopDay": 1,
+  "explanation": "Stopped on day 1: the algorithm crashed (exited with code 3)",
+  "partialFigures": true,
+  "unvisitedAtStop": 5,
+  "days": 1,
+  "visitedSoFar": 0,
+  "workingMinutes": 0,
+  "totalDistanceKm": 0,
+  "totalRuntimeMs": 13.728334000006726,
+  "finalReturnMinute": null,
+  "dayRecords": [
+    {
+      "day": 1,
+      "instanceId": "n5-seed1",
+      "numPlaces": 5,
+      "route": null,
+      "status": null,
+      "killed": false,
+      "runtimeMs": 13.728334000006726,
+      "stats": null,
+      "valid": false,
+      "failureReason": "exited with code 3",
+      "visited": [],
+      "distanceKm": null,
+      "returnMinute": null,
+      "schedule": null,
+      "workingMinutes": null
+    }
+  ],
+  "experiment": "scaling",
+  "instanceHash": "e917de4da571dac84ef431798a047a90176ed28d09635359ea777e2b425fc967"
+}
