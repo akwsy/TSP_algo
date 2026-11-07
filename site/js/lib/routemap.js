@@ -2,7 +2,7 @@
 // SVG drawing of the same scene, so the map never goes blank. Force the fallback with ?map=svg on the page URL.
 // The only text on the map is the destination names. Every route is a straight-line path with arrowheads and stop numbers.
 import { h } from "./dom.js";
-import { buildScene, chooseEngine, project, slotColors, laneOffsets, offsetSegment, summaryRows, differenceNotes, labelPlan, labelSide, TILE_LIMITS, labelsVisible, FADED_OPACITY, stopTimes, stopLine, legDetails, legRows } from "./mapmodel.js";
+import { buildScene, chooseEngine, project, slotColors, laneOffsets, offsetSegment, summaryRows, differenceNotes, labelPlan, labelSide, TILE_LIMITS, labelsVisible, FADED_OPACITY, stopTimes, dayStopLine, legDetails, legRows } from "./mapmodel.js";
 import { algorithmStyle } from "./algstyle.js";
 import { marker } from "./charts.js";
 import { revealSchedule } from "./motion.js";
@@ -71,13 +71,18 @@ function svg(tag, attrs = {}, ...kids) {
 }
 
 /** One-line key: dot colour = opening time (early to late), filled = visited, hollow = skipped, square = depot. */
-export function slotLegend() {
+export function slotLegend(opts = {}) {
   const cols = slotColors();
   return h("p", { class: "legend", "aria-label": "Map key" },
     h("span", { class: "key" }, "Opens:", " early ", cols.map((c, i) => h("span", { class: "key" }, h("span", { class: "dot filled", style: `background:${c}` }), String(i + 1))), " late"),
-    h("span", { class: "key" }, h("span", { class: "dot filled", style: "background:var(--muted)" }), "visited"),
-    h("span", { class: "key" }, h("span", { class: "dot hollow" }), "skipped"),
-    h("span", { class: "key" }, h("span", { class: "dot hollow faded", style: `opacity:${FADED_OPACITY}` }), "Faded: no shown route goes here"),
+    ...(opts.day ? [
+      h("span", { class: "key" }, h("span", { class: "dot filled", style: "background:var(--muted)" }), "visited on this day"),
+      h("span", { class: "key" }, h("span", { class: "dot done" }), "done on an earlier day"),
+      h("span", { class: "key" }, h("span", { class: "dot hollow faded", style: `opacity:${FADED_OPACITY}` }), "Faded: still to visit")]
+    : [
+      h("span", { class: "key" }, h("span", { class: "dot filled", style: "background:var(--muted)" }), "visited"),
+      h("span", { class: "key" }, h("span", { class: "dot hollow" }), "skipped"),
+      h("span", { class: "key" }, h("span", { class: "dot hollow faded", style: `opacity:${FADED_OPACITY}` }), "Faded: no shown route goes here")]),
     h("span", { class: "key" }, h("span", { class: "dot depot" }), "depot"));
 }
 
@@ -185,15 +190,15 @@ export function createRouteMap(instance, opts) {
   // What a hover, tap or keyboard focus shows. Times come from the model (stopTimes / legDetails); this only lays them out.
   const byEntry = (id) => entries.find((e) => e.id === id) || { id, label: id };
   const stopParts = (p) => ({ title: `${p.name}${p.depot ? " (depot)" : ""}`, hours: p.depot ? null : `Open ${p.window}${p.slot == null ? "" : ` (slot ${p.slot + 1} of 4)`}`,
-    rows: entries.map((e) => ({ entry: e, text: stopLine(stopTimes(e.run, instance, p.id)) })) });
+    rows: entries.map((e) => ({ entry: e, text: dayStopLine(e, instance, p.id) })) });
   const legParts = (l) => {
     const e = byEntry(l.entry), g = legDetails(e.run, instance, l.from, l.to);
     return g && { title: `${g.from} to ${g.to}`, hours: null, rows: [{ entry: e, text: null }], facts: legRows(g) };
   };
   const plain = (parts) => [parts.title, parts.hours, ...parts.rows.map((r) => r.text == null ? r.entry.label ?? r.entry.id : `${r.entry.label ?? r.entry.id}: ${r.text}`),
     ...(parts.facts || []).map(([k, v]) => `${k} ${v}`)].filter(Boolean).join(". ");
-  const unvisited = (p) => !p.depot && !p.filled && entries.length > 0; // drawn faded: no shown route goes here
-  const stopLabel = (p) => plain(stopParts(p)) + (unvisited(p) ? ". Not visited by any shown route" : "");
+  const unvisited = (p) => !p.depot && !p.filled && !p.done && entries.length > 0; // drawn faded: no shown route goes here
+  const stopLabel = (p) => plain(stopParts(p)) + (unvisited(p) && !entries.some((e) => e.day != null) ? ". Not visited by any shown route" : "");
   const legLabel = (l) => { const parts = legParts(l); return parts ? plain(parts) : ""; };
   function render(into, parts) {
     into.replaceChildren(...[h("strong", { class: "tip-title" }, parts.title), parts.hours ? h("div", { class: "tip-hours" }, parts.hours) : null,
@@ -349,7 +354,7 @@ export function createRouteMap(instance, opts) {
 
 /** Centre of an element on screen, in the same shape as a mouse event position (for keyboard focus). */
 const centreOf = (node) => { const r = node.getBoundingClientRect(); return { clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 }; };
-const dotClass = (p) => (p.depot ? "depot" : p.filled ? "filled" : "hollow");
+const dotClass = (p) => (p.depot ? "depot" : p.filled ? "filled" : p.done ? "done" : "hollow");
 
 function arrowPath(x, y, angle, color) {
   return svg("path", { d: "M-5,-4.5 L5,0 L-5,4.5 Z", transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${angle.toFixed(1)})`,
@@ -415,10 +420,10 @@ function svgEngine(stage, hover, style) {
         const label = hover.stopLabel(p);
         const mark = p.depot
           ? svg("rect", { x: x - 8, y: y - 8, width: 16, height: 16, class: "pt depot" })
-          : svg("circle", { cx: x, cy: y, r: p.filled ? 7 : 6, class: `pt ${dotClass(p)}`, fill: p.filled ? colors[p.slot] : "var(--surface)",
-            stroke: p.filled ? "var(--text)" : colors[p.slot], "stroke-width": p.filled ? 1.5 : 3 });
+          : svg("circle", { cx: x, cy: y, r: p.filled ? 7 : 6, class: `pt ${dotClass(p)}`, fill: p.filled ? colors[p.slot] : p.done ? "var(--muted)" : "var(--surface)",
+            stroke: p.filled ? "var(--text)" : colors[p.slot], "stroke-width": p.filled ? 1.5 : p.done ? 2.5 : 3 });
         const faded = hover.unvisited(p);
-        const ring = !p.depot && !p.filled ? svg("circle", { cx: x, cy: y, r: 8.5, fill: "none", stroke: faded ? "var(--text)" : "var(--muted)", "stroke-width": faded ? 1.5 : 1.2 }) : null;
+        const ring = !p.depot && !p.filled && !p.done ? svg("circle", { cx: x, cy: y, r: 8.5, fill: "none", stroke: faded ? "var(--text)" : "var(--muted)", "stroke-width": faded ? 1.5 : 1.2 }) : null;
         const side = labelSide({ name: p.name, x }, W);
         const text = p.depot || plan.has(p.id)
           ? svg("text", { x: side === "right" ? x + 11 : x - 11, y: y + 4, class: "pt-label", "text-anchor": side === "right" ? "start" : "end" }, p.name) : null;
@@ -426,7 +431,9 @@ function svgEngine(stage, hover, style) {
         // The depot sends out a soft beacon pulse while the routes draw (two pulses, then still).
         const beacon = p.depot ? svg("g", { class: "beacon-rings", "aria-hidden": "true" },
           svg("circle", { class: "beacon-ring", cx: x, cy: y, r: 10 }), svg("circle", { class: "beacon-ring late", cx: x, cy: y, r: 10 })) : null;
-        const grp = svg("g", { tabindex: 0, role: "button", "aria-label": label, class: faded ? "pt-group faded" : "pt-group" }, beacon, ring, mark, text);
+        // Done on an earlier day: a muted disc with a tick, ringed in the opening-time colour.
+        const tick = p.done ? svg("path", { d: `M${x - 3.2} ${y} l2.4 2.6 l4.2 -5`, fill: "none", stroke: "var(--surface)", "stroke-width": 2, "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true", class: "tick" }) : null;
+        const grp = svg("g", { tabindex: 0, role: "button", "aria-label": label, class: faded ? "pt-group faded" : p.done ? "pt-group done" : "pt-group" }, beacon, ring, mark, tick, text);
         if (p.filled && !p.depot) stops.set(p.id, [mark]);
         grp.addEventListener("click", (ev) => hover.stop(p, ev, true));
         grp.addEventListener("mouseenter", (ev) => hover.stop(p, ev));

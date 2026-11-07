@@ -102,6 +102,10 @@ export function buildScene(instance, entries) {
     return { id: l.id, name: l.name, lat: l.lat, lon: l.lon, depot, slot: l.slot ?? null,
       window: windowText(l), filled: !depot && per.some(({ pts }) => pts.get(l.id).kind === "visited"), info };
   });
+  // Full-run days: a place no shown route visits today, done on an earlier day for every shown run, is drawn as "done".
+  for (const p of points) {
+    p.done = !p.depot && !p.filled && per.length > 0 && per.every(({ e }) => (e.done || []).includes(p.id));
+  }
   const lines = per.filter(({ e }) => validRoute(e.run)).map(({ e }) => ({ entry: e.id, ids: e.run.route }));
   const badges = per.flatMap(({ e, pts }, k) => [...pts.values()].filter((p) => p.kind === "visited")
     .map((p) => ({ entry: e.id, k, id: p.id, text: String(p.order) })));
@@ -244,6 +248,14 @@ export function stopTimes(run, instance, id) {
   const wait = Math.round(s.leaveMinute) - Math.round(s.arriveMinute);
   return { visited: true, arrive: clock(s.arriveMinute), leave: clock(s.leaveMinute),
     wait: wait > 0 ? `Waited ${formatDuration(wait)}` : "No wait" };
+}
+
+/** The stop line of one entry. For a full-run day (entry.day set) a place the day's route skips is either done on an
+ *  earlier day (entry.done) or still to visit; otherwise it is the plain first-day line. */
+export function dayStopLine(entry, instance, id) {
+  const t = stopTimes(entry.run, instance, id);
+  if (t.visited || entry.day == null) return stopLine(t);
+  return (entry.done || []).includes(id) ? "done on an earlier day" : "still to visit";
 }
 
 /** One plain line for a stop (from stopTimes), e.g. "Arrive 09:30 · Waited 1 h · Leave 10:30". */

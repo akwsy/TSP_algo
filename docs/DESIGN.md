@@ -54,3 +54,13 @@ The route draw-in starts only when the map is on screen, jumps to the end on zoo
 `data-motion="reduce"` on `<html>`: CSS animations and transitions are switched off, count-ups and the route draw-in
 never start, and the Replay button is hidden. The system setting always wins over the toggle.
 Timing and the on/off rule are pure functions in `site/js/lib/motion.js`, tested by `tests/test_site_motion.py`.
+
+## Day selector ("Until every place is visited")
+
+Instance explorer and Route detail read saved sessions (`results/sessions-index.json`) in this view. A native
+**Day** dropdown ("Day 1", "Day 2", ...; exactly the completed days, default Day 1, kept in the URL as `day=`) switches the
+map and the schedule table together. On the map a place visited on the chosen day is filled and numbered, a place done on an
+earlier day is a muted disc with a tick ("done on an earlier day"), and every other place is faded ("still to visit").
+An algorithm with fewer days shows "Finished on day K" or "Stopped after day K, did not finish"; a stopped session shows its
+plain-words explanation and figures marked "so far, not a finishing time". Logic: `site/js/lib/sessions.js`
+(tested by `tests/test_site_sessions.py`); layout: `site/js/lib/fullview.js`.
