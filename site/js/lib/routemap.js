@@ -5,6 +5,8 @@ import { h } from "./dom.js";
 import { buildScene, chooseEngine, project, slotColors, laneOffsets, offsetSegment, summaryRows, differenceNotes, labelPlan, labelSide, TILE_LIMITS, labelsVisible, FADED_OPACITY, stopTimes, stopLine, legDetails, legRows } from "./mapmodel.js";
 import { algorithmStyle } from "./algstyle.js";
 import { marker } from "./charts.js";
+import { revealSchedule } from "./motion.js";
+import { motionOn } from "./fx.js";
 
 const LEAFLET = "1.9.4";
 const BASE = `https://cdnjs.cloudflare.com/ajax/libs/leaflet/${LEAFLET}/`;
@@ -46,10 +48,11 @@ export function currentTheme() {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-/** Complete per-algorithm map entry fields (colour, dash, shape) from the algorithm's position in the sorted id list. */
+/** Complete per-algorithm map entry fields (colour, dash, shape) from the algorithm's position in the sorted id list.
+ *  The colour is the CSS token itself (var(--sN)), so lines, markers and swatches follow a theme switch without a redraw. */
 export function entryStyle(index) {
   const s = algorithmStyle(index);
-  return { color: algorithmColor(s.colorIndex), dash: s.dash, shape: s.shape };
+  return { color: `var(--s${s.colorIndex + 1})`, dash: s.dash, shape: s.shape };
 }
 
 /** Small legend glyph: a line sample in the algorithm's colour and dash with its marker shape in the middle. */
@@ -90,15 +93,18 @@ export function routeDrawing(lines, pos, style) {
     line.ids.slice(1).forEach((id, i) => {
       const [a, b] = offsetSegment(pos(line.ids[i]), pos(id), lanes[k]);
       const len = Math.hypot(b.x - a.x, b.y - a.y);
-      out.legs.push({ entry: line.entry, from: line.ids[i], to: id, a, b, color: s.color, dash: s.dash });
+      // `line` and `order` say which route this leg belongs to and its place in that route's visiting order (used by the draw-in);
+      // `leg` on arrows, shapes and badges points back at the leg they sit on.
+      const leg = out.legs.length;
+      out.legs.push({ entry: line.entry, from: line.ids[i], to: id, a, b, color: s.color, dash: s.dash, line: k, order: i });
       if (!len) return;
       const ux = (b.x - a.x) / len, uy = (b.y - a.y) / len, angle = Math.atan2(uy, ux) * 180 / Math.PI;
       const at = (t) => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
-      if (len > 26) out.arrows.push({ ...at(0.58), angle, color: s.color });
-      if (lines.length > 1 && len > 50) out.shapes.push({ ...at(0.32), shape: s.shape, color: s.color });
+      if (len > 26) out.arrows.push({ ...at(0.58), angle, color: s.color, leg });
+      if (lines.length > 1 && len > 50) out.shapes.push({ ...at(0.32), shape: s.shape, color: s.color, leg });
       if (i + 1 < line.ids.length - 1) {
         const back = Math.min(13, len * 0.4);
-        out.badges.push({ x: b.x - ux * back, y: b.y - uy * back, text: String(i + 1), color: s.color, entry: line.entry });
+        out.badges.push({ x: b.x - ux * back, y: b.y - uy * back, text: String(i + 1), color: s.color, entry: line.entry, leg });
       }
     });
   });
@@ -125,7 +131,11 @@ export function createRouteMap(instance, opts) {
   const note = h("p", { class: "meta map-note", hidden: true });
   const panel = h("div", { class: "map-summary" });
   const tip = h("div", { class: "map-tip", hidden: true, "aria-hidden": "true" });
-  const frame = h("div", { class: "map-frame" }, stage, full, tip);
+  // Replay the draw-in (or skip it while it plays). Hidden when motion is off: the map is then always in its final state.
+  const replay = h("button", { type: "button", class: "map-btn map-replay", hidden: true });
+  const hud = h("div", { class: "map-hud", "aria-hidden": "true", hidden: true });
+  const tools = h("div", { class: "map-tools" }, replay, full);
+  const frame = h("div", { class: "map-frame" }, stage, tools, hud, tip);
   const el = h("figure", { class: "routemap" }, panel, frame, note, detail, announcer, help, caption);
   const places = instance.locations.filter((l) => !l.isDepot).length;
   const drawCaption = () => { caption.textContent = `Route map: ${entries.map((e) => e.label ?? e.id).join(", ") || "no routes"}, ${places} places.`;
@@ -148,6 +158,7 @@ export function createRouteMap(instance, opts) {
     full.setAttribute("aria-label", on ? "Exit fullscreen map" : "Fullscreen map");
     document.documentElement.classList.toggle("map-locked", on);
     setInert(on);
+    finishReveal();
     engine?.invalidate?.();
     if (!on && document.activeElement !== full && !el.contains(document.activeElement)) full.focus();
   };
@@ -214,9 +225,87 @@ export function createRouteMap(instance, opts) {
       ...(notes.length ? [h("ul", { class: "sum-notes" }, notes.map((n) => h("li", {}, n)))] : []));
   }
 
+  // ---- draw-in: each route draws itself leg by leg in visiting order, stops light up as they are reached, stop numbers pop in.
+  // The map is drawn complete first; the reveal resets it and plays only once the map is on screen, and any interruption
+  // (zoom, pan, resize, Skip, motion turned off) jumps straight to the complete drawing.
+  let rv = null;
+  const replayText = () => (entries.length > 1 ? "Replay routes" : "Replay route");
+  function paintReplay() {
+    const can = motionOn() && !!engine?.anim?.legs.length;
+    replay.hidden = !can;
+    replay.textContent = rv ? "Skip animation" : replayText();
+    replay.classList.toggle("playing", !!rv);
+    replay.setAttribute("aria-label", rv ? "Skip the route animation" : `${replayText()} in visiting order`);
+  }
+  function finishReveal() {
+    if (!rv) return;
+    cancelAnimationFrame(rv.raf);
+    rv.finish();
+    rv = null;
+    hud.hidden = true;
+    paintReplay();
+  }
+  function startReveal() {
+    finishReveal();
+    const a = engine?.anim;
+    if (!motionOn() || !a || !a.legs.length) return;
+    const perLine = new Map();
+    a.legs.forEach((l) => perLine.set(l.line, (perLine.get(l.line) || 0) + 1));
+    const plans = new Map([...perLine].map(([k, n]) => [k, revealSchedule(n, { budgetMs: Math.min(3200, 900 + n * 160), maxLegMs: 420, minLegMs: 40 })]));
+    const timing = a.legs.map((l) => plans.get(l.line)[l.order]);
+    const total = Math.max(...timing.map((t) => t.start + t.duration));
+    const stopsTotal = a.legs.filter((l) => l.line === 0 && a.stops.has(l.to)).length;
+    const done = new Array(a.legs.length).fill(false);
+    let reached = 0;
+    a.legs.forEach((l) => l.set(0));
+    a.pops.forEach((p) => p.node.classList.add("rv-wait"));
+    for (const nodes of a.stops.values()) nodes.forEach((n) => n.classList.add("rv-dim"));
+    frame.classList.remove("beacon-go"); void frame.offsetWidth; frame.classList.add("beacon-go");
+    a.heads?.forEach((hd) => hd.show(true));
+    hud.hidden = false;
+    const finish = () => {
+      a.legs.forEach((l) => l.set(1));
+      a.pops.forEach((p) => p.node.classList.remove("rv-wait", "rv-pop"));
+      for (const nodes of a.stops.values()) nodes.forEach((n) => n.classList.remove("rv-dim", "rv-lit"));
+      a.heads?.forEach((hd) => hd.show(false));
+    };
+    const t0 = performance.now();
+    const tick = (now) => {
+      const t = now - t0;
+      a.legs.forEach((l, i) => {
+        if (done[i]) return;
+        const { start, duration } = timing[i];
+        if (t < start) return;
+        const p = Math.min(1, (t - start) / duration);
+        l.set(p);
+        a.heads?.[l.line]?.at(l, p);
+        if (p < 1) return;
+        done[i] = true;
+        a.pops.forEach((q) => { if (q.leg === i) { q.node.classList.remove("rv-wait"); q.node.classList.add("rv-pop"); } });
+        a.stops.get(l.to)?.forEach((n) => { if (n.classList.contains("rv-dim")) { n.classList.remove("rv-dim"); n.classList.add("rv-lit"); } });
+        if (l.line === 0 && a.stops.has(l.to)) reached++;
+      });
+      hud.textContent = entries.length > 1 ? `Drawing ${entries.length} routes in visiting order` : `Visiting order: stop ${Math.min(reached, stopsTotal)} of ${stopsTotal}`;
+      if (t >= total) { finishReveal(); return; }
+      rv.raf = requestAnimationFrame(tick);
+    };
+    rv = { finish, raf: requestAnimationFrame(tick) };
+    paintReplay();
+  }
+  replay.addEventListener("click", () => (rv ? finishReveal() : startReveal()));
+  const onMotion = () => { if (!motionOn()) finishReveal(); paintReplay(); };
+  window.addEventListener("motionchange", onMotion);
+  let seen = null; // plays the first time the map is at least a third on screen
+  const watch = () => {
+    if (opts.animate === false || !motionOn() || typeof IntersectionObserver !== "function") return;
+    seen = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { seen.disconnect(); seen = null; startReveal(); } }, { threshold: 0.35 });
+    seen.observe(stage);
+  };
+  const hooks = { interrupt: finishReveal };
+
   const ready = chooseEngine(loadLeaflet, 4000, opts.forceSvg).then((name) => {
     if (dead) return;
-    engine = name === "leaflet" ? leafletEngine(stage, hover, style) : svgEngine(stage, hover, style);
+    engine = name === "leaflet" ? leafletEngine(stage, hover, style, hooks) : svgEngine(stage, hover, style);
     el.dataset.engine = name;
     const target = name === "leaflet" ? stage : stage.firstElementChild;
     target.setAttribute("aria-describedby", helpId);
@@ -229,14 +318,17 @@ export function createRouteMap(instance, opts) {
       note.textContent = opts.forceSvg ? "Plain map (forced)." : "Map tiles unavailable here, so this is a plain drawing of the same destinations and routes.";
     }
     engine.draw(scene());
+    paintReplay();
+    watch();
   });
   drawPanel();
 
   return {
     el,
     ready,
-    setEntries(next) { entries = next; drawPanel(); drawCaption(); if (engine) engine.draw(scene()); },
-    destroy() { dead = true; setInert(false); document.removeEventListener("keydown", onKey); document.removeEventListener("keydown", onEsc); document.documentElement.classList.remove("map-locked"); engine?.destroy(); },
+    setEntries(next) { finishReveal(); entries = next; drawPanel(); drawCaption(); if (engine) engine.draw(scene()); paintReplay(); },
+    replay: () => startReveal(),
+    destroy() { dead = true; finishReveal(); seen?.disconnect(); window.removeEventListener("motionchange", onMotion); setInert(false); document.removeEventListener("keydown", onKey); document.removeEventListener("keydown", onEsc); document.documentElement.classList.remove("map-locked"); engine?.destroy(); },
   };
 }
 
@@ -250,10 +342,13 @@ function arrowPath(x, y, angle, color) {
 }
 
 function badgeNode(x, y, text, color) {
-  return svg("g", { class: "badge-g", "aria-hidden": "true" },
+  return svg("g", { class: "badge-g rv-item", "aria-hidden": "true" },
     svg("circle", { cx: x, cy: y, r: 8, fill: "var(--surface)", stroke: color, "stroke-width": 2 }),
     svg("text", { x, y: y + 3.5, "text-anchor": "middle", class: "badge-t" }, text));
 }
+
+/** A leg drawn from a towards b, `p` of the way (0..1). */
+const lerp = (a, b, p) => ({ x: a.x + (b.x - a.x) * p, y: a.y + (b.y - a.y) * p });
 
 function svgEngine(stage, hover, style) {
   const W = 640, H = 480;
@@ -261,25 +356,27 @@ function svgEngine(stage, hover, style) {
   stage.replaceChildren(root);
   root.addEventListener("click", (e) => { if (e.target === root) hover.hide(); });
   const colors = slotColors();
-  return {
+  const api = {
+    anim: null,
     draw(scene) {
       const xy = project(scene.points, W, H, 44);
       const pos = new Map(scene.points.map((p, i) => [p.id, xy[i]]));
       const g = routeDrawing(scene.lines, (id) => pos.get(id), style);
-      root.replaceChildren();
-      for (const l of g.legs) {
-        root.append(svg("line", { class: "route-halo", stroke: "var(--surface)", "stroke-width": 7, "stroke-linecap": "round", opacity: 0.8,
-          x1: l.a.x.toFixed(1), y1: l.a.y.toFixed(1), x2: l.b.x.toFixed(1), y2: l.b.y.toFixed(1) }));
-      }
+      root.replaceChildren(svg("rect", { class: "map-grid", x: 0, y: 0, width: W, height: H, fill: "url(#map-grid-" + gridId + ")", "aria-hidden": "true" }),
+        svg("defs", {}, svg("pattern", { id: "map-grid-" + gridId, width: 40, height: 40, patternUnits: "userSpaceOnUse" },
+          svg("path", { d: "M40 0H0V40", fill: "none", class: "map-grid-line" }))));
+      const halos = g.legs.map((l) => root.appendChild(svg("line", { class: "route-halo", stroke: "var(--surface)", "stroke-width": 7, "stroke-linecap": "round", opacity: 0.8,
+        x1: l.a.x.toFixed(1), y1: l.a.y.toFixed(1), x2: l.b.x.toFixed(1), y2: l.b.y.toFixed(1) })));
       const lines = [];
       for (const l of g.legs) {
-        const line = svg("line", { class: "route", stroke: l.color, "stroke-width": 3.5, "stroke-dasharray": l.dash || null,
+        const line = svg("line", { class: "route", stroke: l.color, style: `color:${l.color}`, "stroke-width": 3.5, "stroke-dasharray": l.dash || null,
           "stroke-linecap": "round", opacity: 0.92, x1: l.a.x.toFixed(1), y1: l.a.y.toFixed(1), x2: l.b.x.toFixed(1), y2: l.b.y.toFixed(1) });
         lines.push(line);
         root.append(line);
       }
-      g.shapes.forEach((s) => root.append(marker(s.shape, s.x, s.y, s.color, 3.5)));
-      g.arrows.forEach((a) => root.append(arrowPath(a.x, a.y, a.angle, a.color)));
+      const pops = [];
+      g.shapes.forEach((s) => pops.push({ leg: s.leg, node: root.appendChild(svg("g", { class: "rv-item" }, marker(s.shape, s.x, s.y, s.color, 3.5))) }));
+      g.arrows.forEach((a) => pops.push({ leg: a.leg, node: root.appendChild(svg("g", { class: "rv-item" }, arrowPath(a.x, a.y, a.angle, a.color))) }));
       // Wide invisible lines on top, so thin routes are easy to hover, tap or focus.
       const hitWidth = scene.lines.length > 1 ? 11 : 18;
       g.legs.forEach((l, i) => {
@@ -297,6 +394,7 @@ function svgEngine(stage, hover, style) {
         root.append(hit);
       });
       const plan = new Set(labelPlan(scene.points.map((p, i) => ({ id: p.id, name: p.name, ...xy[i], visited: p.filled })), W, H));
+      const stops = new Map();
       for (const p of scene.points) {
         const { x, y } = pos.get(p.id);
         const label = hover.stopLabel(p);
@@ -310,7 +408,11 @@ function svgEngine(stage, hover, style) {
         const text = p.depot || plan.has(p.id)
           ? svg("text", { x: side === "right" ? x + 11 : x - 11, y: y + 4, class: "pt-label", "text-anchor": side === "right" ? "start" : "end" }, p.name) : null;
         if (faded) for (const part of [ring, mark]) part?.setAttribute("opacity", FADED_OPACITY); // the name stays full strength so it remains readable
-        const grp = svg("g", { tabindex: 0, role: "button", "aria-label": label, class: faded ? "pt-group faded" : "pt-group" }, ring, mark, text);
+        // The depot sends out a soft beacon pulse while the routes draw (two pulses, then still).
+        const beacon = p.depot ? svg("g", { class: "beacon-rings", "aria-hidden": "true" },
+          svg("circle", { class: "beacon-ring", cx: x, cy: y, r: 10 }), svg("circle", { class: "beacon-ring late", cx: x, cy: y, r: 10 })) : null;
+        const grp = svg("g", { tabindex: 0, role: "button", "aria-label": label, class: faded ? "pt-group faded" : "pt-group" }, beacon, ring, mark, text);
+        if (p.filled && !p.depot) stops.set(p.id, [mark]);
         grp.addEventListener("click", (ev) => hover.stop(p, ev, true));
         grp.addEventListener("mouseenter", (ev) => hover.stop(p, ev));
         grp.addEventListener("mousemove", (ev) => hover.move(ev));
@@ -320,13 +422,26 @@ function svgEngine(stage, hover, style) {
         grp.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); hover.stop(p, centreOf(grp), true); } });
         root.append(grp);
       }
-      g.badges.forEach((b) => root.append(badgeNode(b.x, b.y, b.text, b.color)));
+      g.badges.forEach((b) => pops.push({ leg: b.leg, node: root.appendChild(badgeNode(b.x, b.y, b.text, b.color)) }));
+      // The glowing head that travels along each route while it draws.
+      const heads = scene.lines.map((line) => {
+        const dot = root.appendChild(svg("circle", { class: "rv-head", r: 5, fill: style(line.entry).color, style: `color:${style(line.entry).color}`, visibility: "hidden", "aria-hidden": "true" }));
+        return { show: (on) => dot.setAttribute("visibility", on ? "visible" : "hidden"),
+          at: (l, p) => { const q = lerp(l.a, l.b, p); dot.setAttribute("cx", q.x.toFixed(1)); dot.setAttribute("cy", q.y.toFixed(1)); } };
+      });
+      api.anim = {
+        legs: g.legs.map((l, i) => ({ line: l.line, order: l.order, to: l.to, a: l.a, b: l.b,
+          set: (p) => { const q = lerp(l.a, l.b, p); for (const n of [halos[i], lines[i]]) { n.setAttribute("x2", q.x.toFixed(1)); n.setAttribute("y2", q.y.toFixed(1)); } } })),
+        pops, stops, heads,
+      };
     },
     destroy() { root.remove(); },
   };
+  const gridId = ++mapCount;
+  return api;
 }
 
-function leafletEngine(stage, hover, style) {
+function leafletEngine(stage, hover, style, hooks) {
   const L = window.L;
   const map = L.map(stage, { zoomControl: true, attributionControl: true, keyboard: true, scrollWheelZoom: false,
     minZoom: TILE_LIMITS.minZoom, maxZoom: TILE_LIMITS.maxZoom });
@@ -339,6 +454,7 @@ function leafletEngine(stage, hover, style) {
   const layer = L.layerGroup().addTo(map);
   const colors = slotColors();
   let fitted = false, last = null, fitZoom = null;
+  const api = { anim: null };
 
   function paint(scene) {
     layer.clearLayers();
@@ -346,8 +462,12 @@ function leafletEngine(stage, hover, style) {
     const px = new Map([...ll].map(([id, v]) => [id, map.latLngToContainerPoint(v)]));
     const back = (p) => map.containerPointToLatLng([p.x, p.y]);
     const g = routeDrawing(scene.lines, (id) => px.get(id), style);
-    for (const l of g.legs) L.polyline([back(l.a), back(l.b)], { color: cssVar("--surface"), weight: 8, opacity: 0.8, lineCap: "round", lineJoin: "round", interactive: false }).addTo(layer);
-    const lines = g.legs.map((l) => L.polyline([back(l.a), back(l.b)], { color: l.color, weight: 4.5, opacity: 0.96, lineCap: "round", lineJoin: "round", dashArray: l.dash || null, interactive: false }).addTo(layer));
+    const halos = g.legs.map((l) => L.polyline([back(l.a), back(l.b)], { color: "var(--surface)", weight: 8, opacity: 0.8, lineCap: "round", lineJoin: "round", interactive: false, className: "route-halo" }).addTo(layer));
+    const lines = g.legs.map((l) => {
+      const pl = L.polyline([back(l.a), back(l.b)], { color: l.color, weight: 4.5, opacity: 0.96, lineCap: "round", lineJoin: "round", dashArray: l.dash || null, interactive: false, className: "route" }).addTo(layer);
+      pl.getElement()?.style.setProperty("color", l.color); // the glow (map.css) takes the route's own colour
+      return pl;
+    });
     // Wide invisible lines on top, so thin routes are easy to hover, tap or focus.
     const hitWeight = scene.lines.length > 1 ? 12 : 20;
     g.legs.forEach((l, i) => {
@@ -368,25 +488,31 @@ function leafletEngine(stage, hover, style) {
       hit.on("add", wire); wire();
     });
     const icon = (node, size, cls = "lf-icon") => L.divIcon({ html: node, className: cls, iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
+    const pops = [];
     for (const s of g.shapes) {
-      L.marker(back(s), { interactive: false, keyboard: false,
-        icon: icon(svg("svg", { width: 12, height: 12, viewBox: "0 0 12 12" }, marker(s.shape, 6, 6, s.color, 3.5)), 12) }).addTo(layer);
+      const glyph = svg("svg", { width: 12, height: 12, viewBox: "0 0 12 12", class: "rv-item" }, marker(s.shape, 6, 6, s.color, 3.5));
+      L.marker(back(s), { interactive: false, keyboard: false, icon: icon(glyph, 12) }).addTo(layer);
+      pops.push({ leg: s.leg, node: glyph });
     }
     for (const a of g.arrows) {
-      const glyph = svg("svg", { width: 14, height: 14, viewBox: "-7 -7 14 14" }, arrowPath(0, 0, a.angle, a.color));
+      const glyph = svg("svg", { width: 14, height: 14, viewBox: "-7 -7 14 14", class: "rv-item" }, arrowPath(0, 0, a.angle, a.color));
       L.marker(back(a), { interactive: false, keyboard: false, icon: icon(glyph, 14) }).addTo(layer);
+      pops.push({ leg: a.leg, node: glyph });
     }
     for (const b of g.badges) {
-      const badge = h("span", { class: "lf-badge", style: `--ring:${b.color}` }, b.text);
+      const badge = h("span", { class: "lf-badge rv-item", style: `--ring:${b.color}` }, b.text);
       L.marker(back(b), { interactive: false, keyboard: false, icon: icon(badge, 16) }).addTo(layer);
+      pops.push({ leg: b.leg, node: badge });
     }
     const size = map.getSize();
     const plan = new Set(labelPlan(scene.points.map((p) => ({ id: p.id, name: p.name, ...px.get(p.id), visited: p.filled })), size.x, size.y));
     // Names are drawn only once zoomed in past the initial fit (the depot keeps its name as a landmark); hover, tap and focus always give the name.
     const showNames = labelsVisible(map.getZoom(), fitZoom ?? map.getZoom(), TILE_LIMITS.maxZoom);
+    const stops = new Map();
     for (const p of scene.points) {
       const faded = hover.unvisited(p);
       const dot = h("span", { class: `lf-dot ${dotClass(p)}${faded ? " faded" : ""}`, style: p.depot ? null : `--slot:${colors[p.slot]}${faded ? `;opacity:${FADED_OPACITY}` : ""}` });
+      if (p.filled && !p.depot) stops.set(p.id, [dot]);
       const m = L.marker(ll.get(p.id), { icon: icon(dot, 20), keyboard: true, zIndexOffset: 500 }).addTo(layer);
       const side = labelSide({ name: p.name, x: px.get(p.id).x }, size.x);
       if (p.depot || (showNames && plan.has(p.id))) m.bindTooltip(p.name, { permanent: true, direction: side, offset: [side === "right" ? 6 : -6, 0], className: "lf-label" });
@@ -405,11 +531,24 @@ function leafletEngine(stage, hover, style) {
       };
       m.on("add", wire); wire();
     }
+    // The glowing head that travels along each route while it draws.
+    const heads = scene.lines.map((line) => {
+      const c = style(line.entry).color;
+      const dot = L.circleMarker(back(g.legs[0]?.a ?? { x: 0, y: 0 }), { radius: 5, color: c, fillColor: c, fillOpacity: 1, weight: 0, interactive: false, className: "rv-head" });
+      return { show: (on) => (on ? dot.addTo(layer) : dot.remove()), at: (l, p) => dot.setLatLng(back(lerp(l.a, l.b, p))) };
+    });
+    api.anim = {
+      legs: g.legs.map((l, i) => ({ line: l.line, order: l.order, to: l.to, a: l.a, b: l.b,
+        set: (p) => { const ends = [back(l.a), back(lerp(l.a, l.b, p))]; halos[i].setLatLngs(ends); lines[i].setLatLngs(ends); } })),
+      pops, stops, heads,
+    };
   }
   const repaint = () => { if (last) paint(last); };
-  map.on("zoomend moveend resize", () => { hover.hide(); repaint(); });
+  // Zooming or panning mid draw-in jumps to the complete drawing, then repaints for the new view.
+  map.on("zoomstart movestart", () => hooks?.interrupt());
+  map.on("zoomend moveend resize", () => { hooks?.interrupt(); hover.hide(); repaint(); });
   map.on("click", () => hover.hide());
-  return {
+  return Object.assign(api, {
     draw(scene) {
       last = scene;
       if (!fitted) { map.fitBounds(L.latLngBounds(scene.points.map((p) => [p.lat, p.lon])), { padding: [40, 40] }); fitted = true; fitZoom = map.getZoom(); }
@@ -417,5 +556,5 @@ function leafletEngine(stage, hover, style) {
     },
     invalidate() { map.invalidateSize(); },
     destroy() { map.off(); map.remove(); },
-  };
+  });
 }

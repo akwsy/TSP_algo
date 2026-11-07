@@ -62,7 +62,7 @@ export default {
       replaceHashParams("instance", p);
     }
 
-    async function draw(rebuildToggles) {
+    async function draw(rebuildToggles, animate = true) {
       const mine = ++token;
       maps.forEach((m) => m.destroy());
       maps = [];
@@ -81,7 +81,7 @@ export default {
         toggles.replaceChildren(h("legend", {}, "Algorithms shown"), ...algIds.map((a) => h("label", { class: "check" },
           h("input", { type: "checkbox", checked: !state.hidden.has(a), onchange: (e) => {
             if (e.target.checked) state.hidden.delete(a); else state.hidden.add(a);
-            sync(); draw(false);
+            sync(); draw(false, false); // a tick only changes what is shown: no replay
           } }),
           algorithmSwatch({ id: a, ...entryStyle(colorIdx[a]) }), a)));
       }
@@ -91,12 +91,12 @@ export default {
       if (!shown.length) {
         out.push(h("div", { class: "empty card" }, "No algorithm selected. Tick at least one above."));
       } else if (state.mode === "overlay") {
-        const m = createRouteMap(instance, { entries: shown, forceSvg });
+        const m = createRouteMap(instance, { entries: shown, forceSvg, animate });
         maps.push(m);
         out.push(h("div", { class: "card pad" }, m.el), compareTable(shown));
       } else {
         out.push(h("div", { class: "grid" }, shown.map((e) => {
-          const m = createRouteMap(instance, { entries: [e], forceSvg });
+          const m = createRouteMap(instance, { entries: [e], forceSvg, animate });
           maps.push(m);
           return h("section", { class: "card pad alg-card", "aria-label": e.id },
             h("h2", { class: "alg-title" }, algorithmSwatch(e), e.id),
