@@ -9,7 +9,9 @@
 
 Evaluation is incremental: a run already saved in results/ for the same algorithm code
 (a hash of every file in its folder), the same instance and the same time limit is reused,
-not run again. Only new or changed algorithms and instances are evaluated.
+not run again. Only new or changed algorithms and instances are evaluated. This holds for the
+full run (until every place is visited) too; the summary says how many full-run sessions were
+reused versus newly run, per algorithm.
 
 Press Ctrl+C to stop the website.
 """
