@@ -115,3 +115,78 @@ def aggregate(records, work_keys=DEFAULT_WORK_KEYS):
             "algorithms": sorted({r["algorithmId"] for r in records}),
             "groups": groups,
             "bestKnown": sorted(best.values(), key=lambda b: (b["numCustomers"], b["instanceId"]))}
+
+
+def aggregate_sessions(sessions):
+    """Full-run aggregate over session records (layout: harness/session.py). Pure.
+
+    Definitions
+    - Only FINISHED sessions (outcome "finished") enter any mean/std; a stopped session
+      is counted with its stop reason and is never treated as a time.
+    - workingHours = workingMinutes / 60 (hours, not minutes). days, totalDistanceKm (km) and
+      totalRuntimeMs (compute time, ms) are summarised the same way: {mean, std, n}, std sample
+      (n - 1), null when n < 2; mean null when n is 0.
+    - instances per size = distinct instanceIds seen at that size (instancesPerSize, keyed by
+      the size as a string); unfinished = instances - finished.
+
+    Ranking rule, per size (ranking[*].entries, in display order):
+      1. algorithms that finished every instance at that size, by mean working hours (fewer
+         first), exact ties by shorter mean total distance, then by algorithm id;
+      2. algorithms with some but not all instances finished, ordered the same way by the means
+         over their finished instances;
+      3. algorithms with no finished instance last, by algorithm id, with rank null.
+      Ranked entries get rank 1, 2, ... in that order; each entry carries finishedAll and
+      unfinished (count of instances not finished).
+    Overall (overall): per algorithm the average of its per-size ranks, an unranked size
+    counting as (number of algorithms + 1); lower is better, ties by algorithm id.
+    """
+    cells = {}
+    inst = {}
+    for r in sessions:
+        cells.setdefault((r["algorithmId"], r["numCustomers"]), []).append(r)
+        inst.setdefault(r["numCustomers"], set()).add(r["instanceId"])
+    groups = []
+    for (alg, n), runs in sorted(cells.items()):
+        done = [r for r in runs if r["outcome"] == "finished"]
+        reasons = {}
+        for r in runs:
+            if r["outcome"] != "finished":
+                reasons[r["stopReason"]] = reasons.get(r["stopReason"], 0) + 1
+        groups.append({
+            "algorithmId": alg, "numCustomers": n, "instances": len(inst[n]),
+            "finished": len(done), "stopped": len(runs) - len(done),
+            "stopReasons": dict(sorted(reasons.items())),
+            "workingHours": _summary([r["workingMinutes"] / 60 for r in done]),
+            "days": _summary([r["days"] for r in done]),
+            "totalDistanceKm": _summary([r["totalDistanceKm"] for r in done]),
+            "totalRuntimeMs": _summary([r["totalRuntimeMs"] for r in done]),
+        })
+    algs = sorted({g["algorithmId"] for g in groups})
+    ranking = []
+    for n in sorted(inst):
+        gs = [g for g in groups if g["numCustomers"] == n]
+        order = sorted(gs, key=lambda g: (
+            g["finished"] == 0, g["finished"] < g["instances"],
+            g["workingHours"]["mean"] if g["finished"] else 0,
+            g["totalDistanceKm"]["mean"] if g["finished"] else 0, g["algorithmId"]))
+        entries, rank = [], 0
+        for g in order:
+            if g["finished"]:
+                rank += 1
+            entries.append({
+                "rank": rank if g["finished"] else None, "algorithmId": g["algorithmId"],
+                "finishedAll": g["finished"] == g["instances"],
+                "unfinished": g["instances"] - g["finished"], "finished": g["finished"],
+                "workingHours": g["workingHours"], "totalDistanceKm": g["totalDistanceKm"]})
+        ranking.append({"numCustomers": n, "instances": len(inst[n]), "entries": entries})
+    last = len(algs) + 1
+    overall = []
+    for a in algs:
+        ranks = [next((e["rank"] for e in rk["entries"] if e["algorithmId"] == a), None)
+                 for rk in ranking]
+        ranks = [last if x is None else x for x in ranks]
+        overall.append({"algorithmId": a, "averageRank": sum(ranks) / len(ranks)})
+    overall.sort(key=lambda o: (o["averageRank"], o["algorithmId"]))
+    return {"sizes": sorted(inst), "algorithms": algs,
+            "instancesPerSize": {str(n): len(inst[n]) for n in sorted(inst)},
+            "groups": groups, "ranking": ranking, "overall": overall}

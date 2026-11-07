@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from dataclasses import replace
 from pathlib import Path
 
-from .aggregate import aggregate
+from .aggregate import aggregate, aggregate_sessions
 from .config import ConfigError, InstanceConfig
 from .dataset import DatasetError, load_places
 from .experiments import EXPERIMENTS
@@ -32,6 +32,7 @@ def run_full_sessions(algorithms, instances, records, results_dir, exp, count):
     out.mkdir(parents=True, exist_ok=True)
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     first_days = {(r["algorithmId"], r["instanceId"]): r for r in records}
+    sessions = []
     for meta in algorithms:
         for inst in chosen:
             session = run_session(meta, inst, run_id, first_day=first_days.get((meta["id"], inst["instanceId"])))
@@ -40,6 +41,8 @@ def run_full_sessions(algorithms, instances, records, results_dir, exp, count):
             (out / name).write_text(json.dumps(session, indent=2) + "\n", encoding="utf-8")
             print(f"{meta['id']} until every place is visited on {inst['instanceId']}: "
                   f"{session['outcome']}, {session['days']} days", flush=True)
+            sessions.append(session)
+    return sessions
 
 
 def main(argv=None):
@@ -96,7 +99,7 @@ def main(argv=None):
     if args.full_run_instances < 0:
         print("error: --full-run-instances must not be negative", file=sys.stderr)
         return 2
-    run_full_sessions(algorithms, instances, records, Path(args.results_dir), exp,
+    sessions = run_full_sessions(algorithms, instances, records, Path(args.results_dir), exp,
                       min(args.full_run_instances, exp.instances_per_size))
     reused, ran = sum(stats["reused"].values()), sum(stats["ran"].values())
     print(f"Reused {reused} saved runs, ran {ran} new.")
@@ -110,6 +113,8 @@ def main(argv=None):
         "sizes": list(exp.sizes), "instancesPerSize": exp.instances_per_size, "seeds": seeds,
         "departureMinute": DEFAULTS.departure_minute, "periodMinutes": DEFAULTS.period_minutes,
         "speedKmh": DEFAULTS.speed_kmh}, **result}
+    if sessions:  # full-run block: see aggregate_sessions (hours, km, ms; own `ranking`/`overall`)
+        result["full"] = aggregate_sessions(sessions)
     out = Path(args.results_dir) / f"aggregates-{exp.name}.json"
     out.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {out}")
