@@ -1,0 +1,184 @@
+{
+  "algorithmId": "greedy-insertion-cached",
+  "commit": "139fd0a3916a00f5a6ae7f1aa35b368fbd9d2ecc",
+  "fingerprint": "3147f19b6687314e43aeced33e9566151d3bcf92e64d5778ddbd4111da78494f",
+  "instanceId": "n10-seed5",
+  "seed": 5,
+  "numCustomers": 10,
+  "runId": "20261107T100000000000Z",
+  "timestamp": "2026-11-07T07:19:44+00:00",
+  "outcome": "finished",
+  "stopReason": null,
+  "stopDay": null,
+  "explanation": null,
+  "partialFigures": false,
+  "unvisitedAtStop": 0,
+  "days": 3,
+  "visitedSoFar": 10,
+  "workingMinutes": 2821.232799714148,
+  "totalDistanceKm": 1314.6749596225732,
+  "totalRuntimeMs": 43.549249000079726,
+  "finalReturnMinute": 1371.7690588774271,
+  "dayRecords": [
+    {
+      "day": 1,
+      "instanceId": "n10-seed5",
+      "numPlaces": 10,
+      "route": [
+        0,
+        8,
+        9,
+        2,
+        10,
+        5,
+        7,
+        3,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 14.664457999970182,
+      "stats": {
+        "iterations": 140,
+        "boundaryReplays": 0,
+        "customersPruned": 3
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        8,
+        9,
+        2,
+        10,
+        5,
+        7,
+        3
+      ],
+      "distanceKm": 670.3635138163952,
+      "returnMinute": 1365.545270724593,
+      "schedule": [
+        {
+          "id": 8,
+          "arriveMinute": 380.7495167905566,
+          "startMinute": 380.7495167905566,
+          "leaveMinute": 380.7495167905566
+        },
+        {
+          "id": 9,
+          "arriveMinute": 531.3098097781406,
+          "startMinute": 531.3098097781406,
+          "leaveMinute": 531.3098097781406
+        },
+        {
+          "id": 2,
+          "arriveMinute": 796.423940725954,
+          "startMinute": 796.423940725954,
+          "leaveMinute": 796.423940725954
+        },
+        {
+          "id": 10,
+          "arriveMinute": 947.4392976476113,
+          "startMinute": 947.4392976476113,
+          "leaveMinute": 947.4392976476113
+        },
+        {
+          "id": 5,
+          "arriveMinute": 1057.7121862057563,
+          "startMinute": 1057.7121862057563,
+          "leaveMinute": 1057.7121862057563
+        },
+        {
+          "id": 7,
+          "arriveMinute": 1157.6921053595227,
+          "startMinute": 1157.6921053595227,
+          "leaveMinute": 1157.6921053595227
+        },
+        {
+          "id": 3,
+          "arriveMinute": 1230.674791797894,
+          "startMinute": 1230.674791797894,
+          "leaveMinute": 1230.674791797894
+        }
+      ],
+      "workingMinutes": 1005.5452707245929
+    },
+    {
+      "day": 2,
+      "instanceId": "n10-seed5-day2",
+      "numPlaces": 3,
+      "route": [
+        0,
+        1,
+        6,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 14.42158300005758,
+      "stats": {
+        "iterations": 10,
+        "boundaryReplays": 0,
+        "customersPruned": 1
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        1,
+        6
+      ],
+      "distanceKm": 375.2860339696084,
+      "returnMinute": 1365.687528989555,
+      "schedule": [
+        {
+          "id": 1,
+          "arriveMinute": 514.4812107271982,
+          "startMinute": 514.4812107271982,
+          "leaveMinute": 514.4812107271982
+        },
+        {
+          "id": 6,
+          "arriveMinute": 727.2415219648577,
+          "startMinute": 1170,
+          "leaveMinute": 1170
+        }
+      ],
+      "workingMinutes": 1005.687528989555
+    },
+    {
+      "day": 3,
+      "instanceId": "n10-seed5-day3",
+      "numPlaces": 1,
+      "route": [
+        0,
+        4,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 14.463208000051964,
+      "stats": {
+        "iterations": 1,
+        "boundaryReplays": 0,
+        "customersPruned": 0
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        4
+      ],
+      "distanceKm": 269.0254118365696,
+      "returnMinute": 1371.7690588774271,
+      "schedule": [
+        {
+          "id": 4,
+          "arriveMinute": 561.7690588774271,
+          "startMinute": 1170,
+          "leaveMinute": 1170
+        }
+      ],
+      "workingMinutes": 810
+    }
+  ],
+  "experiment": "scaling",
+  "instanceHash": "df28ea87228dff2fed2ec980ac3995697cbc71a3dc8a75afe9cc4f35dbd9175e"
+}

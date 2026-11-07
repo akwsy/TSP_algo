@@ -1,12 +1,12 @@
 {
   "algorithmId": "nearest-neighbour",
-  "commit": null,
+  "commit": "c0b8cc57a4d0e300ca2269ba5d814e4022ca09b4",
   "fingerprint": "33b917412b79e7370501cb710e1efad1bba60d680da00bf6a8c79a5c42b74830",
-  "instanceId": "n10-seed1",
-  "seed": 1,
+  "instanceId": "n10-seed4",
+  "seed": 4,
   "numCustomers": 10,
-  "runId": "20261107T070435852045Z",
-  "timestamp": "2026-11-07T07:04:35+00:00",
+  "runId": "20261107T100000000000Z",
+  "timestamp": "2026-11-07T07:19:44+00:00",
   "outcome": "finished",
   "stopReason": null,
   "stopDay": null,
@@ -17,12 +17,12 @@
   "visitedSoFar": 10,
   "workingMinutes": 2757.3041999532916,
   "totalDistanceKm": 964.0686066859912,
-  "totalRuntimeMs": 41.74408199969548,
+  "totalRuntimeMs": 43.1907079996563,
   "finalReturnMinute": 1380.3893046446997,
   "dayRecords": [
     {
       "day": 1,
-      "instanceId": "n10-seed1",
+      "instanceId": "n10-seed4",
       "numPlaces": 10,
       "route": [
         0,
@@ -32,7 +32,7 @@
       ],
       "status": "HEURISTIC",
       "killed": false,
-      "runtimeMs": 14.89133299992318,
+      "runtimeMs": 14.592999999877065,
       "stats": {
         "customersVisited": 2,
         "iterations": 27
@@ -63,7 +63,7 @@
     },
     {
       "day": 2,
-      "instanceId": "n10-seed1-day2",
+      "instanceId": "n10-seed4-day2",
       "numPlaces": 8,
       "route": [
         0,
@@ -77,7 +77,7 @@
       ],
       "status": "HEURISTIC",
       "killed": false,
-      "runtimeMs": 13.381957999627048,
+      "runtimeMs": 14.218790999620978,
       "stats": {
         "customersVisited": 6,
         "iterations": 35
@@ -136,7 +136,7 @@
     },
     {
       "day": 3,
-      "instanceId": "n10-seed1-day3",
+      "instanceId": "n10-seed4-day3",
       "numPlaces": 2,
       "route": [
         0,
@@ -146,7 +146,7 @@
       ],
       "status": "HEURISTIC",
       "killed": false,
-      "runtimeMs": 13.470791000145255,
+      "runtimeMs": 14.378917000158253,
       "stats": {
         "customersVisited": 2,
         "iterations": 3
@@ -177,5 +177,5 @@
     }
   ],
   "experiment": "scaling",
-  "instanceHash": "88900f20fb336e096d174da1d41c3feb67d03d28b8b645425b1c245a14a5f858"
+  "instanceHash": "ee9da2fe263e692a472cae8f16188ccd6da4ba815dd0fd910a8e4f0f7e1f8f64"
 }

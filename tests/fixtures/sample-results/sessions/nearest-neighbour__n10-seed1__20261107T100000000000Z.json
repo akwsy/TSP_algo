@@ -1,0 +1,139 @@
+{
+  "algorithmId": "nearest-neighbour",
+  "commit": "c0b8cc57a4d0e300ca2269ba5d814e4022ca09b4",
+  "fingerprint": "33b917412b79e7370501cb710e1efad1bba60d680da00bf6a8c79a5c42b74830",
+  "instanceId": "n10-seed1",
+  "seed": 1,
+  "numCustomers": 10,
+  "runId": "20261107T100000000000Z",
+  "timestamp": "2026-11-07T07:19:44+00:00",
+  "outcome": "did not finish",
+  "stopReason": "no_progress",
+  "stopDay": 3,
+  "explanation": "Stopped on day 3: the algorithm visited no new places (5 still unvisited)",
+  "partialFigures": true,
+  "unvisitedAtStop": 5,
+  "days": 3,
+  "visitedSoFar": 5,
+  "workingMinutes": 812.5076758261769,
+  "totalDistanceKm": 444.14559170531993,
+  "totalRuntimeMs": 43.421873999704985,
+  "finalReturnMinute": 753.710711731803,
+  "dayRecords": [
+    {
+      "day": 1,
+      "instanceId": "n10-seed1",
+      "numPlaces": 10,
+      "route": [
+        0,
+        10,
+        6,
+        1,
+        3,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 14.47904099995867,
+      "stats": {
+        "customersVisited": 4,
+        "iterations": 40
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        10,
+        6,
+        1,
+        3
+      ],
+      "distanceKm": 279.1979760629158,
+      "returnMinute": 778.7969640943738,
+      "schedule": [
+        {
+          "id": 10,
+          "arriveMinute": 466.3966862818635,
+          "startMinute": 466.3966862818635,
+          "leaveMinute": 466.3966862818635
+        },
+        {
+          "id": 6,
+          "arriveMinute": 490.82191713212137,
+          "startMinute": 490.82191713212137,
+          "leaveMinute": 490.82191713212137
+        },
+        {
+          "id": 1,
+          "arriveMinute": 559.3735209016081,
+          "startMinute": 559.3735209016081,
+          "leaveMinute": 559.3735209016081
+        },
+        {
+          "id": 3,
+          "arriveMinute": 594.8084576670266,
+          "startMinute": 594.8084576670266,
+          "leaveMinute": 594.8084576670266
+        }
+      ],
+      "workingMinutes": 418.79696409437383
+    },
+    {
+      "day": 2,
+      "instanceId": "n10-seed1-day2",
+      "numPlaces": 6,
+      "route": [
+        0,
+        9,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 14.398499999970227,
+      "stats": {
+        "customersVisited": 1,
+        "iterations": 11
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        9
+      ],
+      "distanceKm": 164.9476156424041,
+      "returnMinute": 753.710711731803,
+      "schedule": [
+        {
+          "id": 9,
+          "arriveMinute": 483.7107117318031,
+          "startMinute": 630,
+          "leaveMinute": 630
+        }
+      ],
+      "workingMinutes": 393.71071173180303
+    },
+    {
+      "day": 3,
+      "instanceId": "n10-seed1-day3",
+      "numPlaces": 5,
+      "route": [
+        0,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 14.544332999776088,
+      "stats": {
+        "customersVisited": 0,
+        "iterations": 5
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [],
+      "distanceKm": 0.0,
+      "returnMinute": 360.0,
+      "schedule": [],
+      "workingMinutes": null
+    }
+  ],
+  "experiment": "scaling",
+  "instanceHash": "8381209db40801045c705673c4b61a4f3b5200704ff1a0da1e4f59baace2a608"
+}

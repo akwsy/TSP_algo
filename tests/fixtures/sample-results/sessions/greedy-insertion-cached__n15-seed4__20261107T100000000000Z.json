@@ -1,0 +1,250 @@
+{
+  "algorithmId": "greedy-insertion-cached",
+  "commit": "139fd0a3916a00f5a6ae7f1aa35b368fbd9d2ecc",
+  "fingerprint": "3147f19b6687314e43aeced33e9566151d3bcf92e64d5778ddbd4111da78494f",
+  "instanceId": "n15-seed4",
+  "seed": 4,
+  "numCustomers": 15,
+  "runId": "20261107T100000000000Z",
+  "timestamp": "2026-11-07T07:19:44+00:00",
+  "outcome": "finished",
+  "stopReason": null,
+  "stopDay": null,
+  "explanation": null,
+  "partialFigures": false,
+  "unvisitedAtStop": 0,
+  "days": 4,
+  "visitedSoFar": 15,
+  "workingMinutes": 2541.334444993133,
+  "totalDistanceKm": 1357.8029703414522,
+  "totalRuntimeMs": 58.63450099968759,
+  "finalReturnMinute": 686.1219529237521,
+  "dayRecords": [
+    {
+      "day": 1,
+      "instanceId": "n15-seed4",
+      "numPlaces": 15,
+      "route": [
+        0,
+        8,
+        10,
+        4,
+        12,
+        15,
+        3,
+        6,
+        2,
+        11,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 15.088624999862077,
+      "stats": {
+        "iterations": 265,
+        "boundaryReplays": 0,
+        "customersPruned": 6
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        8,
+        10,
+        4,
+        12,
+        15,
+        3,
+        6,
+        2,
+        11
+      ],
+      "distanceKm": 506.0688010047812,
+      "returnMinute": 1298.3392891492838,
+      "schedule": [
+        {
+          "id": 8,
+          "arriveMinute": 492.1128955760428,
+          "startMinute": 492.1128955760428,
+          "leaveMinute": 492.1128955760428
+        },
+        {
+          "id": 10,
+          "arriveMinute": 581.1090526674307,
+          "startMinute": 581.1090526674307,
+          "leaveMinute": 581.1090526674307
+        },
+        {
+          "id": 4,
+          "arriveMinute": 604.102017971382,
+          "startMinute": 630,
+          "leaveMinute": 630
+        },
+        {
+          "id": 12,
+          "arriveMinute": 682.3629553600107,
+          "startMinute": 682.3629553600107,
+          "leaveMinute": 682.3629553600107
+        },
+        {
+          "id": 15,
+          "arriveMinute": 861.5005829046144,
+          "startMinute": 861.5005829046144,
+          "leaveMinute": 861.5005829046144
+        },
+        {
+          "id": 3,
+          "arriveMinute": 939.1791935393474,
+          "startMinute": 939.1791935393474,
+          "leaveMinute": 939.1791935393474
+        },
+        {
+          "id": 6,
+          "arriveMinute": 1012.5433895695355,
+          "startMinute": 1012.5433895695355,
+          "leaveMinute": 1012.5433895695355
+        },
+        {
+          "id": 2,
+          "arriveMinute": 1016.661894386506,
+          "startMinute": 1170,
+          "leaveMinute": 1170
+        },
+        {
+          "id": 11,
+          "arriveMinute": 1195.5562169397433,
+          "startMinute": 1195.5562169397433,
+          "leaveMinute": 1195.5562169397433
+        }
+      ],
+      "workingMinutes": 938.3392891492838
+    },
+    {
+      "day": 2,
+      "instanceId": "n15-seed4-day2",
+      "numPlaces": 6,
+      "route": [
+        0,
+        9,
+        7,
+        13,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 14.798167000208196,
+      "stats": {
+        "iterations": 19,
+        "boundaryReplays": 0,
+        "customersPruned": 3
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        9,
+        7,
+        13
+      ],
+      "distanceKm": 352.6821018580803,
+      "returnMinute": 1377.478031087839,
+      "schedule": [
+        {
+          "id": 9,
+          "arriveMinute": 483.7107117318031,
+          "startMinute": 483.7107117318031,
+          "leaveMinute": 483.7107117318031
+        },
+        {
+          "id": 7,
+          "arriveMinute": 587.0381529202625,
+          "startMinute": 587.0381529202625,
+          "leaveMinute": 587.0381529202625
+        },
+        {
+          "id": 13,
+          "arriveMinute": 681.5451216992814,
+          "startMinute": 1170,
+          "leaveMinute": 1170
+        }
+      ],
+      "workingMinutes": 1017.4780310878391
+    },
+    {
+      "day": 3,
+      "instanceId": "n15-seed4-day3",
+      "numPlaces": 3,
+      "route": [
+        0,
+        5,
+        14,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 14.2984589997468,
+      "stats": {
+        "iterations": 7,
+        "boundaryReplays": 0,
+        "customersPruned": 1
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        5,
+        14
+      ],
+      "distanceKm": 281.63743219608943,
+      "returnMinute": 782.4561482941341,
+      "schedule": [
+        {
+          "id": 5,
+          "arriveMinute": 570.3893046446996,
+          "startMinute": 570.3893046446996,
+          "leaveMinute": 570.3893046446996
+        },
+        {
+          "id": 14,
+          "arriveMinute": 629.8738280370679,
+          "startMinute": 629.8738280370679,
+          "leaveMinute": 629.8738280370679
+        }
+      ],
+      "workingMinutes": 422.4561482941341
+    },
+    {
+      "day": 4,
+      "instanceId": "n15-seed4-day4",
+      "numPlaces": 1,
+      "route": [
+        0,
+        1,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 14.449249999870517,
+      "stats": {
+        "iterations": 1,
+        "boundaryReplays": 0,
+        "customersPruned": 0
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        1
+      ],
+      "distanceKm": 217.4146352825014,
+      "returnMinute": 686.1219529237521,
+      "schedule": [
+        {
+          "id": 1,
+          "arriveMinute": 523.0609764618761,
+          "startMinute": 523.0609764618761,
+          "leaveMinute": 523.0609764618761
+        }
+      ],
+      "workingMinutes": 163.06097646187607
+    }
+  ],
+  "experiment": "scaling",
+  "instanceHash": "b959975b1b3baa056d23c462eecca7e5a849d99da91c98daab933f599800a272"
+}

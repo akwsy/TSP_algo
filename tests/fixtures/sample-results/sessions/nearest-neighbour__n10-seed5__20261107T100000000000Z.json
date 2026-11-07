@@ -1,12 +1,12 @@
 {
   "algorithmId": "nearest-neighbour",
-  "commit": null,
+  "commit": "c0b8cc57a4d0e300ca2269ba5d814e4022ca09b4",
   "fingerprint": "33b917412b79e7370501cb710e1efad1bba60d680da00bf6a8c79a5c42b74830",
-  "instanceId": "n10-seed2",
-  "seed": 2,
+  "instanceId": "n10-seed5",
+  "seed": 5,
   "numCustomers": 10,
-  "runId": "20261107T070435852045Z",
-  "timestamp": "2026-11-07T07:04:36+00:00",
+  "runId": "20261107T100000000000Z",
+  "timestamp": "2026-11-07T07:19:44+00:00",
   "outcome": "finished",
   "stopReason": null,
   "stopDay": null,
@@ -17,12 +17,12 @@
   "visitedSoFar": 10,
   "workingMinutes": 2773.7935020665363,
   "totalDistanceKm": 960.3214046333142,
-  "totalRuntimeMs": 40.72125099992263,
+  "totalRuntimeMs": 42.99612500017247,
   "finalReturnMinute": 1371.7690588774271,
   "dayRecords": [
     {
       "day": 1,
-      "instanceId": "n10-seed2",
+      "instanceId": "n10-seed5",
       "numPlaces": 10,
       "route": [
         0,
@@ -35,7 +35,7 @@
       ],
       "status": "HEURISTIC",
       "killed": false,
-      "runtimeMs": 13.947334000022238,
+      "runtimeMs": 14.868125000248256,
       "stats": {
         "customersVisited": 5,
         "iterations": 45
@@ -87,7 +87,7 @@
     },
     {
       "day": 2,
-      "instanceId": "n10-seed2-day2",
+      "instanceId": "n10-seed5-day2",
       "numPlaces": 5,
       "route": [
         0,
@@ -98,7 +98,7 @@
       ],
       "status": "HEURISTIC",
       "killed": false,
-      "runtimeMs": 13.452874999984488,
+      "runtimeMs": 14.056500000151573,
       "stats": {
         "customersVisited": 3,
         "iterations": 14
@@ -136,7 +136,7 @@
     },
     {
       "day": 3,
-      "instanceId": "n10-seed2-day3",
+      "instanceId": "n10-seed5-day3",
       "numPlaces": 2,
       "route": [
         0,
@@ -146,7 +146,7 @@
       ],
       "status": "HEURISTIC",
       "killed": false,
-      "runtimeMs": 13.321041999915906,
+      "runtimeMs": 14.07149999977264,
       "stats": {
         "customersVisited": 2,
         "iterations": 3
@@ -177,5 +177,5 @@
     }
   ],
   "experiment": "scaling",
-  "instanceHash": "f31b4b1703080e6b95449b82a861cf23ceb6f38675b8be9144b86bce439e2ad0"
+  "instanceHash": "df28ea87228dff2fed2ec980ac3995697cbc71a3dc8a75afe9cc4f35dbd9175e"
 }

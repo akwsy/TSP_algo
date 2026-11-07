@@ -1,12 +1,12 @@
 {
   "algorithmId": "nearest-neighbour",
-  "commit": null,
+  "commit": "c0b8cc57a4d0e300ca2269ba5d814e4022ca09b4",
   "fingerprint": "33b917412b79e7370501cb710e1efad1bba60d680da00bf6a8c79a5c42b74830",
-  "instanceId": "n15-seed1",
-  "seed": 1,
+  "instanceId": "n15-seed4",
+  "seed": 4,
   "numCustomers": 15,
-  "runId": "20261107T070435852045Z",
-  "timestamp": "2026-11-07T07:04:36+00:00",
+  "runId": "20261107T100000000000Z",
+  "timestamp": "2026-11-07T07:19:44+00:00",
   "outcome": "finished",
   "stopReason": null,
   "stopDay": null,
@@ -17,12 +17,12 @@
   "visitedSoFar": 15,
   "workingMinutes": 3268.3051549581887,
   "totalDistanceKm": 1475.1974805384637,
-  "totalRuntimeMs": 67.38862500014875,
+  "totalRuntimeMs": 71.57220799990682,
   "finalReturnMinute": 686.1219529237521,
   "dayRecords": [
     {
       "day": 1,
-      "instanceId": "n15-seed1",
+      "instanceId": "n15-seed4",
       "numPlaces": 15,
       "route": [
         0,
@@ -35,7 +35,7 @@
       ],
       "status": "HEURISTIC",
       "killed": false,
-      "runtimeMs": 13.453999999910593,
+      "runtimeMs": 14.513958999941678,
       "stats": {
         "customersVisited": 5,
         "iterations": 75
@@ -87,7 +87,7 @@
     },
     {
       "day": 2,
-      "instanceId": "n15-seed1-day2",
+      "instanceId": "n15-seed4-day2",
       "numPlaces": 10,
       "route": [
         0,
@@ -98,7 +98,7 @@
       ],
       "status": "HEURISTIC",
       "killed": false,
-      "runtimeMs": 13.552041999901121,
+      "runtimeMs": 14.316999999664404,
       "stats": {
         "customersVisited": 3,
         "iterations": 34
@@ -136,7 +136,7 @@
     },
     {
       "day": 3,
-      "instanceId": "n15-seed1-day3",
+      "instanceId": "n15-seed4-day3",
       "numPlaces": 7,
       "route": [
         0,
@@ -148,7 +148,7 @@
       ],
       "status": "HEURISTIC",
       "killed": false,
-      "runtimeMs": 13.357083000300918,
+      "runtimeMs": 14.132792000054906,
       "stats": {
         "customersVisited": 4,
         "iterations": 25
@@ -193,7 +193,7 @@
     },
     {
       "day": 4,
-      "instanceId": "n15-seed1-day4",
+      "instanceId": "n15-seed4-day4",
       "numPlaces": 3,
       "route": [
         0,
@@ -203,7 +203,7 @@
       ],
       "status": "HEURISTIC",
       "killed": false,
-      "runtimeMs": 13.53795800014268,
+      "runtimeMs": 14.624666000145226,
       "stats": {
         "customersVisited": 2,
         "iterations": 6
@@ -234,7 +234,7 @@
     },
     {
       "day": 5,
-      "instanceId": "n15-seed1-day5",
+      "instanceId": "n15-seed4-day5",
       "numPlaces": 1,
       "route": [
         0,
@@ -243,7 +243,7 @@
       ],
       "status": "HEURISTIC",
       "killed": false,
-      "runtimeMs": 13.487541999893438,
+      "runtimeMs": 13.98379100010061,
       "stats": {
         "customersVisited": 1,
         "iterations": 1
@@ -267,5 +267,5 @@
     }
   ],
   "experiment": "scaling",
-  "instanceHash": "4586de16c68838a8822db2d912a4f7edbc7f3811444910aca31471161b8cc860"
+  "instanceHash": "b959975b1b3baa056d23c462eecca7e5a849d99da91c98daab933f599800a272"
 }
