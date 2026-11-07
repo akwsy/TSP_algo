@@ -19,27 +19,38 @@ from .generate_instance import DEFAULT_DATASET
 from .instance import build_instance
 from .run import ROOT, discover_algorithms, instance_hash, run_batch
 from .session import run_session
+from .sessionstore import find_saved_session, read_sessions_index, save_session
 
 DEFAULTS = InstanceConfig(seed=0)
 
 
-def run_full_sessions(algorithms, instances, records, results_dir, exp, count):
+def run_full_sessions(algorithms, instances, records, results_dir, exp, count, reuse=True, rerun=()):
     """Run each algorithm day by day on the first `count` seeds of each size and save one session
-    file each (layout: harness/session.py). Day 1 reuses the first-day record. Ticket 03 will add
-    reuse of saved sessions here."""
+    file each (layout and index: harness/session.py, harness/sessionstore.py). Day 1 reuses the
+    first-day record. A session already saved for the same algorithm code, instance and experiment
+    is reused, not run again (unless reuse is False or the algorithm is in `rerun`).
+    Returns {"reused": {id: n}, "ran": {id: n}}."""
     chosen = [i for i in instances if i["seed"] <= count]
-    out = results_dir / "sessions"
-    out.mkdir(parents=True, exist_ok=True)
+    (results_dir / "sessions").mkdir(parents=True, exist_ok=True)
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     first_days = {(r["algorithmId"], r["instanceId"]): r for r in records}
+    entries = read_sessions_index(results_dir)
+    stats = {"reused": {}, "ran": {}}
     for meta in algorithms:
         for inst in chosen:
+            key = (meta["id"], meta["_fingerprint"], instance_hash(inst), exp.name)
+            saved = (find_saved_session(entries, results_dir, key)
+                     if reuse and meta["id"] not in rerun else None)
+            if saved is not None:
+                stats["reused"][meta["id"]] = stats["reused"].get(meta["id"], 0) + 1
+                continue
+            stats["ran"][meta["id"]] = stats["ran"].get(meta["id"], 0) + 1
             session = run_session(meta, inst, run_id, first_day=first_days.get((meta["id"], inst["instanceId"])))
-            session.update(experiment=exp.name, instanceHash=instance_hash(inst))
-            name = f"{meta['id']}__{inst['instanceId']}__{run_id}.json"
-            (out / name).write_text(json.dumps(session, indent=2) + "\n", encoding="utf-8")
+            session.update(experiment=exp.name, instanceHash=key[2])
+            entries = save_session(results_dir, entries, session)
             print(f"{meta['id']} until every place is visited on {inst['instanceId']}: "
                   f"{session['outcome']}, {session['days']} days", flush=True)
+    return stats
 
 
 def main(argv=None):
@@ -96,13 +107,20 @@ def main(argv=None):
     if args.full_run_instances < 0:
         print("error: --full-run-instances must not be negative", file=sys.stderr)
         return 2
-    run_full_sessions(algorithms, instances, records, Path(args.results_dir), exp,
-                      min(args.full_run_instances, exp.instances_per_size))
+    full = run_full_sessions(algorithms, instances, records, Path(args.results_dir), exp,
+                             min(args.full_run_instances, exp.instances_per_size),
+                             reuse=not args.force, rerun=set(args.rerun))
     reused, ran = sum(stats["reused"].values()), sum(stats["ran"].values())
     print(f"Reused {reused} saved runs, ran {ran} new.")
     for meta in algorithms:
         a = meta["id"]
         print(f"  {a}: reused {stats['reused'].get(a, 0)}, ran {stats['ran'].get(a, 0)}")
+    if args.full_run_instances > 0:
+        print(f"Full run: reused {sum(full['reused'].values())} saved sessions, "
+              f"ran {sum(full['ran'].values())} new.")
+        for meta in algorithms:
+            a = meta["id"]
+            print(f"  {a}: reused {full['reused'].get(a, 0)}, ran {full['ran'].get(a, 0)}")
     if stats["legacy"]:
         print(f"Note: {stats['legacy']} older saved runs have no fingerprint, so they were not reused.")
     result = aggregate(records)
