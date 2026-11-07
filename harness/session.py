@@ -7,6 +7,8 @@ Saved layout (stable; later tickets build on it). One JSON file per session:
     {
       "algorithmId", "commit", "fingerprint", "instanceId", "instanceHash", "seed",
       "numCustomers", "experiment", "runId", "timestamp",
+      "formatVersion": SESSION_FORMAT_VERSION when the session was run (see below),
+      "maxDays":       the day cap in force when it was run (30 unless --max-days says otherwise),
       "outcome":       "finished" | "did not finish",
       "stopReason":    null when finished, else one of STOP_REASONS (listed below),
       "stopDay":       null when finished, else the day number the session stopped on
@@ -57,6 +59,11 @@ from datetime import datetime, timezone
 from .run import make_record
 
 MAX_DAYS = 30
+# Version of everything that decides what a session's result is, apart from the algorithm code and
+# the instance: the session logic (stop rules, sub-instances, how days are scored), the record
+# layout and the working-hours definition. Bump it whenever one of those changes. It is part of
+# the reuse key (see sessionstore.py), so saved sessions of an older version are run again.
+SESSION_FORMAT_VERSION = 1
 STOP_REASONS = ("no_progress", "day_limit", "crashed", "invalid_route", "unreadable_output",
                 "timed_out", "could_not_start")
 
@@ -160,6 +167,7 @@ def run_session(meta, instance, run_id, first_day=None, max_days=None):
         "algorithmId": meta["id"], "commit": meta["_commit"], "fingerprint": meta.get("_fingerprint"),
         "instanceId": instance["instanceId"], "seed": instance.get("seed"),
         "numCustomers": len(instance["locations"]) - 1, "runId": run_id,
+        "formatVersion": SESSION_FORMAT_VERSION, "maxDays": max_days,
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "outcome": "did not finish" if stop else "finished",
         "stopReason": stop[0] if stop else None, "stopDay": stop[1] if stop else None,

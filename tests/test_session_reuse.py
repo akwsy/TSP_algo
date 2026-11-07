@@ -1,10 +1,15 @@
 """Full-run sessions are saved once and reused (same mechanism as the first-day runs)."""
+import contextlib
+import io
 import json
 import os
 import shutil
 import subprocess
 import sys
 import unittest
+from unittest import mock
+
+from harness import experiment, session
 
 from test_run import ROOT, CliCase, write_algorithm
 
@@ -137,6 +142,51 @@ class SessionReuseTest(CliCase):
         self.assertEqual(len(self.executions()), 4)  # day 1 reused from the first-day runs
         self.assertEqual(len(self.sessions_index()), 4)
         self.assertEqual(len(self.files()), 4)  # orphans of the same session are not left behind
+
+    def go_in_process(self, *args):
+        """Like go(), but in this process so a test can patch harness.session."""
+        argv = ["scaling", "--sizes", "2", "--instances", "2", *args,
+                "--dataset", str(self.tmp / "places.txt"), "--algorithms-dir", str(self.algs),
+                "--instances-dir", str(self.tmp / "instances"), "--results-dir", str(self.results)]
+        with mock.patch.dict(os.environ, {"RUN_COUNTER": str(self.counter)}), \
+                contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(experiment.main(argv), 0)
+
+    def test_changed_session_format_version_invalidates(self):
+        self.go()
+        self.executions()
+        self.go_in_process()
+        self.assertEqual(self.executions(), [])  # same version: reused
+        with mock.patch.object(session, "SESSION_FORMAT_VERSION", session.SESSION_FORMAT_VERSION + 1):
+            self.go_in_process()
+        self.assertEqual(self.executions(), ["alpha"] * 2 + ["beta"] * 2)  # day 2 again; day 1 is a saved run
+        versions = {e["formatVersion"] for e in self.sessions_index()}
+        self.assertEqual(versions, {session.SESSION_FORMAT_VERSION, session.SESSION_FORMAT_VERSION + 1})
+
+    def test_changed_day_cap_invalidates(self):
+        self.go()
+        self.executions()
+        self.go("--max-days", "5")
+        self.assertEqual(self.executions(), ["alpha"] * 2 + ["beta"] * 2)
+        self.go("--max-days", "5")
+        self.assertEqual(self.executions(), [])
+        self.go()  # back to the default cap: that session is still saved
+        self.assertEqual(self.executions(), [])
+        self.assertEqual({e["maxDays"] for e in self.sessions_index()}, {5, 30})
+        saved = json.loads((self.results / self.sessions_index()[0]["file"]).read_text())
+        self.assertIn(saved["maxDays"], (5, 30))
+        self.assertEqual(saved["formatVersion"], session.SESSION_FORMAT_VERSION)
+
+    def test_old_entries_without_version_or_cap_are_not_reused(self):
+        self.go()
+        self.executions()
+        index = self.results / "sessions-index.json"
+        data = json.loads(index.read_text())
+        for e in data["sessions"]:
+            del e["formatVersion"], e["maxDays"]
+        index.write_text(json.dumps(data))
+        self.go()
+        self.assertEqual(self.executions(), ["alpha"] * 2 + ["beta"] * 2)
 
 
 if __name__ == "__main__":

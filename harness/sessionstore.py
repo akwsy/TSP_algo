@@ -6,29 +6,34 @@ tickets read it):
 
     {"sessions": [ {"file": "sessions/<name>.json",   path relative to the results dir
                     "runId", "algorithmId", "instanceId", "numCustomers", "seed", "experiment",
-                    "fingerprint", "instanceHash", "timestamp", "outcome", "stopReason",
-                    "stopDay", "days", "visitedSoFar", "workingMinutes", "unvisitedAtStop",
-                    "partialFigures"} ] }
+                    "fingerprint", "instanceHash", "formatVersion", "maxDays", "timestamp",
+                    "outcome", "stopReason", "stopDay", "days", "visitedSoFar", "workingMinutes",
+                    "unvisitedAtStop", "partialFigures"} ] }
 
 The session files themselves are described in harness/session.py.
 
 Reuse key: algorithmId + fingerprint (hash of every file in the algorithm folder, so the time
-limit in algorithm.json counts) + instanceHash + experiment. Only indexed sessions are ever
-reused; a session file without a matching index entry (e.g. written before this index existed)
-is not. Saving a session deletes every older file with the same key and replaces its index
-entry, so a key never has duplicates. Sessions of other algorithm versions stay (History).
+limit in algorithm.json counts) + instanceHash + experiment + formatVersion (SESSION_FORMAT_VERSION
+in harness/session.py: session logic, record layout, working-hours definition) + maxDays (the
+effective day cap). Changing any of them runs the session again. Entries written before
+formatVersion and maxDays existed lack them, so they are never reused (they stay as history).
+Only indexed sessions are ever reused; a session file without a matching index entry (e.g.
+written before this index existed) is not. Saving a session deletes every older file with the
+same key and replaces its index entry, so a key never has duplicates. Sessions of other algorithm versions stay (History).
 """
 import json
 
 from .run import write_index
 
 INDEX_FIELDS = ("runId", "algorithmId", "instanceId", "numCustomers", "seed", "experiment",
-                "fingerprint", "instanceHash", "timestamp", "outcome", "stopReason", "stopDay",
-                "days", "visitedSoFar", "workingMinutes", "unvisitedAtStop", "partialFigures")
+                "fingerprint", "instanceHash", "formatVersion", "maxDays", "timestamp", "outcome",
+                "stopReason", "stopDay", "days", "visitedSoFar", "workingMinutes", "unvisitedAtStop",
+                "partialFigures")
 
 
 def session_key(s):
-    return (s.get("algorithmId"), s.get("fingerprint"), s.get("instanceHash"), s.get("experiment"))
+    return (s.get("algorithmId"), s.get("fingerprint"), s.get("instanceHash"), s.get("experiment"),
+            s.get("formatVersion"), s.get("maxDays"))
 
 
 def read_sessions_index(results_dir):

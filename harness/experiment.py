@@ -18,8 +18,9 @@ from .experiments import EXPERIMENTS
 from .generate_instance import DEFAULT_DATASET
 from .instance import build_instance
 from .run import ROOT, discover_algorithms, instance_hash, run_batch
+from . import session as sessionlib
 from .session import MAX_DAYS, run_session
-from .sessionstore import find_saved_session, read_sessions_index, save_session
+from .sessionstore import find_saved_session, read_sessions_index, save_session, session_key
 
 DEFAULTS = InstanceConfig(seed=0)
 
@@ -41,7 +42,10 @@ def run_full_sessions(algorithms, instances, records, results_dir, exp, count, r
     sessions = []
     for meta in algorithms:
         for inst in chosen:
-            key = (meta["id"], meta["_fingerprint"], instance_hash(inst), exp.name)
+            key = session_key({
+                "algorithmId": meta["id"], "fingerprint": meta["_fingerprint"],
+                "instanceHash": instance_hash(inst), "experiment": exp.name,
+                "formatVersion": sessionlib.SESSION_FORMAT_VERSION, "maxDays": max_days or MAX_DAYS})
             saved = (find_saved_session(entries, results_dir, key)
                      if reuse and meta["id"] not in rerun else None)
             if saved is not None:
