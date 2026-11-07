@@ -106,6 +106,18 @@ class SessionReuseTest(CliCase):
         self.assertEqual(self.executions(), [])
         self.assertIn("  crashy: reused 2, ran 0", proc.stdout)
 
+    def test_index_entries_carry_what_the_pages_list_so_they_need_no_session_file(self):
+        write_algorithm(self.algs, "crashy", CRASH_DAY2 % "crashy")
+        self.go()
+        for entry in self.sessions_index():
+            saved = json.loads((self.results / entry["file"]).read_text())
+            for field in ("commit", "totalDistanceKm", "explanation"):
+                self.assertIn(field, entry)
+                self.assertEqual(entry[field], saved[field], field)
+        crashy = next(e for e in self.sessions_index() if e["algorithmId"] == "crashy")
+        self.assertEqual(crashy["explanation"], "Stopped on day 2: the algorithm crashed (exited with code 3)")
+        self.assertGreater(crashy["totalDistanceKm"], 0)
+
     def test_force_and_rerun_apply_to_sessions_without_stale_duplicates(self):
         self.go()
         self.executions()

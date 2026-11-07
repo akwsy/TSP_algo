@@ -8,7 +8,13 @@ tickets read it):
                     "runId", "algorithmId", "instanceId", "numCustomers", "seed", "experiment",
                     "fingerprint", "instanceHash", "formatVersion", "maxDays", "timestamp",
                     "outcome", "stopReason", "stopDay", "days", "visitedSoFar", "workingMinutes",
-                    "unvisitedAtStop", "partialFigures"} ] }
+                    "unvisitedAtStop", "partialFigures",
+                    "commit", "totalDistanceKm", "explanation"} ] }
+
+commit, totalDistanceKm and explanation are copied from the session file so the Failures and
+History pages can list sessions from this index alone, without fetching every session file.
+They are display fields, not part of the reuse key. Entries written before they existed lack
+them; the pages then fall back to fetching that session's file.
 
 The session files themselves are described in harness/session.py.
 
@@ -30,7 +36,7 @@ from .run import write_index
 INDEX_FIELDS = ("runId", "algorithmId", "instanceId", "numCustomers", "seed", "experiment",
                 "fingerprint", "instanceHash", "formatVersion", "maxDays", "timestamp", "outcome",
                 "stopReason", "stopDay", "days", "visitedSoFar", "workingMinutes", "unvisitedAtStop",
-                "partialFigures")
+                "partialFigures", "commit", "totalDistanceKm", "explanation")
 
 
 def session_key(s):
