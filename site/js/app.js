@@ -1,4 +1,4 @@
-import { h } from "./lib/dom.js";
+import { h, selectKey, findSelect } from "./lib/dom.js";
 import { pages, defaultPath } from "./pages/index.js";
 
 const main = document.getElementById("main");
@@ -44,6 +44,8 @@ async function route() {
     else a.removeAttribute("aria-current");
   }
   nav.querySelector("[aria-current]")?.scrollIntoView?.({ inline: "center", block: "nearest" });
+  // A filter <select> changed the URL: after the re-render keep keyboard focus on that same select instead of dropping it to <main>.
+  const keepFocus = document.activeElement instanceof HTMLSelectElement && main.contains(document.activeElement) ? selectKey(document.activeElement) : null;
   if (typeof cleanup === "function") cleanup();
   cleanup = null;
   main.replaceChildren();
@@ -59,7 +61,7 @@ async function route() {
     console.warn(err);
     main.replaceChildren(h("h1", {}, page.title), h("div", { class: "error", role: "alert" }, err.message));
   }
-  main.focus({ preventScroll: true });
+  (findSelect(main, keepFocus) || main).focus({ preventScroll: true });
 }
 addEventListener("hashchange", route);
 route();

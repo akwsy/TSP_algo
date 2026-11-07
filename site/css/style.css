@@ -6,12 +6,15 @@
   --bad-bg: #fbeae6; --warn-bg: #fbf0dc; --ok-bg: #e2f3ec;
   --radius: 8px; --gap: 16px; --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: light;
 }
+:root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"] {
   --bg: #14171a; --surface: #1d2126; --text: #e8eaed; --muted: #a3abb4; --line: #333a42; --control: #6f7881;
   --accent: #56b4e9; --accent-text: #0b1620; --focus: #f0a04b;
   --ok: #4fd1a1; --warn: #e6b45a; --bad: #ff8f77;
   --bad-bg: #3a2420; --warn-bg: #3a3020; --ok-bg: #1d3329;
+  color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -19,12 +22,14 @@
     --accent: #56b4e9; --accent-text: #0b1620; --focus: #f0a04b;
     --ok: #4fd1a1; --warn: #e6b45a; --bad: #ff8f77;
     --bad-bg: #3a2420; --warn-bg: #3a3020; --ok-bg: #1d3329;
+    color-scheme: dark;
   }
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 var(--font); }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
-.skip { position: absolute; left: -999px; top: 8px; background: var(--surface); padding: 8px 12px; z-index: 10; }
+a { color: var(--accent); }
+.skip { position: absolute; left: -999px; top: 8px; color: var(--text); background: var(--surface); padding: 8px 12px; z-index: 10; }
 .skip:focus { left: 8px; }
 
 .topbar { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding: 12px var(--gap);

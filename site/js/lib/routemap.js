@@ -21,6 +21,7 @@ const TILES = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrai
 const BLANK_TILE = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 const ATTRIBUTION = "Tiles &copy; Esri, USGS, NOAA";
 let leafletPromise = null;
+let mapCount = 0;
 
 export function loadLeaflet() {
   if (window.L) return Promise.resolve(window.L);
@@ -70,7 +71,7 @@ function svg(tag, attrs = {}, ...kids) {
 export function slotLegend() {
   const cols = slotColors();
   return h("p", { class: "legend", "aria-label": "Map key" },
-    h("span", { class: "key" }, "Opens:", " early ", cols.map((c) => h("span", { class: "dot filled", style: `background:${c}` })), " late"),
+    h("span", { class: "key" }, "Opens:", " early ", cols.map((c, i) => h("span", { class: "key" }, h("span", { class: "dot filled", style: `background:${c}` }), String(i + 1))), " late"),
     h("span", { class: "key" }, h("span", { class: "dot filled", style: "background:var(--muted)" }), "visited"),
     h("span", { class: "key" }, h("span", { class: "dot hollow" }), "skipped"),
     h("span", { class: "key" }, h("span", { class: "dot hollow faded", style: `opacity:${FADED_OPACITY}` }), "Faded: no shown route goes here"),
@@ -112,21 +113,43 @@ export function routeDrawing(lines, pos, style) {
 export function createRouteMap(instance, opts) {
   let entries = opts.entries;
   let engine = null; // { draw(scene), destroy() }
-  const detail = h("div", { class: "map-detail", role: "status", "aria-live": "polite" }, "Hover or press a destination for details.");
+  // The detail panel is plain text: focused stops and legs are announced through their own accessible names, so it must not be a live
+  // region (that would read each one twice). Only an explicit activation (tap, click, Enter, Space) is announced, via `announcer`.
+  const detail = h("div", { class: "map-detail" }, "Hover or press a destination for details.");
+  const announcer = h("div", { class: "sr-only", role: "status", "aria-live": "polite" });
+  const helpId = `map-help-${++mapCount}`;
+  const help = h("p", { id: helpId, class: "sr-only" });
+  const caption = h("figcaption", { class: "meta map-caption" });
   const stage = h("div", { class: "map-stage", style: opts.height ? `min-height:${opts.height}px` : null });
   const full = h("button", { type: "button", class: "map-full", "aria-pressed": "false", "aria-label": "Fullscreen map", title: "Fullscreen map (Esc to leave)" }, "Fullscreen");
   const note = h("p", { class: "meta map-note", hidden: true });
   const panel = h("div", { class: "map-summary" });
   const tip = h("div", { class: "map-tip", hidden: true, "aria-hidden": "true" });
   const frame = h("div", { class: "map-frame" }, stage, full, tip);
-  const el = h("figure", { class: "routemap" }, panel, frame, note, detail);
+  const el = h("figure", { class: "routemap" }, panel, frame, note, detail, announcer, help, caption);
+  const places = instance.locations.filter((l) => !l.isDepot).length;
+  const drawCaption = () => { caption.textContent = `Route map: ${entries.map((e) => e.label ?? e.id).join(", ") || "no routes"}, ${places} places.`;
+    if (stage.getAttribute("role") === "region") stage.setAttribute("aria-label", caption.textContent.replace(/\.$/, "")); };
+  drawCaption();
+  // Fullscreen covers the page, so everything outside the map is made inert (no Tab, no screen reader access) while it is on.
+  let inerted = [];
+  const setInert = (on) => {
+    for (const n of inerted) n.inert = false;
+    inerted = [];
+    if (!on) return;
+    for (let n = el; n && n !== document.body; n = n.parentElement) {
+      for (const sib of n.parentElement?.children ?? []) if (sib !== n && !["SCRIPT", "LINK", "STYLE"].includes(sib.tagName)) { sib.inert = true; inerted.push(sib); }
+    }
+  };
   const setFull = (on) => {
     el.classList.toggle("is-full", on);
     full.setAttribute("aria-pressed", String(on));
     full.textContent = on ? "Exit fullscreen" : "Fullscreen";
     full.setAttribute("aria-label", on ? "Exit fullscreen map" : "Fullscreen map");
     document.documentElement.classList.toggle("map-locked", on);
+    setInert(on);
     engine?.invalidate?.();
+    if (!on && document.activeElement !== full && !el.contains(document.activeElement)) full.focus();
   };
   full.addEventListener("click", () => setFull(!el.classList.contains("is-full")));
   const onKey = (e) => { if (e.key === "Escape" && el.classList.contains("is-full")) { setFull(false); full.focus(); } };
@@ -135,7 +158,7 @@ export function createRouteMap(instance, opts) {
 
   // What a hover, tap or keyboard focus shows. Times come from the model (stopTimes / legDetails); this only lays them out.
   const byEntry = (id) => entries.find((e) => e.id === id) || { id, label: id };
-  const stopParts = (p) => ({ title: `${p.name}${p.depot ? " (depot)" : ""}`, hours: p.depot ? null : `Open ${p.window}`,
+  const stopParts = (p) => ({ title: `${p.name}${p.depot ? " (depot)" : ""}`, hours: p.depot ? null : `Open ${p.window}${p.slot == null ? "" : ` (slot ${p.slot + 1} of 4)`}`,
     rows: entries.map((e) => ({ entry: e, text: stopLine(stopTimes(e.run, instance, p.id)) })) });
   const legParts = (l) => {
     const e = byEntry(l.entry), g = legDetails(e.run, instance, l.from, l.to);
@@ -159,10 +182,13 @@ export function createRouteMap(instance, opts) {
     tip.style.left = `${Math.max(4, Math.min(x, fr.width - w - 4))}px`;
     tip.style.top = `${Math.max(4, Math.min(y, fr.height - ht - 4))}px`;
   }
-  const open = (parts, ev) => { render(detail, parts); render(tip, parts); tip.hidden = false; place(ev); };
+  const open = (parts, ev, announce) => {
+    render(detail, parts); render(tip, parts); tip.hidden = false; place(ev);
+    if (announce) announcer.textContent = plain(parts);
+  };
   const hover = {
-    stop: (p, ev) => open(stopParts(p), ev),
-    leg: (l, ev) => { const parts = legParts(l); if (parts) open(parts, ev); },
+    stop: (p, ev, announce) => open(stopParts(p), ev, announce),
+    leg: (l, ev, announce) => { const parts = legParts(l); if (parts) open(parts, ev, announce); },
     move: (ev) => { if (!tip.hidden) place(ev); },
     hide: () => { tip.hidden = true; },
     stopLabel, legLabel, unvisited,
@@ -192,6 +218,12 @@ export function createRouteMap(instance, opts) {
     if (dead) return;
     engine = name === "leaflet" ? leafletEngine(stage, hover, style) : svgEngine(stage, hover, style);
     el.dataset.engine = name;
+    const target = name === "leaflet" ? stage : stage.firstElementChild;
+    target.setAttribute("aria-describedby", helpId);
+    if (name === "leaflet") { stage.setAttribute("role", "region"); drawCaption(); }
+    help.textContent = name === "leaflet"
+      ? "Map. Arrow keys pan, plus and minus zoom. Tab moves through the routes and the stops. Press Enter or Space on a stop or route for its details, and Escape to close them."
+      : "Map drawing. Tab moves through the routes and the stops. Press Enter or Space on a stop or route for its details, and Escape to close them.";
     if (name === "svg") {
       note.hidden = false;
       note.textContent = opts.forceSvg ? "Plain map (forced)." : "Map tiles unavailable here, so this is a plain drawing of the same destinations and routes.";
@@ -203,8 +235,8 @@ export function createRouteMap(instance, opts) {
   return {
     el,
     ready,
-    setEntries(next) { entries = next; drawPanel(); if (engine) engine.draw(scene()); },
-    destroy() { dead = true; document.removeEventListener("keydown", onKey); document.removeEventListener("keydown", onEsc); document.documentElement.classList.remove("map-locked"); engine?.destroy(); },
+    setEntries(next) { entries = next; drawPanel(); drawCaption(); if (engine) engine.draw(scene()); },
+    destroy() { dead = true; setInert(false); document.removeEventListener("keydown", onKey); document.removeEventListener("keydown", onEsc); document.documentElement.classList.remove("map-locked"); engine?.destroy(); },
   };
 }
 
@@ -219,7 +251,7 @@ function arrowPath(x, y, angle, color) {
 
 function badgeNode(x, y, text, color) {
   return svg("g", { class: "badge-g", "aria-hidden": "true" },
-    svg("circle", { cx: x, cy: y, r: 7.5, fill: color, stroke: "var(--surface)", "stroke-width": 1.5 }),
+    svg("circle", { cx: x, cy: y, r: 8, fill: "var(--surface)", stroke: color, "stroke-width": 2 }),
     svg("text", { x, y: y + 3.5, "text-anchor": "middle", class: "badge-t" }, text));
 }
 
@@ -254,14 +286,14 @@ function svgEngine(stage, hover, style) {
         const hit = svg("line", { class: "leg-hit", tabindex: 0, role: "button", "aria-label": hover.legLabel(l), stroke: "transparent", "stroke-width": hitWidth,
           "stroke-linecap": "round", x1: l.a.x.toFixed(1), y1: l.a.y.toFixed(1), x2: l.b.x.toFixed(1), y2: l.b.y.toFixed(1) });
         const lit = (on) => lines[i].setAttribute("stroke-width", on ? 6.5 : 3.5);
-        const enter = (ev) => { lit(true); hover.leg(l, ev); };
+        const enter = (ev, announce) => { lit(true); hover.leg(l, ev, announce); };
         hit.addEventListener("mouseenter", enter);
         hit.addEventListener("mousemove", (ev) => hover.move(ev));
         hit.addEventListener("mouseleave", () => { lit(false); hover.hide(); });
-        hit.addEventListener("click", enter);
+        hit.addEventListener("click", (ev) => enter(ev, true));
         hit.addEventListener("focus", () => { lit(true); hover.leg(l, centreOf(hit)); });
         hit.addEventListener("blur", () => { lit(false); hover.hide(); });
-        hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); enter(centreOf(hit)); } });
+        hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); enter(centreOf(hit), true); } });
         root.append(hit);
       });
       const plan = new Set(labelPlan(scene.points.map((p, i) => ({ id: p.id, name: p.name, ...xy[i], visited: p.filled })), W, H));
@@ -279,13 +311,13 @@ function svgEngine(stage, hover, style) {
           ? svg("text", { x: side === "right" ? x + 11 : x - 11, y: y + 4, class: "pt-label", "text-anchor": side === "right" ? "start" : "end" }, p.name) : null;
         if (faded) for (const part of [ring, mark]) part?.setAttribute("opacity", FADED_OPACITY); // the name stays full strength so it remains readable
         const grp = svg("g", { tabindex: 0, role: "button", "aria-label": label, class: faded ? "pt-group faded" : "pt-group" }, ring, mark, text);
-        grp.addEventListener("click", (ev) => hover.stop(p, ev));
+        grp.addEventListener("click", (ev) => hover.stop(p, ev, true));
         grp.addEventListener("mouseenter", (ev) => hover.stop(p, ev));
         grp.addEventListener("mousemove", (ev) => hover.move(ev));
         grp.addEventListener("mouseleave", () => hover.hide());
         grp.addEventListener("focus", () => hover.stop(p, centreOf(grp)));
         grp.addEventListener("blur", () => hover.hide());
-        grp.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); hover.stop(p, centreOf(grp)); } });
+        grp.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); hover.stop(p, centreOf(grp), true); } });
         root.append(grp);
       }
       g.badges.forEach((b) => root.append(badgeNode(b.x, b.y, b.text, b.color)));
@@ -321,7 +353,8 @@ function leafletEngine(stage, hover, style) {
     g.legs.forEach((l, i) => {
       const hit = L.polyline([back(l.a), back(l.b)], { color: "#000", weight: hitWeight, opacity: 0, lineCap: "round", className: "leg-hit", bubblingMouseEvents: false }).addTo(layer);
       const lit = (on) => lines[i].setStyle({ weight: on ? 7.5 : 4.5, opacity: on ? 1 : 0.96 });
-      hit.on("mouseover click", (e) => { lit(true); hover.leg(l, e.originalEvent); });
+      hit.on("mouseover", (e) => { lit(true); hover.leg(l, e.originalEvent); });
+      hit.on("click", (e) => { lit(true); hover.leg(l, e.originalEvent, true); });
       hit.on("mousemove", (e) => hover.move(e.originalEvent));
       hit.on("mouseout", () => { lit(false); hover.hide(); });
       const wire = () => {
@@ -330,7 +363,7 @@ function leafletEngine(stage, hover, style) {
         node.setAttribute("tabindex", "0"); node.setAttribute("role", "button"); node.setAttribute("aria-label", hover.legLabel(l));
         node.addEventListener("focus", () => { lit(true); hover.leg(l, centreOf(node)); });
         node.addEventListener("blur", () => { lit(false); hover.hide(); });
-        node.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); hover.leg(l, centreOf(node)); } });
+        node.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); hover.leg(l, centreOf(node), true); } });
       };
       hit.on("add", wire); wire();
     });
@@ -344,7 +377,7 @@ function leafletEngine(stage, hover, style) {
       L.marker(back(a), { interactive: false, keyboard: false, icon: icon(glyph, 14) }).addTo(layer);
     }
     for (const b of g.badges) {
-      const badge = h("span", { class: "lf-badge", style: `background:${b.color}` }, b.text);
+      const badge = h("span", { class: "lf-badge", style: `--ring:${b.color}` }, b.text);
       L.marker(back(b), { interactive: false, keyboard: false, icon: icon(badge, 16) }).addTo(layer);
     }
     const size = map.getSize();
@@ -357,7 +390,8 @@ function leafletEngine(stage, hover, style) {
       const m = L.marker(ll.get(p.id), { icon: icon(dot, 20), keyboard: true, zIndexOffset: 500 }).addTo(layer);
       const side = labelSide({ name: p.name, x: px.get(p.id).x }, size.x);
       if (p.depot || (showNames && plan.has(p.id))) m.bindTooltip(p.name, { permanent: true, direction: side, offset: [side === "right" ? 6 : -6, 0], className: "lf-label" });
-      m.on("click mouseover", (e) => hover.stop(p, e.originalEvent));
+      m.on("mouseover", (e) => hover.stop(p, e.originalEvent));
+      m.on("click", (e) => { if (e.originalEvent?.detail !== 0) hover.stop(p, e.originalEvent, true); }); // keyboard Enter is handled below
       m.on("mousemove", (e) => hover.move(e.originalEvent));
       m.on("mouseout", () => hover.hide());
       const wire = () => {
@@ -366,6 +400,8 @@ function leafletEngine(stage, hover, style) {
         mel.setAttribute("aria-label", hover.stopLabel(p)); mel.setAttribute("role", "button");
         mel.addEventListener("focus", () => hover.stop(p, centreOf(mel)));
         mel.addEventListener("blur", () => hover.hide());
+        // Leaflet itself turns only Enter into a click; handle Enter and Space here so details show (again) after Escape too.
+        mel.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); hover.stop(p, centreOf(mel), true); } });
       };
       m.on("add", wire); wire();
     }

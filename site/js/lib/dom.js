@@ -22,3 +22,9 @@ export function select(label, options, value, onchange) {
     options.map((o) => h("option", { value: o.value, selected: String(o.value) === String(value) }, o.label)));
   return h("label", {}, label, sel);
 }
+
+/** Stable identity of a <select> made by select(): its visible label text. Used to keep focus on it across a page re-render. */
+export const selectKey = (sel) => sel.closest("label")?.firstChild?.textContent ?? null;
+export function findSelect(root, key) {
+  return key == null ? null : [...root.querySelectorAll("select")].find((s) => selectKey(s) === key) ?? null;
+}
