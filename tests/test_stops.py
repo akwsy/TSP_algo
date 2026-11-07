@@ -105,6 +105,7 @@ class StopTest(CliCase):
         self.assertEqual((s["visitedSoFar"], s["unvisitedAtStop"], s["partialFigures"]), (1, 1, True))
 
     def test_default_day_limit_is_30(self):
+        sys.path.insert(0, str(ROOT))
         from harness import session
         self.assertEqual(session.MAX_DAYS, 30)
 
