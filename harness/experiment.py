@@ -27,6 +27,10 @@ def main(argv=None):
     ap.add_argument("name", help="experiment name: " + ", ".join(EXPERIMENTS))
     ap.add_argument("--sizes", type=int, nargs="+", help="customer counts (default: the experiment's)")
     ap.add_argument("--instances", type=int, help="instances (seeds 1..N) per size")
+    ap.add_argument("--force", action="store_true",
+                    help="re-evaluate everything, ignoring saved runs")
+    ap.add_argument("--rerun", nargs="+", metavar="ID", default=[],
+                    help="re-evaluate only these algorithms (their saved runs are not reused)")
     ap.add_argument("--dataset", default=str(DEFAULT_DATASET))
     ap.add_argument("--algorithms-dir", default=str(ROOT / "algorithms"))
     ap.add_argument("--instances-dir", default="instances")
@@ -57,8 +61,21 @@ def main(argv=None):
         print(f"error: no algorithm.json found under {args.algorithms_dir}", file=sys.stderr)
         return 2
 
+    unknown = [a for a in args.rerun if a not in {m["id"] for m in algorithms}]
+    if unknown:
+        print(f"error: --rerun: no such algorithm: {', '.join(unknown)}", file=sys.stderr)
+        return 2
+    stats = {}
     records = run_batch(algorithms, instances, Path(args.instances_dir), Path(args.results_dir),
-                        extra={"experiment": exp.name})
+                        extra={"experiment": exp.name}, reuse=not args.force,
+                        rerun=set(args.rerun), stats=stats)
+    reused, ran = sum(stats["reused"].values()), sum(stats["ran"].values())
+    print(f"Reused {reused} saved runs, ran {ran} new.")
+    for meta in algorithms:
+        a = meta["id"]
+        print(f"  {a}: reused {stats['reused'].get(a, 0)}, ran {stats['ran'].get(a, 0)}")
+    if stats["legacy"]:
+        print(f"Note: {stats['legacy']} older saved runs have no fingerprint, so they were not reused.")
     result = aggregate(records)
     result = {"experiment": exp.name, "parameters": {
         "sizes": list(exp.sizes), "instancesPerSize": exp.instances_per_size, "seeds": seeds,

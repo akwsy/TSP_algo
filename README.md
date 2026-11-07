@@ -31,7 +31,9 @@ python3 start.py
 
 `start.py` does two things in order:
 
-1. **Runs the evaluation.** It builds the problem instances, runs every algorithm in `algorithms/` on the same instances, checks each answer independently, and writes the results into `results/`. The full default run (7 sizes from 5 to 100 customers, 30 instances each) takes about 10 seconds with the baseline algorithm.
+1. **Runs the evaluation.** It builds the problem instances, runs every algorithm in `algorithms/` on the same instances, checks each answer independently, and writes the results into `results/`. **Evaluation is incremental:** each algorithm is evaluated only once. A saved run is reused when the algorithm's code (a hash of every file in its folder, including `algorithm.json` and so its time limit), the instance and the settings are unchanged, so running `start.py` again evaluates nothing new and says so ("Reusing 210 saved runs, running 0 new"). Editing one algorithm re-evaluates only that algorithm; adding one evaluates only the new one; extra sizes or instances run only the missing pairs. The first full default run (7 sizes from 5 to 100 customers, 30 instances each) takes about 10 seconds with the baseline algorithm.
+
+   Saved data lives in `results/` and `instances/` (both git-ignored). Delete those folders to start completely fresh. Runtimes are saved with the run, so re-evaluating an algorithm (`--rerun`) refreshes its runtimes; reused runs keep the runtimes measured when they ran. Runs saved by an older version of the harness carry no fingerprint and are re-evaluated once.
 2. **Starts the website** at http://127.0.0.1:8000/ and opens it in your browser. Press Ctrl+C in the terminal to stop it.
 
 Useful options:
@@ -39,6 +41,8 @@ Useful options:
 ```
 python3 start.py --sizes 5 10 --instances 3       # a quick small run first
 python3 start.py --skip-run                       # just open the site on results you already have
+python3 start.py --force                          # re-evaluate everything, ignoring saved runs
+python3 start.py --rerun nearest-neighbour        # re-evaluate only the named algorithms (refreshes their runtimes)
 python3 start.py --port 8001                      # if port 8000 is busy
 python3 start.py --no-browser                     # do not open a browser window
 ```
@@ -69,7 +73,7 @@ python3 -m harness.experiment scaling                                   # sizes 
 python3 -m harness.experiment scaling --sizes 5 10 15 --instances 5     # a quick run
 ```
 
-This builds the instances into `instances/`, runs every algorithm in `algorithms/` on them, validates each answer independently, and writes one JSON record per run plus `index.json` and `aggregates-scaling.json` into `results/`. Use `--results-dir`, `--instances-dir` and `--algorithms-dir` to write elsewhere.
+This is incremental, with the same `--force` and `--rerun ID [ID ...]` options as `start.py`: it builds the instances into `instances/`, runs every algorithm in `algorithms/` on them (skipping pairs already saved for the same code and instance), validates each answer independently, and writes one JSON record per run plus `index.json` and `aggregates-scaling.json` into `results/`. Use `--results-dir`, `--instances-dir` and `--algorithms-dir` to write elsewhere.
 
 ## Run the tests
 
