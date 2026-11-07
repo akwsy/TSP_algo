@@ -88,6 +88,9 @@ def main(argv=None):
     if args.max_days < 1:
         print("error: --max-days must be a positive whole number", file=sys.stderr)
         return 2
+    if args.full_run_instances < 0:
+        print("error: --full-run-instances must not be negative", file=sys.stderr)
+        return 2
     if args.name not in EXPERIMENTS:
         print(f"error: unknown experiment {args.name!r}; known: {', '.join(EXPERIMENTS)}",
               file=sys.stderr)
@@ -120,9 +123,6 @@ def main(argv=None):
     records = run_batch(algorithms, instances, Path(args.instances_dir), Path(args.results_dir),
                         extra={"experiment": exp.name}, reuse=not args.force,
                         rerun=set(args.rerun), stats=stats)
-    if args.full_run_instances < 0:
-        print("error: --full-run-instances must not be negative", file=sys.stderr)
-        return 2
     full = {}
     sessions = run_full_sessions(algorithms, instances, records, Path(args.results_dir), exp,
                                  min(args.full_run_instances, exp.instances_per_size),
