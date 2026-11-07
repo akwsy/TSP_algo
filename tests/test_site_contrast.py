@@ -60,6 +60,17 @@ class ContrastTest(unittest.TestCase):
                 self.assertGreaterEqual(ratio(t["accent"], t[bg]), 4.5, f"link on {bg} ({name})")
                 self.assertGreaterEqual(ratio(t["text"], t[bg]), 4.5, f"text on {bg} ({name})")
 
+    def test_secondary_text_status_focus_and_controls_on_every_surface(self):
+        # Mission control surfaces: page (bg), panel (surface) and raised panel/header rows (surface-2).
+        for name, t in self.t.items():
+            for bg in ("surface", "surface-2", "bg"):
+                for fg in ("muted", "ok", "warn", "bad", "accent"):
+                    self.assertGreaterEqual(ratio(t[fg], t[bg]), 4.5, f"{fg} on {bg} ({name})")
+                self.assertGreaterEqual(ratio(t["focus"], t[bg]), 3.0, f"focus ring on {bg} ({name})")
+                self.assertGreaterEqual(ratio(t["control"], t[bg]), 3.0, f"control border on {bg} ({name})")
+            for fg in ("ok", "warn", "bad"):  # status badges sit on their own tint
+                self.assertGreaterEqual(ratio(t[fg], t[f"{fg}-bg"]), 4.5, f"{fg} badge ({name})")
+
     def test_stop_number_badges_read_at_4_5(self):
         css = strip((CSS / "map.css").read_text())
         self.assertRegex(css, r"\.lf-badge\s*\{[^}]*background:\s*var\(--surface\)[^}]*color:\s*var\(--text\)")

@@ -1,20 +1,25 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="dark light">
 <title>Routing algorithm results</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%230072b2'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23070a0f'/%3E%3Ccircle cx='8' cy='8' r='3.5' fill='%235cc8ff'/%3E%3C/svg%3E">
+<!-- Applies the stored theme and motion choice before first paint (dark by default). js/app.js owns the logic afterwards. -->
+<script src="js/boot.js"></script>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/charts.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
-  <div class="brand">Routing results</div>
+  <div class="brand"><span class="beacon" aria-hidden="true"></span><span>Routing results</span><small>Algorithm console</small></div>
   <nav id="nav" aria-label="Main"></nav>
-  <button id="theme" class="btn" type="button" aria-label="Switch colour theme"></button>
+  <div class="topbar-tools">
+    <button id="motion" class="btn" type="button" aria-pressed="false"><span class="lamp" aria-hidden="true"></span>Reduce motion</button>
+    <button id="theme" class="btn" type="button"></button>
+  </div>
 </header>
 <main id="main" tabindex="-1"></main>
 <script type="module" src="js/app.js"></script>

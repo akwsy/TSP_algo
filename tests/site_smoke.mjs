@@ -71,6 +71,8 @@ for (const [device, w, hgt, scheme] of MODES) {
     await s("Runtime.enable"); await s("Log.enable"); await s("Network.enable"); await s("Page.enable");
     await s("Emulation.setDeviceMetricsOverride", { width: w, height: hgt, deviceScaleFactor: 1, mobile: device === "phone" });
     await s("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: scheme }] });
+    // The site is dark by default whatever the OS says; choose the theme the way a visitor would (the stored theme button choice).
+    await s("Page.addScriptToEvaluateOnNewDocument", { source: `try { localStorage.setItem("theme", ${JSON.stringify(scheme)}); } catch (e) {}` });
     await s("Page.navigate", { url: `${base}/#/${page}` });
     await new Promise((r) => setTimeout(r, waitMs));
     const { result } = await s("Runtime.evaluate", { expression: "JSON.stringify({h1: document.querySelector('main h1')?.textContent, nan: /NaN|undefined|\\bfalse\\b|\\bnull\\b|\\[object/.test(document.body.innerText), hscroll: document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('main *, header *')].some((e) => !e.closest('.table-wrap, #nav, pre, .leaflet-container, svg') && e.getBoundingClientRect().right > document.documentElement.clientWidth + 1)})", returnByValue: true });
