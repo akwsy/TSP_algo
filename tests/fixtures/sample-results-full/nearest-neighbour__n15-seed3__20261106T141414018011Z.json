@@ -1,0 +1,65 @@
+{
+  "algorithmId": "nearest-neighbour",
+  "commit": "2918102ce3635fb1f03659d1e3c1a474a802c4eb",
+  "instanceId": "n15-seed3",
+  "seed": 3,
+  "numCustomers": 15,
+  "runId": "20261106T141414018011Z",
+  "timestamp": "2026-11-06T14:14:23+00:00",
+  "status": "HEURISTIC",
+  "route": [
+    0,
+    11,
+    6,
+    2,
+    0
+  ],
+  "runtimeMs": 14.19125000393251,
+  "stats": {
+    "customersVisited": 3
+  },
+  "stderr": "",
+  "valid": true,
+  "failureReason": null,
+  "visited": 3,
+  "skipped": [
+    1,
+    3,
+    4,
+    5,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    15
+  ],
+  "distanceKm": 152.18356254740047,
+  "travelMinutes": 228.27534382110068,
+  "waitMinutes": 220.72376999730153,
+  "totalMinutes": 448.9991138184022,
+  "returnMinute": 808.9991138184023,
+  "schedule": [
+    {
+      "id": 11,
+      "arriveMinute": 375.9282520689236,
+      "startMinute": 375.9282520689236,
+      "leaveMinute": 375.9282520689236
+    },
+    {
+      "id": 6,
+      "arriveMinute": 409.27623000269847,
+      "startMinute": 630,
+      "leaveMinute": 630
+    },
+    {
+      "id": 2,
+      "arriveMinute": 708.9709929802376,
+      "startMinute": 708.9709929802376,
+      "leaveMinute": 708.9709929802376
+    }
+  ],
+  "experiment": "scaling"
+}

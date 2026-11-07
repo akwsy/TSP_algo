@@ -76,13 +76,20 @@ for (const [device, w, hgt, scheme] of MODES) {
     await s("Page.addScriptToEvaluateOnNewDocument", { source: `try { localStorage.setItem("theme", ${JSON.stringify(scheme)}); localStorage.setItem("view", ${JSON.stringify(view)}); } catch (e) {}` });
     await s("Page.navigate", { url: `${base}/#/${page}` });
     await new Promise((r) => setTimeout(r, waitMs));
-    const { result } = await s("Runtime.evaluate", { expression: "JSON.stringify({mainText: document.querySelector('main')?.innerText || '', toggle: [...document.querySelectorAll('#viewtoggle [role=radiogroup] [role=radio]')].map((b) => b.getAttribute('aria-checked')).join(), h1: document.querySelector('main h1')?.textContent, nan: /NaN|undefined|\\bfalse\\b|\\bnull\\b|\\[object/.test(document.body.innerText), hscroll: document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('main *, header *')].some((e) => !e.closest('.table-wrap, #nav, pre, .leaflet-container, svg') && e.getBoundingClientRect().right > document.documentElement.clientWidth + 1)})", returnByValue: true });
+    const { result } = await s("Runtime.evaluate", { expression: "JSON.stringify({mainText: document.querySelector('main')?.innerText || '', toggle: [...document.querySelectorAll('#viewtoggle [role=radiogroup] [role=radio]')].map((b) => b.getAttribute('aria-checked')).join(), h1: document.querySelector('main h1')?.textContent, svgCharts: document.querySelectorAll('main figure.chart svg.chart-svg').length, nan: /NaN|undefined|\\bfalse\\b|\\bnull\\b|\\[object/.test(document.body.innerText), hscroll: document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('main *, header *')].some((e) => !e.closest('.table-wrap, #nav, pre, .leaflet-container, svg') && e.getBoundingClientRect().right > document.documentElement.clientWidth + 1)})", returnByValue: true });
     Object.assign(entry, JSON.parse(result.value));
     if (entry.toggle !== (view === "full" ? "false,true" : "true,false")) entry.errors.push(`view toggle state is ${entry.toggle}, expected the ${view} view selected`);
     // What each page says in the full-run view: the ranked table with its "did not finish" label, or the plain "coming to this page" note.
     const name = page.split("?")[0];
     if (view === "full" && name === "overview" && !/ranked below: \d+ instances? did(n't| not) finish/.test(entry.mainText)) entry.errors.push("full-run overview lacks the ranked-below label");
-    if (view === "full" && ["scaling", "instance", "run"].includes(name) && !/view is coming to the/.test(entry.mainText)) entry.errors.push("page lacks the full-run coming-soon note");
+    if (view === "full" && ["instance", "run"].includes(name) && !/view is coming to the/.test(entry.mainText)) entry.errors.push("page lacks the full-run coming-soon note");
+    if (name === "scaling" && view === "full") {
+      if (/view is coming to the/.test(entry.mainText)) entry.errors.push("full-run scaling still shows the coming-soon note");
+      if (entry.svgCharts !== 4) entry.errors.push(`full-run scaling shows ${entry.svgCharts} charts, expected 4`);
+      if (/log-log|declared complexity/i.test(entry.mainText)) entry.errors.push("full-run scaling shows the complexity plot");
+      if (!/Not plotted: /.test(entry.mainText)) entry.errors.push("full-run scaling lacks the not-plotted note");
+    }
+    if (name === "scaling" && view === "first" && !/Measured growth against declared complexity/.test(entry.mainText)) entry.errors.push("first-day scaling lacks the complexity plot");
     if (view === "first" && /coming to the|working hours/.test(entry.mainText)) entry.errors.push("first-day page shows full-run wording");
     delete entry.mainText;
     if (!entry.h1) entry.errors.push("page rendered no heading");
