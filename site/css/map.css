@@ -55,9 +55,12 @@ main:has(.routemap) { max-width: min(1640px, 100%); }
   background: color-mix(in srgb, var(--surface) 90%, transparent); border: 1px solid var(--line-strong); padding: 6px 10px; border-radius: var(--radius);
   box-shadow: 0 0 0 1px var(--glow); pointer-events: none; animation: fade-slide var(--t-fast) var(--ease-out); }
 .map-hud[hidden] { display: none; }
-.routemap.is-full { position: fixed; inset: 0; z-index: 2000; background: var(--bg); padding: 10px; grid-template-rows: auto 1fr auto auto; }
-.routemap.is-full .map-frame { min-height: 0; }
-.routemap.is-full .map-stage { height: 100%; border-radius: 6px; }
+/* Fullscreen: the figure fills the screen (top layer via the Fullscreen API, or fixed as a fallback); the map takes all the height the
+   other rows (summary, details, caption) leave, whichever of them are showing. */
+.routemap.is-full { position: fixed; inset: 0; z-index: 2000; background: var(--bg); padding: 10px; display: flex; flex-direction: column; overflow: auto; }
+.routemap.is-full > * { flex: none; }
+.routemap.is-full .map-frame { flex: 1 1 auto; min-height: 200px; display: flex; }
+.routemap.is-full .map-stage, .routemap.is-full .alg-card .map-stage { flex: 1 1 auto; height: auto; min-height: 0; border-radius: 6px; }
 .map-locked { overflow: hidden; }
 .map-svg { display: block; width: 100%; height: 100%; background: radial-gradient(ellipse at 50% 40%, var(--surface), var(--bg)); }
 .map-svg .map-grid-line { stroke: var(--grid); stroke-width: 1; }

@@ -34,6 +34,17 @@ class SitePagesTest(unittest.TestCase):
         for p in pages:
             self.assertEqual(p["errors"], [], p["page"])
 
+    def test_map_fullscreen_fills_the_viewport_and_escape_restores(self):
+        """Regression: an ancestor's entrance animation (transform) became the containing block of the position:fixed overlay,
+        so Fullscreen showed a clipped, collapsed map. Leaflet and SVG, desktop and phone, Fullscreen API and CSS fallback."""
+        server = serve.make_server(0, FIX / "sample-results", FIX / "sample-algorithms", instances=FIX / "sample-instances")
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        out = subprocess.run(["node", str(ROOT / "tests" / "site_fullscreen.mjs"), f"http://127.0.0.1:{server.server_port}"],
+                             capture_output=True, text=True, timeout=180)
+        self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

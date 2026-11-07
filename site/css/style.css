@@ -46,13 +46,15 @@
 
 /* ---------- base ---------- */
 * { box-sizing: border-box; }
-html { background: var(--bg); }
+html { background: var(--bg); scroll-padding-top: 80px; }
+/* In-page jumps (skip link, anchors) glide, but only when motion is welcome; native wheel and touch scrolling is never touched. */
+:root[data-motion="full"] { scroll-behavior: smooth; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 var(--font); -webkit-font-smoothing: antialiased; min-height: 100vh; }
 /* Faint instrument grid, strongest at the top of the screen and fading out: texture, never behind running text at strength. */
 body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background: radial-gradient(1100px 520px at 72% -8%, var(--wash), transparent 70%),
-    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 44px 44px, linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 44px 44px;
-  -webkit-mask-image: linear-gradient(#000, rgb(0 0 0 / .35) 60%, transparent); mask-image: linear-gradient(#000, rgb(0 0 0 / .35) 60%, transparent); }
+    linear-gradient(color-mix(in srgb, var(--bg) 0%, transparent), color-mix(in srgb, var(--bg) 65%, transparent) 60%, var(--bg)),
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 44px 44px, linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 44px 44px; }
 ::selection { background: var(--accent); color: var(--accent-text); }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
 a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
@@ -113,12 +115,16 @@ option { background: var(--surface); color: var(--text); }
 
 /* ---------- panels ---------- */
 .card { position: relative; background: linear-gradient(180deg, var(--surface-2), var(--surface) 56px); border: 1px solid var(--line); border-radius: var(--radius);
-  box-shadow: inset 0 1px 0 var(--edge-hi), 0 18px 40px -28px var(--shadow); transition: border-color var(--t-mid), box-shadow var(--t-mid); }
+  box-shadow: inset 0 1px 0 var(--edge-hi), 0 18px 40px -28px var(--shadow); }
 /* Corner ticks: the frame of an instrument panel. */
 .card::before { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; opacity: .8;
   background: linear-gradient(var(--accent), var(--accent)) 0 0 / 12px 1px no-repeat, linear-gradient(var(--accent), var(--accent)) 0 0 / 1px 12px no-repeat,
     linear-gradient(var(--accent), var(--accent)) 100% 100% / 12px 1px no-repeat, linear-gradient(var(--accent), var(--accent)) 100% 100% / 1px 12px no-repeat; }
-.card:hover { border-color: var(--line-strong); box-shadow: inset 0 1px 0 var(--edge-hi), 0 0 0 1px var(--glow), 0 18px 44px -24px var(--glow-strong); }
+/* The hover glow is a pseudo-element that fades in (opacity is composited). Transitioning box-shadow itself repainted a 44px blur on
+   every card the pointer crossed while scrolling: measured 4x the raster time on the Scaling page. */
+.card::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; opacity: 0; border: 1px solid var(--line-strong); will-change: opacity;
+  box-shadow: 0 0 0 1px var(--glow), 0 18px 44px -24px var(--glow-strong); transition: opacity var(--t-mid); }
+.card:hover::after { opacity: 1; }
 .table-wrap { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
 caption { text-align: left; padding: 14px 16px 8px; color: var(--muted); font-size: .85rem; caption-side: top; }
@@ -180,9 +186,12 @@ pre { margin: 8px 0 0; padding: 12px 14px; background: var(--bg); border: 1px so
 @keyframes slide-in { from { opacity: 0; transform: translateX(-14px); } }
 @keyframes fade-slide { from { opacity: 0; transform: translateY(6px); } }
 /* A new view assembles panel by panel (each child of <main> gets --i from JS). */
-main.entering > * { animation: rise var(--t-slow) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 70ms); }
+main.entering > * { animation: rise var(--t-slow) var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 70ms); }
 /* Rows of a ranking or list slide in in their order. */
-.stagger > * { animation: slide-in 520ms var(--ease-out) both; animation-delay: calc(120ms + var(--i, 0) * 45ms); }
+.stagger > * { animation: slide-in 520ms var(--ease-out) backwards; animation-delay: calc(120ms + var(--i, 0) * 45ms); }
+/* A transform (even a running or filling one) on an ancestor becomes the containing block of position:fixed descendants, so the
+   CSS fullscreen map overlay would be clipped to its panel. While it is open nothing above it may animate. */
+.map-locked main.entering > *, .map-locked .stagger > * { animation: none; }
 details[open] > :not(summary) { animation: fade-slide var(--t-mid) var(--ease-out); }
 /* Reduced motion: from the system or the header toggle. Everything lands in its final state at once. */
 @media (prefers-reduced-motion: reduce) {
@@ -200,6 +209,7 @@ details[open] > :not(summary) { animation: fade-slide var(--t-mid) var(--ease-ou
   .btn { padding: 0 10px; }
   /* On a phone the bar wraps to three rows, so it scrolls away instead of covering a third of the screen. */
   .topbar { padding-left: var(--gap); padding-right: var(--gap); position: relative; }
+  html { scroll-padding-top: 12px; }
   .readout > div { border-right: 0; border-bottom: 1px solid var(--line); }
   .readout > div:last-child { border-bottom: 0; }
   .toolbar { padding: 10px 12px; }
