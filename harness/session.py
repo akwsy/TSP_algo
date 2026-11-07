@@ -45,14 +45,13 @@ Stop reasons (STOP_REASONS; stable). Explanation texts, N = day, K = places stil
 A day killed by the time limit that had already printed a complete valid route is scored by the
 runner's normal rules (status TIME_LIMIT, killed true): it is progress if the route is valid and
 visits new places, otherwise no_progress or invalid_route. Only a timeout with no usable route is
-timed_out. The day cap can be lowered for tests with the environment variable TSP_MAX_DAYS
-(default 30).
+timed_out. The day cap is 30 (MAX_DAYS); a different cap can be passed explicitly (run_session's `max_days`,
+the experiment command's advanced `--max-days N`) and is part of the saved-session reuse key.
 
 Day 1 is the ordinary first-day run (a saved first-day record may be passed in and is reused).
 Later days get sub_instance(): only the unvisited places plus the depot (id 0), customers
 renumbered consecutively in original order, same seed, speed, departure and deadline.
 """
-import os
 from datetime import datetime, timezone
 
 from .run import make_record
@@ -60,11 +59,6 @@ from .run import make_record
 MAX_DAYS = 30
 STOP_REASONS = ("no_progress", "day_limit", "crashed", "invalid_route", "unreadable_output",
                 "timed_out", "could_not_start")
-
-
-def day_cap():
-    """The day cap: MAX_DAYS, or TSP_MAX_DAYS from the environment (a test hook)."""
-    return int(os.environ.get("TSP_MAX_DAYS") or MAX_DAYS)
 
 
 def classify_failure(entry):
@@ -127,7 +121,7 @@ def run_session(meta, instance, run_id, first_day=None, max_days=None):
     `first_day` is the saved first-day record for this algorithm and instance, used as day 1
     when given (so nothing is computed twice). Returns the session record (see module doc).
     Seam: ticket 03 decides whether a saved session is reused and indexes it."""
-    max_days = max_days or day_cap()
+    max_days = max_days or MAX_DAYS
     unvisited = set(range(1, len(instance["locations"])))
     days = []
     stop = None
