@@ -277,7 +277,8 @@ function svgEngine(stage, hover, style) {
         const side = labelSide({ name: p.name, x }, W);
         const text = p.depot || plan.has(p.id)
           ? svg("text", { x: side === "right" ? x + 11 : x - 11, y: y + 4, class: "pt-label", "text-anchor": side === "right" ? "start" : "end" }, p.name) : null;
-        const grp = svg("g", { tabindex: 0, role: "button", "aria-label": label, class: faded ? "pt-group faded" : "pt-group", opacity: faded ? FADED_OPACITY : null }, ring, mark, text);
+        if (faded) for (const part of [ring, mark]) part?.setAttribute("opacity", FADED_OPACITY); // the name stays full strength so it remains readable
+        const grp = svg("g", { tabindex: 0, role: "button", "aria-label": label, class: faded ? "pt-group faded" : "pt-group" }, ring, mark, text);
         grp.addEventListener("click", (ev) => hover.stop(p, ev));
         grp.addEventListener("mouseenter", (ev) => hover.stop(p, ev));
         grp.addEventListener("mousemove", (ev) => hover.move(ev));
