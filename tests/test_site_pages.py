@@ -30,9 +30,10 @@ class SitePagesTest(unittest.TestCase):
                              capture_output=True, text=True, timeout=120)
         self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
         pages = json.loads(out.stdout)
-        self.assertEqual(len(pages), 6)
+        self.assertEqual(len(pages), 12)  # six pages, each in both toggle states
+        self.assertEqual({p["view"] for p in pages}, {"first", "full"})
         for p in pages:
-            self.assertEqual(p["errors"], [], p["page"])
+            self.assertEqual(p["errors"], [], f"{p['page']} ({p['view']})")
 
     def test_map_fullscreen_fills_the_viewport_and_escape_restores(self):
         """Regression: an ancestor's entrance animation (transform) became the containing block of the position:fixed overlay,

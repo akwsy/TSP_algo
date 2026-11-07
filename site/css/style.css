@@ -93,6 +93,21 @@ code, .mono { font-family: var(--mono); font-size: .9em; }
 .btn .theme-lamp { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 .btn[aria-disabled="true"] { cursor: not-allowed; }
 
+/* View toggle: two-option radio group in the header ("First day only" / "Until every place is visited"). */
+/* The toggle gets its own row under the brand and menu on every width, so the menu never has to wrap around it. */
+.viewbar { order: 4; flex-basis: 100%; padding-bottom: 8px; }
+.viewswitch { display: inline-flex; border: 1px solid var(--control); border-radius: var(--radius); background: var(--surface-2); overflow: hidden; }
+.view-opt { font: 600 .85rem/1.2 var(--font); color: var(--text); background: transparent; border: 0; padding: 4px 14px; min-height: 44px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left;
+  transition: background-color var(--t-fast), color var(--t-fast); }
+.view-opt + .view-opt { border-left: 1px solid var(--control); }
+.view-opt:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.view-opt[aria-checked="true"] { background: var(--accent); color: var(--accent-text); }
+.view-opt:focus-visible { outline-offset: -3px; }
+.view-count { font: 500 .7rem/1.2 var(--mono); letter-spacing: .02em; opacity: .9; }
+.view-count:empty { display: none; }
+.view-note { margin: 0 0 20px; padding: 10px 14px; max-width: 68ch; color: var(--text); background: var(--warn-bg); border-left: 3px solid var(--warn); border-radius: 3px; }
+
 /* ---------- page frame ---------- */
 main { max-width: 1320px; margin: 0 auto; padding: 36px var(--gap) 72px; }
 main:focus { outline: none; }
@@ -204,6 +219,8 @@ details[open] > :not(summary) { animation: fade-slide var(--t-mid) var(--ease-ou
   th, td { padding: 9px 10px; }
   .topbar { gap: 6px 10px; justify-content: space-between; padding-top: 8px; padding-bottom: 0; }
   .brand small { display: none; }
+  .viewswitch { display: flex; }
+  .view-opt { flex: 1 1 0; padding: 4px 10px; font-size: .8rem; }
   #nav { order: 3; flex-basis: 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--gap)); padding: 0 var(--gap); }
   #nav a { white-space: nowrap; padding: 0 12px; }
   .btn { padding: 0 10px; }

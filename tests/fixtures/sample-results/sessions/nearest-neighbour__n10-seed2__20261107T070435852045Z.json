@@ -1,0 +1,181 @@
+{
+  "algorithmId": "nearest-neighbour",
+  "commit": null,
+  "fingerprint": "33b917412b79e7370501cb710e1efad1bba60d680da00bf6a8c79a5c42b74830",
+  "instanceId": "n10-seed2",
+  "seed": 2,
+  "numCustomers": 10,
+  "runId": "20261107T070435852045Z",
+  "timestamp": "2026-11-07T07:04:36+00:00",
+  "outcome": "finished",
+  "stopReason": null,
+  "stopDay": null,
+  "explanation": null,
+  "partialFigures": false,
+  "unvisitedAtStop": 0,
+  "days": 3,
+  "visitedSoFar": 10,
+  "workingMinutes": 2773.7935020665363,
+  "totalDistanceKm": 960.3214046333142,
+  "totalRuntimeMs": 40.72125099992263,
+  "finalReturnMinute": 1371.7690588774271,
+  "dayRecords": [
+    {
+      "day": 1,
+      "instanceId": "n10-seed2",
+      "numPlaces": 10,
+      "route": [
+        0,
+        8,
+        10,
+        5,
+        7,
+        3,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 13.947334000022238,
+      "stats": {
+        "customersVisited": 5,
+        "iterations": 45
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        8,
+        10,
+        5,
+        7,
+        3
+      ],
+      "distanceKm": 295.4936553466662,
+      "returnMinute": 1318.1059730769816,
+      "schedule": [
+        {
+          "id": 8,
+          "arriveMinute": 380.7495167905566,
+          "startMinute": 380.7495167905566,
+          "leaveMinute": 380.7495167905566
+        },
+        {
+          "id": 10,
+          "arriveMinute": 385.1345099430176,
+          "startMinute": 900,
+          "leaveMinute": 900
+        },
+        {
+          "id": 5,
+          "arriveMinute": 1010.272888558145,
+          "startMinute": 1010.272888558145,
+          "leaveMinute": 1010.272888558145
+        },
+        {
+          "id": 7,
+          "arriveMinute": 1110.2528077119114,
+          "startMinute": 1110.2528077119114,
+          "leaveMinute": 1110.2528077119114
+        },
+        {
+          "id": 3,
+          "arriveMinute": 1183.2354941502826,
+          "startMinute": 1183.2354941502826,
+          "leaveMinute": 1183.2354941502826
+        }
+      ],
+      "workingMinutes": 958.1059730769816
+    },
+    {
+      "day": 2,
+      "instanceId": "n10-seed2-day2",
+      "numPlaces": 5,
+      "route": [
+        0,
+        9,
+        1,
+        6,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 13.452874999984488,
+      "stats": {
+        "customersVisited": 3,
+        "iterations": 14
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        9,
+        1,
+        6
+      ],
+      "distanceKm": 394.9019997226522,
+      "returnMinute": 1365.687528989555,
+      "schedule": [
+        {
+          "id": 9,
+          "arriveMinute": 493.56070655440857,
+          "startMinute": 493.56070655440857,
+          "leaveMinute": 493.56070655440857
+        },
+        {
+          "id": 1,
+          "arriveMinute": 543.9051593567638,
+          "startMinute": 543.9051593567638,
+          "leaveMinute": 543.9051593567638
+        },
+        {
+          "id": 6,
+          "arriveMinute": 756.6654705944233,
+          "startMinute": 1170,
+          "leaveMinute": 1170
+        }
+      ],
+      "workingMinutes": 1005.687528989555
+    },
+    {
+      "day": 3,
+      "instanceId": "n10-seed2-day3",
+      "numPlaces": 2,
+      "route": [
+        0,
+        2,
+        4,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 13.321041999915906,
+      "stats": {
+        "customersVisited": 2,
+        "iterations": 3
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        2,
+        4
+      ],
+      "distanceKm": 269.92574956399585,
+      "returnMinute": 1371.7690588774271,
+      "schedule": [
+        {
+          "id": 2,
+          "arriveMinute": 532.0923541571328,
+          "startMinute": 630,
+          "leaveMinute": 630
+        },
+        {
+          "id": 4,
+          "arriveMinute": 661.0272113114337,
+          "startMinute": 1170,
+          "leaveMinute": 1170
+        }
+      ],
+      "workingMinutes": 810
+    }
+  ],
+  "experiment": "scaling",
+  "instanceHash": "f31b4b1703080e6b95449b82a861cf23ceb6f38675b8be9144b86bce439e2ad0"
+}
