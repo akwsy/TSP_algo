@@ -74,7 +74,10 @@ for (const [device, w, hgt, scheme] of MODES) {
     await s("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: scheme }] });
     // The site is dark by default whatever the OS says; choose the theme the way a visitor would (the stored theme button choice).
     await s("Page.addScriptToEvaluateOnNewDocument", { source: `try { localStorage.setItem("theme", ${JSON.stringify(scheme)}); localStorage.setItem("view", ${JSON.stringify(view)}); } catch (e) {}` });
-    await s("Page.navigate", { url: `${base}/#/${page}` });
+    // The full view lists sessions, and the sample sessions are on other problems than the first-day runs.
+    const url = view === "full" && page.startsWith("instance") ? "instance?id=n10-seed4"
+      : view === "full" && page === "run" ? "run?algorithm=greedy-insertion-cached&example=4&places=10" : page;
+    await s("Page.navigate", { url: `${base}/#/${url}` });
     await new Promise((r) => setTimeout(r, waitMs));
     const { result } = await s("Runtime.evaluate", { expression: "JSON.stringify({mainText: document.querySelector('main')?.innerText || '', toggle: [...document.querySelectorAll('#viewtoggle [role=radiogroup] [role=radio]')].map((b) => b.getAttribute('aria-checked')).join(), h1: document.querySelector('main h1')?.textContent, svgCharts: document.querySelectorAll('main figure.chart svg.chart-svg').length, nan: /NaN|undefined|\\bfalse\\b|\\bnull\\b|\\[object/.test(document.body.innerText), hscroll: document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('main *, header *')].some((e) => !e.closest('.table-wrap, #nav, pre, .leaflet-container, svg') && e.getBoundingClientRect().right > document.documentElement.clientWidth + 1)})", returnByValue: true });
     Object.assign(entry, JSON.parse(result.value));
@@ -85,7 +88,6 @@ for (const [device, w, hgt, scheme] of MODES) {
     // Failures and History list full-run sessions in both toggle states (they do not follow the toggle).
     if (name === "failures" && !(/did not finish every place/.test(entry.mainText) && /stopped on day \d+/i.test(entry.mainText) && /so far, not a finishing time/.test(entry.mainText) && /Example \d+ with \d+ places/.test(entry.mainText) && /Stopped on day \d+:/.test(entry.mainText))) entry.errors.push("Failures lacks a stopped session with its day, explanation and partial figures");
     if (name === "history" && !/Until every place is visited \(\d+ of \d+ finished\)/.test(entry.mainText)) entry.errors.push("History lacks the full-run sessions group");
-    if (view === "full" && ["instance", "run"].includes(name) && !/view is coming to the/.test(entry.mainText)) entry.errors.push("page lacks the full-run coming-soon note");
     if (name === "scaling" && view === "full") {
       if (/view is coming to the/.test(entry.mainText)) entry.errors.push("full-run scaling still shows the coming-soon note");
       if (entry.svgCharts !== 4) entry.errors.push(`full-run scaling shows ${entry.svgCharts} charts, expected 4`);
@@ -94,6 +96,30 @@ for (const [device, w, hgt, scheme] of MODES) {
     }
     if (name === "scaling" && view === "first" && !/Measured growth against declared complexity/.test(entry.mainText)) entry.errors.push("first-day scaling lacks the complexity plot");
     if (view === "first" && !["failures", "history"].includes(name) && /coming to the|working hours/.test(entry.mainText)) entry.errors.push("first-day page shows full-run wording");
+    if (view === "full" && ["instance", "run"].includes(name)) {
+      if (/view is coming to the/.test(entry.mainText)) entry.errors.push("full-run page still shows the coming-soon note");
+      // The day selector: right options, and choosing Day 2 changes the map and (Route detail) the schedule table.
+      const probe = await s("Runtime.evaluate", { awaitPromise: true, returnByValue: true, expression: `(async () => {
+        const daySel = () => [...document.querySelectorAll('main select')].find((x) => x.closest('label')?.firstChild?.textContent === 'Day');
+        const sig = () => JSON.stringify([[...document.querySelectorAll('.pt-group, .leaflet-marker-icon')].map((g) => g.getAttribute('aria-label')),
+          [...document.querySelectorAll('main table tbody')].map((t) => t.innerText), [...document.querySelectorAll('main .stats')].map((t) => t.innerText)]);
+        const sel = daySel();
+        if (!sel) return { options: null };
+        const options = [...sel.options].map((o) => o.textContent);
+        const before = sig();
+        sel.value = '2'; sel.dispatchEvent(new Event('change'));
+        await new Promise((r) => setTimeout(r, 1200));
+        return { options, name: sel.closest('label').firstChild.textContent, changed: before !== sig(), url: location.hash };
+      })()` });
+      const p = probe.result.value;
+      const want = name === "instance" ? "Day 1,Day 2,Day 3" : "Day 1,Day 2";
+      if (!p.options) entry.errors.push("no day selector");
+      else {
+        if (p.options.join() !== want) entry.errors.push(`day options ${p.options.join()}, expected ${want}`);
+        if (!p.changed) entry.errors.push("choosing Day 2 did not change the map or schedule");
+        if (!/day=2/.test(p.url)) entry.errors.push("chosen day is not remembered in the URL");
+      }
+    }
     delete entry.mainText;
     if (!entry.h1) entry.errors.push("page rendered no heading");
     if (entry.nan) entry.errors.push("page text contains NaN/undefined");

@@ -108,6 +108,23 @@ class SceneTest(unittest.TestCase):
         self.assertEqual([l["ids"] for l in scene["lines"]], [[0, 1, 2, 0], [0, 3, 0]])
         self.assertEqual(len(scene["badges"]), 3)
 
+    def test_places_done_on_earlier_days_are_marked_done_only_when_every_shown_run_has_them(self):
+        a = {"id": "a", "label": "A", "run": RUN, "day": 2, "done": [3]}
+        b = {"id": "b", "label": "B", "run": {"valid": False, "route": None}, "day": 2, "done": [3, 2]}
+        pts = {p["id"]: p for p in call("buildScene", INST, [a, b])["points"]}
+        self.assertTrue(pts[3]["done"] and not pts[3]["filled"])
+        self.assertFalse(pts[2]["done"])  # visited today by A (filled) and done earlier for B
+        self.assertFalse(pts[1]["done"])
+        self.assertFalse(pts[0]["done"])
+        only = {p["id"]: p for p in call("buildScene", INST, [a, {**b, "done": []}])["points"]}
+        self.assertFalse(only[3]["done"])
+
+    def test_stop_line_for_a_full_run_day(self):
+        self.assertEqual(call("dayStopLine", {"run": RUN, "day": 2, "done": [3]}, INST, 3), "done on an earlier day")
+        self.assertEqual(call("dayStopLine", {"run": RUN, "day": 2, "done": []}, INST, 3), "still to visit")
+        self.assertEqual(call("dayStopLine", {"run": RUN, "day": 2, "done": []}, INST, 1), "Arrive 06:10 \u00b7 No wait \u00b7 Leave 06:10")
+        self.assertEqual(call("dayStopLine", {"run": RUN}, INST, 3), "not visited")
+
     def test_failed_run_draws_no_route_and_nothing_filled(self):
         scene = call("buildScene", INST, [{"id": "a", "label": "A", "run": {"valid": False, "route": None}}])
         self.assertEqual(scene["lines"], [])
