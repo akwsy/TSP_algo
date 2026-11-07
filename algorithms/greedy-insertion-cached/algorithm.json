@@ -1,0 +1,10 @@
+{
+  "id": "greedy-insertion-cached",
+  "displayName": "Greedy insertion with cache",
+  "author": "Raymond",
+  "description": "Repeatedly inserts the customer and position that add the least distance. Earliest-leave and latest-start times are cached per stop, so each insertion is checked in O(1) instead of replaying the route; customers that fit nowhere are dropped for good.",
+  "complexity": { "time": "O(n^3)", "space": "O(n^2)" },
+  "exact": false,
+  "command": ["python3", "solve.py"],
+  "timeLimitSeconds": 10
+}
