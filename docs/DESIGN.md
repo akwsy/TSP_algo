@@ -67,6 +67,6 @@ plain-words explanation and figures marked "so far, not a finishing time". Logic
 
 ## View toggle ("First day only" / "Until every place is visited")
 
-One two-button group in the header (a labelled group; the current view is marked pressed, Tab reaches it, Enter or Space
-switches). The choice is stored in `localStorage` (inside try/catch) and applies to Overview, Scaling, Instance and Route
+One two-button group in the header (a labelled radio group; the current view is marked checked, Tab reaches it, the arrow keys
+switch). The choice is stored in `localStorage` (inside try/catch) and applies to Overview, Scaling, Instance and Route
 detail; each view names its instance count in plain words. Logic: `site/js/lib/view.js`.
