@@ -1,0 +1,10 @@
+{
+  "id": "nearest-neighbour",
+  "displayName": "Nearest neighbour (baseline)",
+  "author": "Project team",
+  "description": "The baseline every other algorithm is compared against. From the depot, repeatedly go to the nearest customer that can still be served within its window and leaves time to return before the deadline; ties go to the lowest id.",
+  "complexity": { "time": "O(n^2)", "space": "O(n)" },
+  "exact": false,
+  "command": ["python3", "solve.py"],
+  "timeLimitSeconds": 10
+}

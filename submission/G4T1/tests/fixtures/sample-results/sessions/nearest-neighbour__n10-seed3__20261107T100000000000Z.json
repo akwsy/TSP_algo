@@ -1,0 +1,67 @@
+{
+  "algorithmId": "nearest-neighbour",
+  "commit": "c0b8cc57a4d0e300ca2269ba5d814e4022ca09b4",
+  "fingerprint": "33b917412b79e7370501cb710e1efad1bba60d680da00bf6a8c79a5c42b74830",
+  "instanceId": "n10-seed3",
+  "seed": 3,
+  "numCustomers": 10,
+  "runId": "20261107T100000000000Z",
+  "timestamp": "2026-11-07T07:19:44+00:00",
+  "outcome": "did not finish",
+  "stopReason": "day_limit",
+  "stopDay": 1,
+  "explanation": "Stopped after day 1: 8 places still unvisited (day limit reached)",
+  "partialFigures": true,
+  "unvisitedAtStop": 8,
+  "days": 1,
+  "visitedSoFar": 2,
+  "workingMinutes": 348.7513203474066,
+  "totalDistanceKm": 71.71643989776892,
+  "totalRuntimeMs": 14.35316699962641,
+  "finalReturnMinute": 708.7513203474066,
+  "dayRecords": [
+    {
+      "day": 1,
+      "instanceId": "n10-seed3",
+      "numPlaces": 10,
+      "route": [
+        0,
+        9,
+        4,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 14.35316699962641,
+      "stats": {
+        "customersVisited": 2,
+        "iterations": 27
+      },
+      "valid": true,
+      "failureReason": null,
+      "visited": [
+        9,
+        4
+      ],
+      "distanceKm": 71.71643989776892,
+      "returnMinute": 708.7513203474066,
+      "schedule": [
+        {
+          "id": 9,
+          "arriveMinute": 388.82333949924674,
+          "startMinute": 630,
+          "leaveMinute": 630
+        },
+        {
+          "id": 4,
+          "arriveMinute": 666.5225658743954,
+          "startMinute": 666.5225658743954,
+          "leaveMinute": 666.5225658743954
+        }
+      ],
+      "workingMinutes": 348.7513203474066
+    }
+  ],
+  "experiment": "scaling",
+  "instanceHash": "58ccf497543f2fec4cea030d2ce7c29265e8af515c3dd26a4f98c318c0e672fe"
+}

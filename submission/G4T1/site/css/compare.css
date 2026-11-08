@@ -1,0 +1,115 @@
+/* Compare page (js/pages/compare.js). Uses only the tokens of style.css and charts.css, so both themes and the contrast
+   tests cover it. Verdicts are a word plus an icon on a tint, never colour alone. */
+.alg-mark { flex: none; overflow: visible; vertical-align: -2px; }
+.cmp-section h3 { font-size: 1.05rem; letter-spacing: -.01em; font-weight: 680; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cmp-section h4 { font: 600 .7rem var(--mono); letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 14px 0 6px; }
+.cmp-lede { margin: -4px 0 14px; max-width: 72ch; }
+
+/* 1. takeaway */
+.takeaway { padding: 22px 24px 20px; }
+.takeaway .eyebrow { margin: 0 0 10px; font: 600 .72rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.takeaway .eyebrow::after { display: none; }
+.takeaway-text { margin: 0 0 16px; max-width: 58ch; font-size: clamp(1.2rem, 1rem + .9vw, 1.65rem); line-height: 1.3; font-weight: 650; letter-spacing: -.015em; text-wrap: pretty; }
+.standing { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.standing li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid var(--line-strong); border-radius: var(--radius);
+  background: var(--surface-2); font: 600 .85rem var(--mono); }
+.standing li.first { border-color: var(--ok); color: var(--ok); background: var(--ok-bg); }
+.cmp-readout { margin: 0 0 16px; border: 1px solid var(--line); border-radius: var(--radius); background: transparent; }
+.caveats { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-width: 90ch; }
+.caveats li { padding: 6px 12px; border-left: 2px solid var(--control); background: var(--surface-2); border-radius: 2px; font-size: .92rem; }
+
+/* 2. profiles */
+.profile-grid { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.profile { padding: 16px 18px 18px; display: flex; flex-direction: column; }
+.place { font: 700 .72rem var(--mono); letter-spacing: .04em; padding: 2px 7px; border: 1px solid var(--line-strong); border-radius: 3px; color: var(--muted); }
+.place.first { color: var(--ok); border-color: var(--ok); background: var(--ok-bg); }
+.profile-id { margin: 0 0 8px; color: var(--muted); font-size: .78rem; }
+.profile-desc { margin: 0 0 10px; font-size: .92rem; }
+.profile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.facts { display: grid; grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr); gap: 8px 12px; margin: auto 0 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.facts dt { font: 600 .68rem/1.5 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.facts dd { margin: 0; font-size: .9rem; overflow-wrap: anywhere; }
+
+/* 3. head to head */
+.h2h-layout { display: grid; gap: var(--gap); grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; }
+.h2h-grid th { white-space: normal; vertical-align: bottom; }
+.h2h-grid tbody th { vertical-align: middle; font: 650 .9rem var(--font); letter-spacing: 0; text-transform: none; color: var(--text); min-width: 7.5rem; }
+.h2h-grid thead th { text-align: center; }
+.h2h-grid thead th:first-child { text-align: left; }
+.col-head, .row-head { display: inline-flex; align-items: center; gap: 6px; }
+.h2h-grid td { padding: 6px; vertical-align: top; text-align: left; white-space: normal; }
+.h2h-self { text-align: center !important; color: var(--muted); vertical-align: middle !important; }
+.h2h-btn { width: 100%; min-width: 7.5rem; min-height: 44px; display: grid; gap: 2px; padding: 8px 10px; text-align: left; cursor: pointer;
+  font: 500 .8rem/1.3 var(--mono); color: var(--text); background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--radius);
+  transition: border-color var(--t-fast), box-shadow var(--t-fast); }
+.h2h-btn:hover { border-color: var(--accent); }
+.h2h-btn[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent), 0 0 18px -4px var(--glow-strong); }
+.h2h-verdict { display: flex; align-items: center; gap: 6px; font: 700 .72rem var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.h2h-icon { font-size: .8rem; }
+.h2h-diff { font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em; }
+.h2h-diff small, .h2h-record small { font-size: .72rem; font-weight: 500; color: var(--muted); }
+.h2h-margin { color: var(--muted); white-space: nowrap; }
+.h2h-record { white-space: nowrap; }
+.h2h-detail h3 { display: block; }
+.h2h-detail h3 .alg-mark { margin-right: 8px; }
+.h2h-detail h3 .muted { display: block; font-weight: 500; font-size: .9rem; margin-top: 2px; }
+.tone-more .h2h-btn { background: var(--ok-bg); }
+.tone-more .h2h-verdict { color: var(--ok); }
+.tone-fewer .h2h-btn { background: var(--bad-bg); }
+.tone-fewer .h2h-verdict { color: var(--bad); }
+.tone-even .h2h-verdict, .tone-none .h2h-verdict { color: var(--muted); }
+.tone-legend { margin: 0 0 12px; }
+.tone-chip { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 3px; font-size: .72rem;
+  border: 1px solid currentColor; color: var(--muted); background: var(--surface-2); }
+.tone-chip.tone-more { color: var(--ok); background: var(--ok-bg); }
+.tone-chip.tone-fewer { color: var(--bad); background: var(--bad-bg); }
+.h2h-detail { padding: 16px 18px; }
+.h2h-detail p { margin: 0 0 8px; max-width: 64ch; }
+.gap-list { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; font-size: .9rem; }
+.gap-list li { overflow-wrap: anywhere; }
+.gap-size { font: 700 .85rem var(--mono); color: var(--text); }
+
+/* 4. experiment gallery */
+.exp-grid { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fit, minmax(min(100%, 500px), 1fr)); }
+.exp-card { padding: 16px 18px 14px; min-width: 0; }
+.exp-question { margin: 0 0 4px; font-size: 1.02rem; font-weight: 600; }
+.exp-card .meta { margin: 0 0 10px; }
+.exp-takeaway { margin: 0 0 12px; font-size: .92rem; }
+.exp-takeaway .badge { margin-right: 2px; }
+.exp-chart .chart { padding: 10px 0 0; background: none; border: 0; box-shadow: none; }
+.seg { display: inline-flex; border: 1px solid var(--control); border-radius: var(--radius); background: var(--surface-2); overflow: hidden; }
+.seg-opt { font: 600 .82rem var(--font); color: var(--text); background: transparent; border: 0; padding: 0 14px; min-height: 40px; cursor: pointer;
+  transition: background-color var(--t-fast), color var(--t-fast); }
+.seg-opt + .seg-opt { border-left: 1px solid var(--control); }
+.seg-opt:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.seg-opt[aria-checked="true"] { background: var(--accent); color: var(--accent-text); }
+.seg-opt:focus-visible { outline-offset: -3px; }
+
+/* 5. trade-off */
+.tradeoff-layout { display: grid; gap: var(--gap); grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; }
+.frontier-notes { padding: 16px 18px; }
+.frontier-notes ul { margin: 0 0 10px; padding-left: 1.2em; display: grid; gap: 6px; }
+.chart-svg .frontier-line { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; opacity: .85; }
+.chart-svg .frontier-ring, .legend .frontier-ring { stroke: var(--accent); stroke-width: 1.5; fill: none; }
+.legend .frontier-line { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.chart-svg .point-label { font: 600 11.5px var(--font); fill: var(--text); }
+.chart-svg .point-focus { stroke: var(--focus); stroke-width: 2; fill: none; }
+
+/* 6. where they differ */
+.differ-grid { display: grid; gap: var(--gap); grid-template-columns: minmax(0, 1fr); }
+.differ { padding: 16px 18px; }
+.differ-cols { display: grid; gap: 4px 28px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
+.differ .gap-list li::marker { color: var(--muted); }
+.differ .gap-list .muted { display: block; font-size: .82rem; }
+
+@media (max-width: 960px) {
+  .h2h-layout, .tradeoff-layout { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .takeaway { padding: 16px; }
+  .facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .facts dd { margin-bottom: 6px; }
+  .h2h-btn { min-width: 6.75rem; padding: 6px 8px; }
+  .h2h-diff { font-size: 1rem; }
+  .h2h-grid tbody th { min-width: 5.5rem; }
+}

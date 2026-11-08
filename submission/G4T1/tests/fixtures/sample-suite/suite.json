@@ -1,0 +1,126 @@
+{
+ "generatedAt": "2026-11-08T05:53:20+00:00",
+ "experiments": [
+  {
+   "name": "scaling",
+   "description": "Effect of the number of customers on every algorithm.",
+   "param": "customers",
+   "values": [
+    5,
+    10,
+    15,
+    20,
+    30,
+    50,
+    100
+   ],
+   "instancesPerSize": 30,
+   "algorithms": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "aggregates": "aggregates-scaling.json",
+   "timestamp": "2026-11-08T05:50:49+00:00"
+  },
+  {
+   "name": "time-budget",
+   "description": "Effect of the length of the travel period (minutes from the 06:00 departure) with 30 customers.",
+   "param": "period",
+   "values": [
+    240,
+    480,
+    720,
+    960,
+    1080
+   ],
+   "instancesPerSize": 30,
+   "algorithms": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "aggregates": "aggregates-time-budget.json",
+   "timestamp": "2026-11-08T05:51:28+00:00"
+  },
+  {
+   "name": "speed",
+   "description": "Effect of the travel speed (km/h) with 30 customers.",
+   "param": "speed",
+   "values": [
+    20,
+    30,
+    40,
+    60,
+    80
+   ],
+   "instancesPerSize": 30,
+   "algorithms": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "aggregates": "aggregates-speed.json",
+   "timestamp": "2026-11-08T05:52:11+00:00"
+  },
+  {
+   "name": "window-alignment",
+   "description": "Effect of when a 6-hour period starts (departure minute since midnight), i.e. how it lines up with the four customer time windows, with 30 customers.",
+   "param": "departure",
+   "values": [
+    360,
+    540,
+    720,
+    900,
+    1080
+   ],
+   "instancesPerSize": 30,
+   "algorithms": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "aggregates": "aggregates-window-alignment.json",
+   "timestamp": "2026-11-08T05:52:37+00:00"
+  },
+  {
+   "name": "spread",
+   "description": "Effect of how far customers are spread: the selection radius (km) around the depot, with 20 customers.",
+   "param": "radius",
+   "values": [
+    25,
+    50,
+    100,
+    150,
+    250
+   ],
+   "instancesPerSize": 30,
+   "algorithms": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "aggregates": "aggregates-spread.json",
+   "timestamp": "2026-11-08T05:53:05+00:00"
+  },
+  {
+   "name": "stress",
+   "description": "Runtime growth, time-limit hits and failures at large sizes.",
+   "param": "customers",
+   "values": [
+    100,
+    150,
+    200,
+    300
+   ],
+   "instancesPerSize": 10,
+   "algorithms": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "aggregates": "aggregates-stress.json",
+   "timestamp": "2026-11-08T05:53:20+00:00"
+  }
+ ]
+}
