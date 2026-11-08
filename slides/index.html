@@ -1,0 +1,753 @@
+<!doctype html>
+<!--
+  CS201 G4T1 project deck. Self-contained: no build step, no CDN.
+  Keys: left/right/space/PageUp/PageDown move, Enter/Backspace step an interactive, N notes, F fullscreen, T chart/table.
+  Ctrl+P gives one slide per page (tick "Background graphics"). Use a 1920x1080 "page" as set by @page.
+
+  Number provenance: DATA below is copied unmodified (rounded to 4 d.p.) from
+  tests/fixtures/sample-suite/aggregates-*.json, full suite run 8 Nov 2026. Worked example INST is
+  docs/ALGORITHM_SPEC.md section 8. Solve-only speed-ups and the "Example 1" route figures are from HANDOFF.md.
+  Screenshots load from slides/img/ when present; until then a visible TODO shows.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deliver Before Closing</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#070a0f;--surface:#0d131b;--surface-2:#121a25;--line:rgba(150,180,210,.16);--line-strong:rgba(150,180,210,.34);
+  --ink:#eaf0f7;--ink-2:#b4c0ce;--muted:#8693a3;--accent:#5cc8ff;--focus:#ffb547;--ok:#4fd6a0;--bad:#ff7b72;
+  --gi:#3987e5;--ils:#d95926;--nn:#199e70;--tie:#59677a;
+  --slot-1:#fde725;--slot-2:#5ec962;--slot-3:#3fa0c9;--slot-4:#b08cf0;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%) scale(var(--s,1));background:var(--bg);overflow:hidden}
+.slide{position:absolute;inset:0;padding:60px 96px 84px;display:none;flex-direction:column;gap:30px;font-size:30px;line-height:1.32;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:64px 64px;background-position:-1px -1px}
+.slide::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,10,15,.72),var(--bg) 42%);pointer-events:none}
+.slide>*{position:relative}
+.slide.active{display:flex;animation:in .26s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.active{animation:none}*{transition:none!important}}
+
+.kicker{font:600 58px/1.08 var(--mono);color:var(--accent);letter-spacing:-.03em}
+h2{font-size:58px;font-weight:760;letter-spacing:-.03em;line-height:1.08;margin-top:6px;text-wrap:balance}
+header.hd::after{content:"";display:block;width:128px;height:3px;margin-top:16px;background:var(--accent);box-shadow:0 0 16px rgba(92,200,255,.65)}
+.foot{position:absolute!important;left:96px;right:96px;bottom:28px;display:flex;justify-content:space-between;align-items:center;font:22px var(--mono);color:var(--muted)}
+.foot .num{color:var(--ink-2)}
+.fill{flex:1;min-height:0}
+.row{display:flex;gap:32px}.col{display:flex;flex-direction:column;gap:22px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:32px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.panel{position:relative;background:var(--surface);border:1px solid var(--line-strong);padding:26px 30px;min-width:0}
+.panel::before,.panel::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--accent)}
+.panel::before{left:-1px;top:-1px;border-right:0;border-bottom:0}.panel::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+.panel h3{font:600 24px var(--mono);color:var(--accent);margin-bottom:12px;letter-spacing:.02em}
+.big{font-size:40px;line-height:1.24;font-weight:600;letter-spacing:-.015em}.muted{color:var(--muted)}.dim{color:var(--ink-2)}.sm{font-size:25px}.xs{font-size:22px}
+b,strong{color:#fff;font-weight:700}
+.mono,code{font-family:var(--mono)}code{font-size:.92em;color:var(--accent)}
+ul.tight{padding-left:28px;display:flex;flex-direction:column;gap:12px}
+table{border-collapse:collapse;width:100%}th{font:600 24px var(--mono);color:var(--accent);text-align:left;padding:12px 18px;border-bottom:1px solid var(--line-strong)}
+td{padding:15px 18px;border-bottom:1px solid var(--line)}
+.num-col{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+pre.code{font:25px/1.42 var(--mono);color:var(--ink-2);white-space:pre;overflow:hidden}
+pre.code .l{display:block;padding:0 12px;margin:0 -12px;border-left:4px solid transparent}
+pre.code .l.on{background:rgba(92,200,255,.15);border-left-color:var(--accent);color:#fff}
+pre.code .c{color:var(--muted)}pre.code .k{color:var(--accent)}
+.todo{display:inline-block;font:600 25px/1.3 var(--mono);color:var(--focus);border:2px dashed var(--focus);padding:5px 14px;background:rgba(255,181,71,.08)}
+.shot{position:relative;display:flex;align-items:center;justify-content:center;background:var(--surface-2);border:1px solid var(--line-strong);overflow:hidden;min-height:0;text-align:center;padding:24px}
+.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--bg)}
+.stat{font:700 66px/1 var(--sans);letter-spacing:-.03em;color:#fff}
+.stat small{font:500 26px var(--sans);color:var(--ink-2);letter-spacing:0}
+.lab{font-size:25px;color:var(--ink-2);margin-top:9px;line-height:1.24}
+
+.ctrl{display:flex;align-items:center;gap:12px;font:24px var(--mono);color:var(--ink-2)}
+button{font:600 23px var(--mono);color:var(--ink);background:var(--surface-2);border:1px solid var(--line-strong);padding:9px 18px;cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+button.on{background:rgba(92,200,255,.17);border-color:var(--accent);color:#fff}
+.legend{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.legend button{display:flex;align-items:center;gap:10px;padding:6px 14px}
+.legend button.off{opacity:.42;text-decoration:line-through}.swatch{width:18px;height:18px;display:inline-block}
+.slots{display:flex;gap:22px;font:23px var(--mono);color:var(--ink-2);flex-wrap:wrap}.slots i{display:inline-block;width:16px;height:16px;border-radius:50%;margin-right:9px;vertical-align:-1px}
+#tip{position:absolute;z-index:40;pointer-events:none;display:none;background:#04070bf2;border:1px solid var(--accent);padding:12px 16px;font:23px/1.36 var(--mono);color:var(--ink);min-width:220px;white-space:nowrap}
+#tip b{color:var(--accent)}
+.chartwrap .twin{display:none;overflow:hidden;font-size:22px}.slide.show-table .chartwrap .twin{display:block}.slide.show-table .chartwrap .plot{display:none}
+.twin th,.twin td{font:21px var(--mono);padding:4px 10px;text-align:right}.twin th:first-child,.twin td:first-child{text-align:left}
+svg text{font-family:var(--mono)}
+.arrow{color:var(--accent);font:700 40px var(--sans);align-self:center;flex:none}
+.pipe{display:flex;align-items:stretch;gap:14px}.pipe .panel{flex:1;padding:22px 22px}.pipe .panel h3{font-size:23px}
+.chain{display:flex;align-items:center;gap:8px;font:600 28px var(--mono);flex-wrap:wrap}
+.chain span{min-width:58px;height:58px;padding:0 8px;display:inline-flex;align-items:center;justify-content:center;background:var(--surface-2);border:1px solid var(--line-strong);transition:background .18s,border-color .18s,opacity .18s}
+.chain span.drop{background:rgba(217,89,38,.28);border:2px solid var(--ils);opacity:1;color:#fff}.chain span.dep{color:var(--accent)}.chain em{font-style:normal;color:var(--muted);font-weight:400}.chain span.new{background:rgba(92,200,255,.22);border-color:var(--accent);color:#fff}
+.bar{display:flex;gap:2px;height:42px}.bar div{display:flex;align-items:center;justify-content:center;font:600 22px var(--mono);overflow:hidden;white-space:nowrap}
+.h2h{display:grid;grid-template-columns:76px 1fr 366px;gap:13px 14px;align-items:center;font:23px var(--mono)}
+.h2h .head{color:var(--accent);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--accent)}
+#keys{font:22px var(--mono);color:var(--muted)}
+.notes{display:none}
+.lg .panel{display:flex;flex-direction:column;justify-content:center}.lg .panel h3{font-size:27px}.lg .sm,.lg li{font-size:36px;line-height:1.3}.lg ul.tight{gap:20px}
+.pipe .sm{font-size:30px}.huge .stat{font-size:112px}.huge .lab{font-size:32px}
+.lg .todo{font-size:27px!important}
+#notesPanel{position:absolute;z-index:30;left:0;right:0;bottom:0;background:#04070bf5;border-top:2px solid var(--accent);padding:24px 96px 26px;font-size:29px;line-height:1.36;display:none;color:var(--ink)}
+#notesPanel .who{font:600 24px var(--mono);color:var(--accent);margin-bottom:8px}
+#sbmaps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}#sbmaps svg{display:block;width:100%;cursor:crosshair}
+
+@page{size:1920px 1080px;margin:0}
+@media print{
+  html,body{height:auto;overflow:visible;background:var(--bg)}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #stage{position:static;transform:none;width:1920px;height:auto;overflow:visible}
+  .slide{display:flex!important;position:relative;inset:auto;width:1920px;height:1080px;break-after:page;overflow:hidden;animation:none}
+  .slide.no-print,#notesPanel,#tip,.ctrl,.notes,.legend button.off{display:none!important}
+  .slide.show-table .chartwrap .twin{display:none}.slide.show-table .chartwrap .plot{display:block}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<!-- 1 -->
+<section class="slide" data-title="Title">
+  <div class="fill row" style="align-items:center;gap:56px">
+    <div style="flex:1.18">
+      <div class="kicker">CS201 · Beyond the Classic TSP · Group G4T1</div>
+      <h1 style="font-size:104px;font-weight:760;letter-spacing:-.04em;line-height:1.02;margin:22px 0 26px">Deliver before<br>the door closes</h1>
+      <p class="big dim" style="font-weight:500">Redesigning the TSP for shops that only accept stock at set times</p>
+      <p style="margin-top:42px;font:30px var(--mono)">Allan · Ben · Isaiah · Raymond · Zyik</p>
+    </div>
+    <div class="panel" style="flex:.82"><div id="titleMap"></div><div class="slots" data-slots style="margin-top:8px;font-size:21px;gap:14px"></div></div>
+  </div>
+  <div id="keys">← → move · Enter step an interactive · N speaker notes · F fullscreen · T chart/table</div>
+  <aside class="notes" data-speaker="TODO: assign">Hello, we are G4T1. Our project takes the classic TSP and breaks the assumption that every city must be visited, because a real delivery driver cannot do that.</aside>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-title="Use case">
+  <header class="hd"><div class="kicker">Motivation</div><h2>One van, one shift, and shops that only sign for goods at set times</h2></header>
+  <div class="g2 fill">
+    <div class="col big" style="justify-content:center;font-weight:500">
+      <p>The van leaves the warehouse in Kuala Lumpur at <b class="mono">06:00</b> and must be back by <b class="mono">24:00</b>.</p>
+      <p>There are more shops than one driver can serve.</p>
+      <p><b>Goal:</b> complete as many deliveries as possible today. The rest go tomorrow.</p>
+    </div>
+    <div class="panel col" style="justify-content:center">
+      <h3>Try it: when does the van arrive?</h3>
+      <div class="mono" style="font-size:64px;font-weight:700" id="arrClock">14:00</div>
+      <input id="arrRange" type="range" min="360" max="1440" step="15" value="840" aria-label="Van arrival time">
+      <div id="arrRows" class="col" style="gap:16px"></div>
+    </div>
+  </div>
+  <aside class="notes" data-speaker="TODO: assign">A warehouse restocks shops that only accept stock while staff are there to sign. A cafe takes stock from 06:00 to 10:30 before it opens; a mall outlet from 19:30 to midnight after closing. Move the slider: arrive early and you wait outside, arrive late and the trip is wasted.</aside>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-title="Why classic TSP fails">
+  <header class="hd"><div class="kicker">Motivation</div><h2>The classic TSP answers a question this driver is not asking</h2></header>
+  <div class="panel fill" style="display:flex;align-items:center">
+    <table class="big" style="font-size:36px;font-weight:500">
+      <tr><th style="width:48%">Classic TSP assumes</th><th>Our driver has</th></tr>
+      <tr><td>Visit <b>every</b> city</td><td>Visit as many as possible; <b>skipping is allowed</b></td></tr>
+      <tr><td>Minimise distance</td><td><b>Maximise visits</b>; distance is only the tie-break</td></tr>
+      <tr><td>Any city, any time</td><td><b>One time window</b> per place: early waits, late is refused</td></tr>
+      <tr><td>No time limit</td><td><b>Back at the depot</b> by 24:00</td></tr>
+    </table>
+  </div>
+  <aside class="notes" data-speaker="TODO: assign">Classic TSP must visit every shop, which is impossible in one shift. It only minimises distance, and the shortest route can arrive when shops will not accept. And it has no concept of time at all.</aside>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-title="Our variant">
+  <header class="hd"><div class="kicker">New TSP variant</div><h2>Orienteering with time windows: choose <em style="font-style:normal;color:var(--accent)">which</em> shops, not only the order</h2></header>
+  <div class="g2 fill lg" style="grid-template-rows:1fr 1fr;gap:24px 32px">
+    <div class="panel"><h3>INPUT</h3><p class="sm">Depot and <span class="mono">n</span> shops, complete distance matrix, one window <code>[opens, closes]</code> per shop, departure 06:00, deadline 24:00, speed 40 km/h</p></div>
+    <div class="panel"><h3>OUTPUT</h3><p class="sm">A route such as <code>[0, 3, 1, 0]</code>: an ordered <b>subset</b> of shops that starts and ends at the depot</p></div>
+    <div class="panel"><h3>CONSTRAINTS</h3><p class="sm">Early arrival waits. Late arrival is forbidden. Each shop at most once. Depot only at the two ends. Back by the deadline.</p></div>
+    <div class="panel"><h3>SCORING</h3><p class="sm"><b>1.</b> More places visited wins. <b>2.</b> On a tie, shorter distance wins.<br>Invalid, crashed or timed out is a <b>failure</b>, never a silent zero.</p></div>
+  </div>
+  <aside class="notes" data-speaker="TODO: assign">In the literature this is the Orienteering Problem with Time Windows, a prize-collecting TSP. Every place is worth one point. Selecting which cities to serve is part of the problem, which is the fundamental change from TSP.</aside>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-title="Data and instances">
+  <header class="hd"><div class="kicker">Dataset · GeoNames MY.txt</div><h2>From 71,709 Malaysian places to instances one van can actually reach</h2></header>
+  <div class="g2 fill">
+    <div class="col" style="justify-content:center;gap:12px">
+      <div class="panel" style="padding:18px 28px"><div class="stat mono">71,709</div><div class="lab">GeoNames records. Columns used: GeoNameID, name, latitude, longitude, feature class</div></div>
+      <div class="panel" style="padding:18px 28px;margin-left:48px"><div class="stat mono">5,212</div><div class="lab">Populated places (class <code>P</code>) within 150 km of Kuala Lumpur</div></div>
+      <div class="panel" style="padding:18px 28px;margin-left:96px"><div class="stat mono">5 to 300</div><div class="lab">Seeded random sample per instance, with KL as depot</div></div>
+    </div>
+    <div class="col" style="justify-content:center">
+      <p class="sm"><b>Why 150 km:</b> at 40 km/h most of Malaysia is out of reach in one day.</p>
+      <p class="sm"><b>Distance:</b> haversine matrix, precomputed and given to every algorithm. <b>Travel:</b> km ÷ 40 km/h.</p>
+      <div class="panel" style="padding:20px 26px"><h3>DERIVED ATTRIBUTE: ONE OF FOUR 4.5-HOUR SLOTS</h3><div class="bar" id="slotBar"></div></div>
+      <p class="sm"><b>Stated openly:</b> slots are assigned at random (seeded), because GeoNames has no opening-hours data.</p>
+    </div>
+  </div>
+  <aside class="notes" data-speaker="Allan">We use GeoNames as the brief requires. Filtering to populated places within 150 km keeps the instances meaningful, since most of the country cannot be reached in a day at 40 km/h. Time windows are a documented derived attribute: seeded and random, because the dataset has no opening hours.</aside>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-title="Evaluation harness">
+  <header class="hd"><div class="kicker">Evaluation methodology</div><h2>No algorithm is allowed to mark its own homework</h2></header>
+  <div class="pipe" style="margin-top:12px">
+    <div class="panel"><h3>1 · SEEDED INSTANCES</h3><p class="sm">Identical input for every algorithm: a paired comparison</p></div><div class="arrow">→</div>
+    <div class="panel"><h3>2 · ISOLATED SOLVERS</h3><p class="sm">Separate program per algorithm: JSON in on stdin, route out on stdout</p></div><div class="arrow">→</div>
+    <div class="panel"><h3>3 · INDEPENDENT VALIDATOR</h3><p class="sm">Replays every route itself and computes every score</p></div><div class="arrow">→</div>
+    <div class="panel"><h3>4 · STATISTICS</h3><p class="sm">Wins, ties, losses and a bootstrap 95% CI on the visit difference</p></div>
+  </div>
+  <div class="g3 fill huge" style="align-items:center">
+    <div><div class="stat mono">6</div><div class="lab">experiments, each varying one parameter</div></div>
+    <div><div class="stat mono">30</div><div class="lab">instances per value (10 for stress), same seeds for all</div></div>
+    <div><div class="stat mono">0</div><div class="lab">failures, invalid routes or timeouts across the full suite</div></div>
+  </div>
+  <aside class="notes" data-speaker="Allan">Every algorithm receives identical instances. It only returns a route; it cannot report its own score, because an independent validator replays the route. Our results website is the reporting end of this pipeline, so we present it as evaluation methodology, not decoration.</aside>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-title="Baseline">
+  <header class="hd"><div class="kicker">Baseline · nearest neighbour · O(n²)</div><h2>Go to the closest place you can still reach, and repeat</h2></header>
+  <div class="row fill">
+    <div class="col" style="flex:0 0 780px">
+      <div class="panel"><pre class="code" id="nnCode" style="font-size:29px"></pre></div>
+      <div class="ctrl" data-stepctl="nn"></div>
+      <p class="sm" id="nnCap" style="min-height:112px"></p>
+    </div>
+    <div class="col" style="flex:1;min-width:0">
+      <div class="panel" style="padding:12px 20px"><div id="nnMap"></div></div>
+      <div class="panel" style="padding:14px 20px"><div id="nnTime"></div></div>
+    </div>
+  </div>
+  <aside class="notes" data-speaker="TODO: assign">This is a real instance from our specification: four shops, seed five. Press Enter to step. Watch the amber bars: the van reaches customer 2 at 14:15 and waits 314.84 minutes for it to open at 19:30. Nearest neighbour never looks at when a place opens.</aside>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-title="Why NN fails">
+  <header class="hd"><div class="kicker">Baseline · what goes wrong</div><h2>Time is the binding resource, and nearest neighbour spends it waiting</h2></header>
+  <div class="row fill">
+    <figure class="shot" style="flex:0 0 760px" data-src="img/explorer-6-vs-23.png" data-alt="Instance explorer: nearest neighbour and greedy insertion routes on Example 1, 100 places"><span class="todo">TODO: real screenshot<br>Instance explorer, Example 1, 100 places<br>save as slides/img/explorer-6-vs-23.png</span></figure>
+    <div class="col" style="flex:1;justify-content:space-between">
+      <div class="g3" style="gap:16px">
+        <div><div class="stat mono">6</div><div class="lab">NN visits, <span class="mono">763</span> min waiting</div></div>
+        <div><div class="stat mono">23</div><div class="lab">Greedy insertion, <span class="mono">41</span> min waiting</div></div>
+        <div><div class="stat mono">40</div><div class="lab">ILS, same instance</div></div>
+      </div>
+      <div class="panel"><h3>WHERE THE WORKING DAY GOES · MEAN OF 30, n=100</h3><div id="waitBars" class="col" style="gap:14px"></div></div>
+    </div>
+  </div>
+  <aside class="notes" data-speaker="TODO: assign">On Example 1 with 100 places, nearest neighbour visits 6 places, drives only 106.9 km, and waits 763 minutes. Greedy insertion visits 23, drives 676.6 km, and waits 41 minutes. Across 30 instances the pattern holds. The bars are total minutes split into travel and waiting.</aside>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-title="Approach A">
+  <header class="hd"><div class="kicker">Approach A · greedy insertion</div><h2>Slot each shop into the gap that adds the least distance</h2></header>
+  <div class="row fill">
+    <div class="panel" style="flex:0 0 880px"><pre class="code" id="giCode" style="font-size:29px"></pre></div>
+    <div class="col" style="flex:1;min-width:0">
+      <div class="panel" style="padding:12px 20px"><div id="giMap"></div></div>
+      <div class="chain" id="giChain"></div>
+      <p class="sm" id="giCap" style="min-height:76px"></p>
+      <div class="ctrl" data-stepctl="gi"></div>
+    </div>
+  </div>
+  <aside class="notes" data-speaker="Raymond">Unlike nearest neighbour, insertion can place a shop between two existing stops, so the route is reshaped rather than only extended. Each round tries every unvisited customer in every gap. A customer that fits nowhere this round can never fit later, so it is pruned for good. Press Enter to watch the rounds on the same four-shop instance.</aside>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-title="A's data structure">
+  <header class="hd"><div class="kicker">Approach A · revised data structure</div><h2>Two arrays turn each feasibility check from O(k) into O(1)</h2></header>
+  <div class="row fill">
+    <div class="col" style="flex:1.45;min-width:0">
+      <div class="panel" style="padding:22px 28px">
+        <p style="font-size:31px"><code>leave[p]</code> earliest departure from stop p <span class="muted">(forward pass)</span></p>
+        <p style="font-size:31px;margin-top:8px"><code>latest[p]</code> latest safe start at stop p <span class="muted">(backward pass)</span></p>
+      </div>
+      <div class="panel" style="padding:24px 28px;flex:1;display:flex;flex-direction:column;justify-content:center"><h3>TRY AN INSERTION INTO ROUTE <span class="mono" style="color:#fff">0 → 1 → 2 → 0</span></h3>
+        <div class="ctrl" id="cacheCtl" style="flex-wrap:wrap;margin-bottom:14px"></div>
+        <div id="cacheOut" class="mono" style="font-size:27px;line-height:1.62"></div>
+      </div>
+    </div>
+    <div class="col" style="flex:.72;min-width:0">
+      <div class="panel" style="flex:1"><h3>SOLVE TIME, IDENTICAL ROUTES</h3>
+        <table style="font-size:29px"><tr><th>n</th><th class="num-col">Original</th><th class="num-col">Cached</th><th class="num-col">Gain</th></tr>
+        <tr><td class="mono">20</td><td class="num-col">1.5 ms</td><td class="num-col">0.5 ms</td><td class="num-col">2.9×</td></tr>
+        <tr><td class="mono">100</td><td class="num-col">72 ms</td><td class="num-col">9.6 ms</td><td class="num-col"><b>7.5×</b></td></tr></table>
+        <p class="xs muted" style="margin-top:12px">480 instances, solve time only</p>
+      </div>
+      <div class="panel" style="flex:1"><h3>WHY THIS IS EXACT</h3><p style="font-size:27px">Stops before the gap are untouched, and <code>latest[p]</code> already summarises every later constraint. A boundary guard replays in full within 10⁻⁶ min of a limit.</p></div>
+    </div>
+  </div>
+  <aside class="notes" data-speaker="Raymond">The original copied the route and replayed the whole schedule for every try: O(k) per try, O(n⁴) overall. The cache rebuilds two arrays once per round. Click each customer and gap: these are the real values for this route. Customer 3 between stops 1 and 2 passes both comparisons. It is exact, not an approximation.</aside>
+</section>
+
+<!-- 11 -->
+<section class="slide" data-title="Approach B">
+  <header class="hd"><div class="kicker">Approach B · iterated local search</div><h2>Destroy part of the route, rebuild it, keep the best ever seen</h2></header>
+  <div class="row fill">
+    <div class="panel" style="flex:0 0 940px"><pre class="code" style="font-size:27px" id="ilsCode"></pre></div>
+    <div class="col" style="flex:1;min-width:0;justify-content:center">
+      <div class="panel"><h3>THE SHAKE: WINDOW OF R VISITS STARTING AT P</h3>
+        <div class="chain" id="shakeChain" style="font-size:25px;gap:5px;margin:8px 0 18px"></div>
+        <div class="mono" style="font-size:32px" id="shakeState"></div>
+        <p class="sm dim" id="shakeCap" style="margin-top:8px;min-height:72px"></p>
+      </div>
+      <div class="ctrl"><button id="shakeNo">Enter: no improvement</button><button id="shakeYes">New best</button></div>
+      <p class="xs muted">Shake pattern shown on an illustrative 8-stop route.</p>
+    </div>
+  </div>
+  <aside class="notes" data-speaker="Ben / Isaiah">The destroy step lets the search escape a local optimum, a route that no single greedy insertion can improve even though a better one exists. Press Enter to sweep the window along the route. Once it has swept the whole route, the window widens. A new best resets it. Failed shakes are not undone immediately: the walk continues from the worse route and returns to the best after 150 failures.</aside>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-title="B's design choices">
+  <header class="hd"><div class="kicker">Approach B · what makes it different</div><h2>Three design choices, driven by time being the scarce resource</h2></header>
+  <div class="g3 fill lg">
+    <div class="panel"><h3>1 · TIME SHIFT</h3><p class="big" style="font-size:38px">Score an insertion by how much it pushes the schedule later, including new waiting.</p><p class="dim" style="font-size:29px;margin-top:18px">Ties: added distance, then earlier closing, then id.</p></div>
+    <div class="panel"><h3>2 · FORWARD SLACK</h3><p class="mono" style="font-size:26px;line-height:1.5">max_shift[p] = min(<br>&nbsp;closes[p] − visit[p],<br>&nbsp;waiting[p+1] + max_shift[p+1])</p><p class="dim" style="font-size:29px;margin-top:14px">Feasible if <code>shift ≤ waiting[p] + max_shift[p]</code>: O(1) again. Waiting absorbs delay first.</p></div>
+    <div class="panel"><h3>3 · DETERMINISTIC SHAKE</h3><p class="big" style="font-size:38px">No random numbers: the same input always gives the same output.</p><p class="dim" style="font-size:29px;margin-top:18px">Stops at 4,000 stalled iterations or 2,000,000 candidate checks.</p></div>
+  </div>
+  <p class="sm dim">Follows Vansteenwegen et al. (2009), ILS for the team orienteering problem with time windows. With every place worth 1, its ratio score²/shift reduces to smallest shift.</p>
+  <aside class="notes" data-speaker="Ben / Isaiah">If asked whether ILS is just greedy plus extra time: it has a different insertion criterion, time rather than distance; a different slack structure; and a different search paradigm that escapes local optima. Every candidate best is replayed with the validator's arithmetic before being saved.</aside>
+</section>
+
+<!-- 13 -->
+<section class="slide" data-title="Alternatives considered">
+  <header class="hd"><div class="kicker">Alternate structures considered</div><h2>We considered one exact method and two ways of caching slack</h2></header>
+  <div class="row fill">
+    <div class="col lg" style="flex:1;min-width:0">
+      <div class="panel" style="flex:1"><h3>BRANCH AND BOUND: DROPPED</h3><p class="sm">Proves optimality, but the worst case is exponential and it was impractical beyond roughly 15 places.</p></div>
+      <div class="panel" style="flex:1"><h3>O(n⁴) REPLAY: REPLACED</h3><p class="sm">Original greedy insertion replays the schedule per try. Kept only to prove the cache returns identical routes.</p></div>
+    </div>
+    <div class="panel" style="flex:1.25;min-width:0;display:flex;flex-direction:column;justify-content:center"><h3>A AND B STORE THE SAME FACT DIFFERENTLY</h3>
+      <div id="twoCaches"></div>
+      <p style="margin-top:22px;font-size:31px"><code>latest</code> is an absolute deadline. <code>max_shift</code> is relative slack. Here, <b>latest − visit = max_shift</b>.</p>
+      <p class="xs muted">Real values for route 0 → 1 → 2 → 0 on the worked example.</p>
+    </div>
+  </div>
+  <aside class="notes" data-speaker="TODO: assign">Branch and bound searches the tree of all routes and prunes branches whose optimistic bound cannot beat the best found. It was in our earlier code and is not part of the submission. On the right, the two caches computed for the same route: both precompute how much delay each stop can take, so a check is O(1).</aside>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-title="Complexity">
+  <header class="hd"><div class="kicker">Complexity analysis</div><h2>Declared worst cases, and what the work counters actually show</h2></header>
+  <div class="row fill">
+    <div class="col" style="flex:.95;min-width:0;justify-content:center">
+      <div class="panel" style="padding:18px 24px">
+        <table style="font-size:30px"><tr><th>Algorithm</th><th>Time</th><th>Measured work</th></tr>
+        <tr><td>NN</td><td class="mono">O(n²)</td><td class="mono" id="cNN"></td></tr>
+        <tr><td>A: GI + cache</td><td class="mono">O(n³)</td><td class="mono" id="cGI"></td></tr>
+        <tr><td>B: ILS</td><td class="mono">O(I·u·m)</td><td class="mono">budget-bound</td></tr></table>
+      </div>
+      <p style="font-size:31px"><b>A:</b> ≤ n rounds × n customers × k gaps × O(1). Space O(n²).</p>
+      <p style="font-size:31px"><b>Why A beats its bound:</b> rounds and route length k are capped by the 18-hour shift.</p>
+      <p style="font-size:31px"><b>B:</b> anytime heuristic. <span class="mono">I</span> iterations, capped by the stall limit and the check budget.</p>
+    </div>
+    <div class="col chartwrap" style="flex:1.05;min-width:0"><div class="legend" data-legend="work"></div><div class="plot" id="workChart"></div><div class="twin" id="workTwin"></div></div>
+  </div>
+  <aside class="notes" data-speaker="TODO: assign">Greedy insertion is O(n³) in the worst case: at most n rounds, n customers, k gaps, and an O(1) check. The measured work grows much more slowly, because the route is limited by the length of the day. ILS has no neat polynomial bound: its work is capped by the fixed budget of two million candidate checks, the flat line on the chart.</aside>
+</section>
+
+<!-- 15 -->
+<section class="slide" data-title="Results: scaling">
+  <header class="hd"><div class="kicker">Results · scaling · 30 instances per size</div><h2>The redesigned approaches pull away as the choice gets harder</h2></header>
+  <div class="row" style="justify-content:space-between;align-items:center">
+    <div class="legend" data-legend="scaling"></div>
+    <div class="ctrl" id="scaleCtl"><button data-m="visits" class="on">Places visited</button><button data-m="best">% of best found</button><button data-t>Table</button></div>
+  </div>
+  <div class="row fill">
+    <div class="chartwrap" style="flex:1;min-width:0"><div class="plot" id="scaleChart"></div><div class="twin" id="scaleTwin"></div></div>
+    <div class="col" style="flex:0 0 360px;justify-content:center;gap:26px" id="scaleStats"></div>
+  </div>
+  <aside class="notes" data-speaker="Zyik">More places visited is better. Hover any size to read exact values. At 100 customers, ILS averages 34.53 places, greedy insertion 25.43, and nearest neighbour 7.10. Switch to percent of best found: greedy insertion slips from 98 percent to 74, while ILS stays at or near 100. Best found is the best of our three algorithms, not a proven optimum.</aside>
+</section>
+
+<!-- 16 -->
+<section class="slide" data-title="Results: other experiments">
+  <header class="hd"><div class="kicker">Results · one parameter at a time</div><h2>Smart algorithms pay off only when there are real choices to make</h2></header>
+  <div class="row" style="justify-content:space-between;align-items:center">
+    <div class="legend" data-legend="multi"></div>
+    <div class="ctrl"><button data-t>Table</button></div>
+  </div>
+  <div class="g4 fill">
+    <div class="chartwrap"><div class="sm" style="font-weight:700">Time budget</div><div class="xs muted">30 customers</div><div class="plot" id="m1"></div><div class="twin" id="m1t"></div></div>
+    <div class="chartwrap"><div class="sm" style="font-weight:700">Speed</div><div class="xs muted">30 customers</div><div class="plot" id="m2"></div><div class="twin" id="m2t"></div></div>
+    <div class="chartwrap"><div class="sm" style="font-weight:700">Radius around KL</div><div class="xs muted">20 customers</div><div class="plot" id="m3"></div><div class="twin" id="m3t"></div></div>
+    <div class="chartwrap"><div class="sm" style="font-weight:700">Departure</div><div class="xs muted">30 customers, 6-hour period</div><div class="plot" id="m4"></div><div class="twin" id="m4t"></div></div>
+  </div>
+  <aside class="notes" data-speaker="Zyik">Each panel varies one parameter. With a 240 minute period, all three are nearly tied. At a 25 km radius, GI and ILS both reach all 20 places, but nearest neighbour still reaches only 7.2. With only 6 hours, GI and ILS get about 4 visits whatever the departure time, because the bottleneck is how many windows the period overlaps.</aside>
+</section>
+
+<!-- 17 -->
+<section class="slide" data-title="Head-to-head and trade-off">
+  <header class="hd"><div class="kicker">Results · A vs B · paired per instance</div><h2>ILS buys more visits with more runtime, until its budget runs out</h2></header>
+  <div class="row fill">
+    <div class="col" style="flex:1.3;min-width:0">
+      <div class="legend" style="font:23px var(--mono);color:var(--ink-2);gap:24px"><span><i class="swatch" style="background:var(--gi);margin-right:8px;vertical-align:-3px"></i>A wins</span><span><i class="swatch" style="background:var(--tie);margin-right:8px;vertical-align:-3px"></i>tie</span><span><i class="swatch" style="background:var(--ils);margin-right:8px;vertical-align:-3px"></i>B wins</span></div>
+      <div class="h2h" id="h2h"></div>
+    </div>
+    <div class="col chartwrap" style="flex:.7;min-width:0">
+      <div class="row" style="justify-content:space-between;align-items:center"><div class="legend" data-legend="trade"></div><div class="ctrl"><button data-t>Table</button></div></div>
+      <div class="plot" id="tradeChart"></div><div class="twin" id="tradeTwin"></div>
+      <p class="xs muted">Runtime includes about 15 ms of Python start-up. n = 5 to 300.</p>
+    </div>
+  </div>
+  <aside class="notes" data-speaker="Zyik">Each row compares the same instances. The interval on the right is a bootstrap 95 percent confidence interval on mean visits, A minus B: negative means ILS is ahead. From n=10 upward the interval excludes zero. The right chart is the trade-off: at n=100 ILS is about ten times slower but visits more, up to the point where its budget binds.</aside>
+</section>
+
+<!-- 18 -->
+<section class="slide" data-title="Findings">
+  <header class="hd"><div class="kicker">Interesting findings</div><h2>What the experiments taught us</h2></header>
+  <div class="g3 fill lg" style="grid-template-rows:1fr 1fr;gap:20px 26px" id="findings"></div>
+  <aside class="notes" data-speaker="TODO: assign">Six findings. The most useful: time, not distance, is the bottleneck. ILS's switch to least time shift is the main reason it beats greedy insertion. Note the budget: ILS uses its full 2 million checks from about n=50, its lead peaks near n=100 and then shrinks by n=300.</aside>
+</section>
+
+<!-- 19 -->
+<section class="slide" data-title="Limitations">
+  <header class="hd"><div class="kicker">Trade-offs and limitations</div><h2>What these results do not claim</h2></header>
+  <div class="g2 fill lg">
+    <div class="panel"><h3>THE MODEL IS SIMPLIFIED</h3><ul class="tight sm"><li>Constant speed, no traffic</li><li>Straight-line distance, not roads</li><li>Zero service time at each stop</li><li>One window per place, one vehicle</li><li>Windows random, not real shop hours</li></ul></div>
+    <div class="panel"><h3>THE EVIDENCE HAS LIMITS</h3><ul class="tight sm"><li><b>No proof of optimality:</b> no exact solver, so ILS is "best found", not "optimal"</li><li>Runtime is measured in Python, including process start</li><li>ILS trades runtime for quality, and at large n its fixed budget limits that quality</li></ul></div>
+  </div>
+  <aside class="notes" data-speaker="TODO: assign">We state these plainly. In particular, percent of best found compares our three algorithms with each other. Since we dropped branch and bound, we cannot say how far ILS is from the true optimum.</aside>
+</section>
+
+<!-- 20 -->
+<section class="slide" data-title="X-factor">
+  <header class="hd"><div class="kicker">X-factor · and why each one counts</div><h2>Our edge is how rigorously the claims can be checked</h2></header>
+  <div class="g2 fill lg" style="grid-template-rows:1fr 1fr;gap:22px 30px">
+    <div class="panel"><h3>EVALUATION METHODOLOGY</h3><p class="sm">Independent validator, paired seeded instances and bootstrap CIs. <b>Why it counts:</b> a score cannot be misreported, and differences come with uncertainty.</p></div>
+    <div class="panel"><h3>O(1) FEASIBILITY CACHE</h3><p class="sm">With an exactness argument and a floating-point guard. <b>Why it counts:</b> 7.5× faster at n=100 with identical routes, so zero quality cost.</p></div>
+    <div class="panel"><h3>DETERMINISTIC ILS</h3><p class="sm">A systematic shake and a work budget, not a clock. <b>Why it counts:</b> same input, same output, and machine speed cannot change the result.</p></div>
+    <div class="panel"><h3>"UNTIL EVERY PLACE IS VISITED"</h3><p class="sm">A second, multi-day metric: days and working hours to finish all shops. <b>Why it counts:</b> it matches "leftovers go tomorrow".</p><p style="margin-top:10px"><span class="todo" style="font-size:22px">TODO: add multi-day numbers from the Scaling page</span></p></div>
+  </div>
+  <aside class="notes" data-speaker="TODO: assign">The brief says a fancy UI is not an X-factor, so we do not claim our website as one. We claim the methodology, the exact cache, the reproducible search, and the second metric that matches the real use case.</aside>
+</section>
+
+<!-- 21 -->
+<section class="slide" data-title="AI usage">
+  <header class="hd"><div class="kicker">AI usage · course policy section 11</div><h2>What AI helped with, and what is ours</h2></header>
+  <div class="g2 fill lg" style="grid-template-columns:.86fr 1.14fr">
+    <div class="col">
+      <div class="panel"><h3>TOOLS AND WHERE</h3><p class="sm"><b>All code</b> was written by AI. This deck was built with Claude Code from our handoff document.</p><p style="margin-top:12px"><span class="todo" style="font-size:22px">TODO: name the AI tools used for the code</span></p></div>
+      <div class="panel"><h3>ORIGINAL TO THE TEAM</h3><p class="sm">The <b>ideation</b>, and the <b>improvements</b> to each type of algorithm.</p></div>
+    </div>
+    <div class="panel"><h3>THREE REPRESENTATIVE PROMPTS</h3>
+      <div class="col" style="gap:24px;margin:10px 0"><span class="todo">TODO: real prompt 1 (design)</span><span class="todo">TODO: real prompt 2 (implement)</span><span class="todo">TODO: real prompt 3 (debug or improve)</span></div>
+      <p class="sm dim" style="margin-top:24px">We remain accountable for every design decision and can explain any part of this work.</p>
+    </div>
+  </div>
+  <aside class="notes" data-speaker="TODO: assign">We declare this plainly: the ideation and the improvements to each type of algorithm are ours, and all of the code was written by AI. We remain accountable for it and can explain any part. The policy also requires the tools used and three representative prompts, so replace every TODO on this slide before submitting.</aside>
+</section>
+
+<!-- A1 -->
+<section class="slide" data-title="Appendix: site">
+  <header class="hd"><div class="kicker">Appendix · evaluation in practice</div><h2>The results site shows the evidence behind these charts</h2></header>
+  <div class="g2 fill">
+    <figure class="shot" data-src="img/compare.png" data-alt="Compare page of the results site"><span class="todo">TODO: real screenshot of Compare<br>save as slides/img/compare.png</span></figure>
+    <figure class="shot" data-src="img/scaling.png" data-alt="Scaling page of the results site"><span class="todo">TODO: real screenshot of Scaling<br>save as slides/img/scaling.png</span></figure>
+  </div>
+  <aside class="notes" data-speaker="Backup slide">Backup for Q&amp;A. Screenshots must be real captures from the site after running python3 start.py --suite.</aside>
+</section>
+
+<!-- A2 -->
+<section class="slide no-print" data-title="Appendix: live sandbox">
+  <header class="hd"><div class="kicker">Appendix · screen only, left out of the PDF</div><h2 style="font-size:50px">Live sandbox: click a map to add a shop</h2></header>
+  <div class="row" style="justify-content:space-between;align-items:center">
+    <div class="ctrl" id="sbSlots"></div>
+    <div class="ctrl"><span>n</span><input id="sbN" type="range" min="10" max="100" step="5" value="40" style="width:240px" aria-label="Number of shops"><span id="sbNv" style="min-width:48px">40</span><button id="sbNew">New map</button></div>
+  </div>
+  <div id="sbmaps" class="fill"></div>
+  <p class="xs muted">Illustrative only: a browser port of the three algorithms on a random toy map with straight-line km. It is not experimental evidence; every result on the earlier slides comes from the Python harness.</p>
+  <aside class="notes" data-speaker="Backup slide">Optional demo. Choose a slot, then click any map to add a shop in that slot; all three algorithms rerun. This is a toy to show behaviour, not a result.</aside>
+</section>
+
+<div id="tip"></div>
+<div id="notesPanel"><div class="who"></div><div class="txt"></div></div>
+</div>
+
+<!-- Pure algorithm ports; no DOM access. Checked against the worked example in docs/ALGORITHM_SPEC.md section 8. -->
+<script id="algos">
+const EPS=1e-9,GUARD=1e-6;
+function travelOf(I){return I.dist.map(r=>r.map(d=>d/I.speed*60));}
+function validate(I,route){const t=travelOf(I);let clock=I.depart,km=0,wait=0;const legs=[];
+  for(let k=1;k<route.length;k++){const a=route[k-1],b=route[k];km+=I.dist[a][b];const arrive=clock+t[a][b];
+    if(b===0){return{valid:arrive<=I.deadline+EPS,visited:route.length-2,km,wait,ret:arrive,legs:legs.concat({a,b,from:clock,arrive,wait:0,leave:arrive})};}
+    const start=Math.max(arrive,I.opens[b]);if(start>I.closes[b]+EPS)return{valid:false,visited:0,km,wait,legs};
+    wait+=start-arrive;legs.push({a,b,from:clock,arrive,wait:start-arrive,leave:start});clock=start;}
+  return{valid:true,visited:0,km:0,wait:0,ret:I.depart,legs};}
+function solveNN(I){const t=travelOf(I),n=I.dist.length;const route=[0];let clock=I.depart,here=0;const todo=new Set();for(let i=1;i<n;i++)todo.add(i);
+  for(;;){let best=null;for(const j of [...todo].sort((x,y)=>x-y)){const start=Math.max(clock+t[here][j],I.opens[j]);
+      if(start>I.closes[j]+EPS)continue;if(start+t[j][0]>I.deadline+EPS)continue;
+      if(best===null||I.dist[here][j]<best[0])best=[I.dist[here][j],j,start];}
+    if(best===null)break;here=best[1];clock=best[2];todo.delete(here);route.push(here);}
+  route.push(0);return route;}
+function lexLess(a,b){for(let i=0;i<a.length;i++){if(a[i]<b[i])return true;if(a[i]>b[i])return false;}return false;}
+function solveGI(I,log){const t=travelOf(I),n=I.dist.length,{opens,closes,dist}=I,gid=I.id||dist.map((_,i)=>i);
+  const replay=r=>{let c=I.depart;for(let k=1;k<r.length;k++){const i=r[k-1],j=r[k],a=c+t[i][j];if(j===0)return a<=I.deadline+EPS;const s=Math.max(a,opens[j]);if(s>closes[j]+EPS)return false;c=s;}return true;};
+  let route=[0,0],alive=[];for(let i=1;i<n;i++)alive.push(i);
+  while(alive.length){const k=route.length,leave=new Array(k).fill(0),latest=new Array(k).fill(0);leave[0]=I.depart;
+    for(let p=1;p<k-1;p++)leave[p]=Math.max(leave[p-1]+t[route[p-1]][route[p]],opens[route[p]]);
+    latest[k-1]=I.deadline;for(let p=k-2;p>0;p--)latest[p]=Math.min(closes[route[p]],latest[p+1]-t[route[p]][route[p+1]]);
+    let best=null;const still=[],pruned=[];
+    for(const v of alive){let fits=false;for(let p=1;p<k;p++){const a=route[p-1],b=route[p];const s=Math.max(leave[p-1]+t[a][v],opens[v]);
+        const m=Math.min(closes[v]-s,latest[p]-(s+t[v][b]));if(m<-GUARD)continue;
+        if(m<=GUARD&&!replay([...route.slice(0,p),v,...route.slice(p)]))continue;
+        fits=true;const key=[dist[a][v]+dist[v][b]-dist[a][b],closes[v],gid[v],p,v];if(best===null||lexLess(key,best))best=key;}
+      if(fits)still.push(v);else pruned.push(v);}
+    if(log)log.push({route:[...route],leave,latest,best,pruned});
+    if(best===null)break;const p=best[3],v=best[4];route.splice(p,0,v);alive=still.filter(u=>u!==v);}
+  if(log)log.push({route:[...route],final:true});return route;}
+function solveILS(I){const STALL=4000,RESTART=150,MAXC=2e6,t=travelOf(I),n=I.dist.length,{opens,closes,dist}=I,gid=I.id||dist.map((_,i)=>i);
+  let route=[0,0],vis=new Array(n).fill(false);vis[0]=true;let arrive,at,wait,ms,rd=0,bestR=[0,0],bestD=0,cand=0;
+  function sched(){const k=route.length,last=k-1;arrive=new Array(k).fill(0);at=new Array(k).fill(0);wait=new Array(k).fill(0);arrive[0]=at[0]=I.depart;let d=0;
+    for(let p=1;p<k;p++){const a=route[p-1],b=route[p];d+=dist[a][b];arrive[p]=at[p-1]+t[a][b];if(p===last)at[p]=arrive[p];else{at[p]=Math.max(arrive[p],opens[b]);wait[p]=at[p]-arrive[p];}}
+    ms=new Array(k).fill(0);ms[last]=I.deadline-arrive[last];for(let p=last-1;p>0;p--){ms[p]=Math.min(closes[route[p]]-at[p],wait[p+1]+ms[p+1]);}rd=d;}
+  function better(s,ad,c,id,b){if(s<b[0]-EPS)return true;if(s>b[0]+EPS)return false;if(ad<b[1]-EPS)return true;if(ad>b[1]+EPS)return false;if(c<b[2]-EPS)return true;if(c>b[2]+EPS)return false;return id<b[3];}
+  function insertPhase(){for(;;){const last=route.length-1;let b=null,bc=-1,bp=-1;
+      for(let c=1;c<n;c++){if(vis[c])continue;for(let p=1;p<=last;p++){cand++;const pr=route[p-1],su=route[p];let v=at[p-1]+t[pr][c];if(v<opens[c])v=opens[c];if(v>closes[c]+EPS)break;
+          const s=v+t[c][su]-arrive[p];if(s>wait[p]+ms[p]+EPS)continue;const ad=dist[pr][c]+dist[c][su]-dist[pr][su];
+          if(b===null||better(s,ad,closes[c],gid[c],b)){b=[s,ad,closes[c],gid[c]];bc=c;bp=p;}}}
+      if(bc<0)return;route.splice(bp,0,bc);vis[bc]=true;sched();}}
+  function ok(r){let c=I.depart;for(let k=1;k<r.length;k++){const i=r[k-1],j=r[k],a=c+t[i][j];if(j===0)return a<=I.deadline+EPS;const s=Math.max(a,opens[j]);if(s>closes[j]+EPS)return false;c=s;}return true;}
+  function save(){if(!ok(route))return false;bestR=[...route];bestD=rd;return true;}
+  function restore(){route=[...bestR];vis=new Array(n).fill(false);route.forEach(v=>vis[v]=true);sched();}
+  sched();insertPhase();save();let R=1,P=1,since=0,stall=0;const can=n>1&&bestR.length>2;
+  while(can&&cand<MAXC&&stall<STALL){const m=route.length-2;
+    if(m>0){const rem=Math.min(R,m),drop=new Set();for(let i=0;i<rem;i++)drop.add(((P-1+i)%m)+1);const kept=[0];for(let p=1;p<=m;p++){const v=route[p];if(drop.has(p))vis[v]=false;else kept.push(v);}kept.push(0);route=kept;sched();}
+    insertPhase();const v=route.length-2,bv=bestR.length-2;
+    if((v!==bv?v>bv:rd<bestD-EPS)&&save()){R=1;P=1;since=0;stall=0;continue;}
+    since++;stall++;const s=Math.max(1,route.length-2);P+=R;if(P>s){P-=s;R++;const cap=Math.min(s,Math.max(2,Math.floor(s/2)));if(R>cap)R=1;}
+    if(since>=RESTART){restore();R=1;P=1;since=0;}}
+  restore();return bestR;}
+</script>
+
+<script>
+const DATA={"scaling":{"values":[5,10,15,20,30,50,100],"series":{"gi":{"5":{"visits":4.2667,"sd":0.6915,"km":428.475,"min":892.954,"ms":14.9366,"best":0.9833,"work":30.5333,"runs":30,"fail":0,"to":0},"10":{"visits":7.1333,"sd":1.2243,"km":559.9057,"min":969.8452,"ms":15.5682,"best":0.9602,"work":144.0667,"runs":30,"fail":0,"to":0},"15":{"visits":8.9667,"sd":1.2726,"km":565.1101,"min":996.8595,"ms":15.2499,"best":0.9344,"work":339.1,"runs":30,"fail":0,"to":0},"20":{"visits":10.5667,"sd":1.6333,"km":599.5633,"min":1009.6322,"ms":14.8964,"best":0.8907,"work":623.9,"runs":30,"fail":0,"to":0},"30":{"visits":13.9667,"sd":2.2967,"km":632.4725,"min":1021.7591,"ms":16.6458,"best":0.8668,"work":1433.4,"runs":30,"fail":0,"to":0},"50":{"visits":17.8,"sd":2.5918,"km":664.5289,"min":1046.7388,"ms":16.9952,"best":0.7789,"work":3902.4667,"runs":30,"fail":0,"to":0},"100":{"visits":25.4333,"sd":3.2767,"km":663.4149,"min":1046.3054,"ms":22.3459,"best":0.7415,"work":15526.8333,"runs":30,"fail":0,"to":0}},"ils":{"5":{"visits":4.3333,"sd":0.6065,"km":419.686,"min":898.5659,"ms":32.4168,"best":1.0,"work":40926.8667,"runs":30,"fail":0,"to":0},"10":{"visits":7.4,"sd":1.1326,"km":529.5847,"min":959.9562,"ms":55.7802,"best":0.9958,"work":189320.0667,"runs":30,"fail":0,"to":0},"15":{"visits":9.6333,"sd":1.3515,"km":550.0948,"min":980.6277,"ms":88.9152,"best":1.0,"work":447098.4333,"runs":30,"fail":0,"to":0},"20":{"visits":11.8667,"sd":1.306,"km":618.1645,"min":1018.3341,"ms":130.8379,"best":1.0,"work":814471.6333,"runs":30,"fail":0,"to":0},"30":{"visits":16.1333,"sd":2.1292,"km":632.2555,"min":1024.1587,"ms":249.3345,"best":1.0,"work":1912699.8667,"runs":30,"fail":0,"to":0},"50":{"visits":23.0667,"sd":2.5042,"km":650.8826,"min":1044.3716,"ms":237.7298,"best":1.0,"work":2000778.8667,"runs":30,"fail":0,"to":0},"100":{"visits":34.5333,"sd":3.2349,"km":686.7564,"min":1057.7474,"ms":221.4226,"best":1.0,"work":2004255.1333,"runs":30,"fail":0,"to":0}},"nn":{"5":{"visits":2.3667,"sd":0.9643,"km":217.8244,"min":876.8981,"ms":14.4317,"best":0.5561,"work":12.4,"runs":30,"fail":0,"to":0},"10":{"visits":2.8333,"sd":1.3153,"km":188.6475,"min":952.6483,"ms":17.5804,"best":0.3866,"work":32.0667,"runs":30,"fail":0,"to":0},"15":{"visits":3.3,"sd":1.1788,"km":176.4905,"min":960.1158,"ms":14.5533,"best":0.3416,"work":56.7333,"runs":30,"fail":0,"to":0},"20":{"visits":3.7667,"sd":1.6333,"km":185.5702,"min":989.4044,"ms":15.5232,"best":0.3185,"work":85.0667,"runs":30,"fail":0,"to":0},"30":{"visits":4.5333,"sd":1.6132,"km":195.2403,"min":1012.6587,"ms":15.685,"best":0.2853,"work":152.2,"runs":30,"fail":0,"to":0},"50":{"visits":5.8667,"sd":2.0126,"km":191.6103,"min":1032.0289,"ms":15.8082,"best":0.2594,"work":321.2333,"runs":30,"fail":0,"to":0},"100":{"visits":7.1,"sd":1.6682,"km":185.0596,"min":1042.4189,"ms":19.6502,"best":0.2077,"work":779.9,"runs":30,"fail":0,"to":0}}},"pairs":{"5":{"gi":1,"ils":13,"tie":16,"diff":-0.0667,"ci":[-0.1667,0.0],"n":30},"10":{"gi":1,"ils":19,"tie":10,"diff":-0.2667,"ci":[-0.5,-0.0667],"n":30},"15":{"gi":3,"ils":21,"tie":6,"diff":-0.6667,"ci":[-1.0,-0.3667],"n":30},"20":{"gi":1,"ils":28,"tie":1,"diff":-1.3,"ci":[-1.7,-0.9],"n":30},"30":{"gi":0,"ils":29,"tie":1,"diff":-2.1667,"ci":[-2.7333,-1.6],"n":30},"50":{"gi":0,"ils":30,"tie":0,"diff":-5.2667,"ci":[-6.5333,-4.1],"n":30},"100":{"gi":0,"ils":30,"tie":0,"diff":-9.1,"ci":[-10.5667,-7.6333],"n":30}}},"time-budget":{"values":[240,480,720,960,1080],"series":{"gi":{"240":{"visits":2.0333,"sd":1.0662,"km":106.519,"min":159.7785,"ms":15.7635,"best":0.9889,"work":37.2333,"runs":30,"fail":0,"to":0},"480":{"visits":5.4667,"sd":1.4077,"km":270.7257,"min":434.8542,"ms":16.438,"best":0.8682,"work":173.1667,"runs":30,"fail":0,"to":0},"720":{"visits":9.1333,"sd":1.8333,"km":402.964,"min":653.7297,"ms":16.4661,"best":0.895,"work":502.4,"runs":30,"fail":0,"to":0},"960":{"visits":12.5,"sd":1.8708,"km":549.7701,"min":896.4718,"ms":16.3269,"best":0.8762,"work":1040.7,"runs":30,"fail":0,"to":0},"1080":{"visits":13.9667,"sd":2.2967,"km":632.4725,"min":1021.7591,"ms":16.7347,"best":0.8668,"work":1433.4,"runs":30,"fail":0,"to":0}},"ils":{"240":{"visits":2.0667,"sd":1.0807,"km":106.9569,"min":160.4353,"ms":100.0714,"best":1.0,"work":610336.8667,"runs":30,"fail":0,"to":0},"480":{"visits":6.3667,"sd":1.7317,"km":275.5317,"min":434.865,"ms":194.8245,"best":0.9917,"work":1464706.7667,"runs":30,"fail":0,"to":0},"720":{"visits":10.2333,"sd":1.775,"km":408.6198,"min":656.4596,"ms":240.058,"best":1.0,"work":1904979.6,"runs":30,"fail":0,"to":0},"960":{"visits":14.3,"sd":1.7449,"km":558.6617,"min":908.5259,"ms":251.4575,"best":1.0,"work":1942701.5333,"runs":30,"fail":0,"to":0},"1080":{"visits":16.1333,"sd":2.1292,"km":632.2555,"min":1024.1587,"ms":253.2879,"best":1.0,"work":1912699.8667,"runs":30,"fail":0,"to":0}},"nn":{"240":{"visits":2.0333,"sd":1.0662,"km":108.4901,"min":162.7352,"ms":15.953,"best":0.9889,"work":87.3667,"runs":30,"fail":0,"to":0},"480":{"visits":3.0667,"sd":1.2015,"km":137.5774,"min":401.8854,"ms":15.6653,"best":0.5008,"work":115.0667,"runs":30,"fail":0,"to":0},"720":{"visits":3.2,"sd":1.2704,"km":123.8644,"min":649.9185,"ms":16.0277,"best":0.3289,"work":118.5,"runs":30,"fail":0,"to":0},"960":{"visits":3.5333,"sd":1.4794,"km":117.2276,"min":887.5443,"ms":16.5642,"best":0.2524,"work":126.9333,"runs":30,"fail":0,"to":0},"1080":{"visits":4.5333,"sd":1.6132,"km":195.2403,"min":1012.6587,"ms":16.0249,"best":0.2853,"work":152.2,"runs":30,"fail":0,"to":0}}},"pairs":{"240":{"gi":0,"ils":1,"tie":29,"diff":-0.0333,"ci":[-0.1,0.0],"n":30},"480":{"gi":2,"ils":18,"tie":10,"diff":-0.9,"ci":[-1.3333,-0.5],"n":30},"720":{"gi":1,"ils":26,"tie":3,"diff":-1.1,"ci":[-1.5,-0.7333],"n":30},"960":{"gi":0,"ils":29,"tie":1,"diff":-1.8,"ci":[-2.4,-1.2667],"n":30},"1080":{"gi":0,"ils":29,"tie":1,"diff":-2.1667,"ci":[-2.7333,-1.6],"n":30}}},"speed":{"values":[20,30,40,60,80],"series":{"gi":{"20":{"visits":7.4,"sd":1.3797,"km":273.6552,"min":950.954,"ms":16.2715,"best":0.908,"work":352.5333,"runs":30,"fail":0,"to":0},"30":{"visits":10.8,"sd":2.2499,"km":459.4505,"min":1012.3204,"ms":16.3766,"best":0.8781,"work":811.1667,"runs":30,"fail":0,"to":0},"40":{"visits":13.9667,"sd":2.2967,"km":632.4725,"min":1021.7591,"ms":16.8341,"best":0.8668,"work":1433.4,"runs":30,"fail":0,"to":0},"60":{"visits":18.5,"sd":1.8892,"km":957.952,"min":1029.0037,"ms":16.5972,"best":0.8734,"work":2537.7,"runs":30,"fail":0,"to":0},"80":{"visits":22.8333,"sd":1.9841,"km":1284.6435,"min":1035.6037,"ms":16.731,"best":0.9128,"work":3521.7,"runs":30,"fail":0,"to":0}},"ils":{"20":{"visits":8.1333,"sd":1.6761,"km":285.1899,"min":973.2202,"ms":165.7268,"best":0.9878,"work":1177289.9667,"runs":30,"fail":0,"to":0},"30":{"visits":12.2667,"sd":2.0667,"km":452.3999,"min":1006.4491,"ms":229.1576,"best":0.9944,"work":1685684.9667,"runs":30,"fail":0,"to":0},"40":{"visits":16.1333,"sd":2.1292,"km":632.2555,"min":1024.1587,"ms":257.3011,"best":1.0,"work":1912699.8667,"runs":30,"fail":0,"to":0},"60":{"visits":21.2,"sd":1.7499,"km":950.2433,"min":1025.096,"ms":265.3644,"best":1.0,"work":1967573.6333,"runs":30,"fail":0,"to":0},"80":{"visits":25.0333,"sd":1.6078,"km":1251.6329,"min":1034.8071,"ms":278.3774,"best":1.0,"work":1902389.0667,"runs":30,"fail":0,"to":0}},"nn":{"20":{"visits":3.3,"sd":1.442,"km":101.9054,"min":946.5464,"ms":16.7907,"best":0.4143,"work":120.9,"runs":30,"fail":0,"to":0},"30":{"visits":3.8333,"sd":1.5105,"km":137.8783,"min":965.4876,"ms":16.21,"best":0.3187,"work":134.6333,"runs":30,"fail":0,"to":0},"40":{"visits":4.5333,"sd":1.6132,"km":195.2403,"min":1012.6587,"ms":15.987,"best":0.2853,"work":152.2,"runs":30,"fail":0,"to":0},"60":{"visits":5.8,"sd":1.6897,"km":281.9748,"min":1031.8403,"ms":15.8504,"best":0.2742,"work":182.9,"runs":30,"fail":0,"to":0},"80":{"visits":6.7333,"sd":1.9106,"km":344.9255,"min":1023.5932,"ms":16.0446,"best":0.2685,"work":204.2,"runs":30,"fail":0,"to":0}}},"pairs":{"20":{"gi":3,"ils":23,"tie":4,"diff":-0.7333,"ci":[-1.1667,-0.3333],"n":30},"30":{"gi":1,"ils":27,"tie":2,"diff":-1.4667,"ci":[-2.1,-0.8667],"n":30},"40":{"gi":0,"ils":29,"tie":1,"diff":-2.1667,"ci":[-2.7333,-1.6],"n":30},"60":{"gi":0,"ils":30,"tie":0,"diff":-2.7,"ci":[-3.2,-2.2333],"n":30},"80":{"gi":0,"ils":30,"tie":0,"diff":-2.2,"ci":[-2.8333,-1.6667],"n":30}}},"spread":{"values":[25,50,100,150,250],"series":{"gi":{"25":{"visits":20.0,"sd":0.0,"km":278.223,"min":913.4973,"ms":16.6894,"best":1.0,"work":1540.0,"runs":30,"fail":0,"to":0},"50":{"visits":19.1,"sd":0.8847,"km":537.6421,"min":994.9958,"ms":16.4617,"best":0.9795,"work":1471.8333,"runs":30,"fail":0,"to":0},"100":{"visits":13.7333,"sd":1.4606,"km":600.2866,"min":1026.6012,"ms":16.3412,"best":0.8985,"work":982.2,"runs":30,"fail":0,"to":0},"150":{"visits":10.5667,"sd":1.6333,"km":599.5633,"min":1009.6322,"ms":16.4184,"best":0.8907,"work":623.9,"runs":30,"fail":0,"to":0},"250":{"visits":8.1,"sd":1.5391,"km":565.2397,"min":981.3653,"ms":16.2476,"best":0.896,"work":329.5333,"runs":30,"fail":0,"to":0}},"ils":{"25":{"visits":20.0,"sd":0.0,"km":254.1148,"min":907.6008,"ms":118.7041,"best":1.0,"work":400712.4667,"runs":30,"fail":0,"to":0},"50":{"visits":19.5,"sd":0.7311,"km":503.1234,"min":987.7971,"ms":129.5864,"best":1.0,"work":516922.3667,"runs":30,"fail":0,"to":0},"100":{"visits":15.3,"sd":1.236,"km":598.5503,"min":1024.6749,"ms":155.7457,"best":1.0,"work":901721.2,"runs":30,"fail":0,"to":0},"150":{"visits":11.8667,"sd":1.306,"km":618.1645,"min":1018.3341,"ms":133.1037,"best":1.0,"work":814471.6333,"runs":30,"fail":0,"to":0},"250":{"visits":9.0667,"sd":1.5298,"km":570.9241,"min":975.9004,"ms":120.5433,"best":1.0,"work":743936.3,"runs":30,"fail":0,"to":0}},"nn":{"25":{"visits":7.2,"sd":2.4969,"km":97.1498,"min":922.5565,"ms":16.0252,"best":0.36,"work":131.4667,"runs":30,"fail":0,"to":0},"50":{"visits":5.9667,"sd":1.8096,"km":150.0548,"min":992.8838,"ms":15.9454,"best":0.3068,"work":116.9667,"runs":30,"fail":0,"to":0},"100":{"visits":5.0333,"sd":1.9561,"km":191.2907,"min":992.979,"ms":15.9786,"best":0.3294,"work":103.6333,"runs":30,"fail":0,"to":0},"150":{"visits":3.7667,"sd":1.6333,"km":185.5702,"min":989.4044,"ms":16.0149,"best":0.3185,"work":85.0667,"runs":30,"fail":0,"to":0},"250":{"visits":3.0,"sd":1.2034,"km":182.3487,"min":938.3994,"ms":15.8293,"best":0.3412,"work":73.3,"runs":30,"fail":0,"to":0}}},"pairs":{"25":{"gi":2,"ils":28,"tie":0,"diff":0.0,"ci":[0.0,0.0],"n":30},"50":{"gi":0,"ils":30,"tie":0,"diff":-0.4,"ci":[-0.5667,-0.2333],"n":30},"100":{"gi":0,"ils":30,"tie":0,"diff":-1.5667,"ci":[-1.9667,-1.1667],"n":30},"150":{"gi":1,"ils":28,"tie":1,"diff":-1.3,"ci":[-1.7,-0.9],"n":30},"250":{"gi":1,"ils":26,"tie":3,"diff":-0.9667,"ci":[-1.3333,-0.6333],"n":30}}},"stress":{"values":[100,150,200,300],"series":{"gi":{"100":{"visits":26.3,"sd":3.5292,"km":670.5753,"min":1061.3539,"ms":23.6767,"best":0.7437,"work":16019.1,"runs":10,"fail":0,"to":0},"150":{"visits":32.9,"sd":3.4785,"km":672.3761,"min":1058.3201,"ms":32.5278,"best":0.7974,"work":39121.3,"runs":10,"fail":0,"to":0},"200":{"visits":39.5,"sd":3.44,"km":683.321,"min":1055.416,"ms":46.0282,"best":0.9153,"work":71804.8,"runs":10,"fail":0,"to":0},"300":{"visits":53.0,"sd":4.2947,"km":687.1887,"min":1056.7505,"ms":84.289,"best":0.967,"work":182003.9,"runs":10,"fail":0,"to":0}},"ils":{"100":{"visits":35.6,"sd":3.4705,"km":688.5919,"min":1055.9107,"ms":222.7439,"best":1.0,"work":2004576.9,"runs":10,"fail":0,"to":0},"150":{"visits":41.4,"sd":3.8064,"km":694.3237,"min":1059.0791,"ms":222.1436,"best":1.0,"work":2002990.7,"runs":10,"fail":0,"to":0},"200":{"visits":43.1,"sd":2.7669,"km":698.6458,"min":1065.5934,"ms":229.8426,"best":0.9974,"work":2003770.5,"runs":10,"fail":0,"to":0},"300":{"visits":54.8,"sd":5.2873,"km":696.4094,"min":1062.5168,"ms":268.2894,"best":0.998,"work":2007567.5,"runs":10,"fail":0,"to":0}},"nn":{"100":{"visits":7.8,"sd":1.4757,"km":177.759,"min":1029.8493,"ms":20.7506,"best":0.2201,"work":844.7,"runs":10,"fail":0,"to":0},"150":{"visits":9.0,"sd":1.8257,"km":177.3536,"min":1052.7391,"ms":26.3968,"best":0.2191,"work":1453.5,"runs":10,"fail":0,"to":0},"200":{"visits":11.5,"sd":2.3214,"km":195.1327,"min":1063.2752,"ms":34.0871,"best":0.2662,"work":2425.7,"runs":10,"fail":0,"to":0},"300":{"visits":13.7,"sd":2.4967,"km":184.9765,"min":1064.1044,"ms":61.1554,"best":0.2499,"work":4306.5,"runs":10,"fail":0,"to":0}}},"pairs":{"100":{"gi":0,"ils":10,"tie":0,"diff":-9.3,"ci":[-12.0,-6.7],"n":10},"150":{"gi":0,"ils":10,"tie":0,"diff":-8.5,"ci":[-10.9,-6.7],"n":10},"200":{"gi":2,"ils":8,"tie":0,"diff":-3.6,"ci":[-5.7,-1.8],"n":10},"300":{"gi":3,"ils":7,"tie":0,"diff":-1.8,"ci":[-3.1,-0.6],"n":10}}},"window-alignment":{"values":[360,540,720,900,1080],"series":{"gi":{"360":{"visits":4.1,"sd":1.2415,"km":184.6269,"min":318.0294,"ms":17.9259,"best":0.9583,"work":73.3,"runs":30,"fail":0,"to":0},"540":{"visits":4.1333,"sd":1.5253,"km":190.8399,"min":291.9626,"ms":16.581,"best":0.9372,"work":78.8333,"runs":30,"fail":0,"to":0},"720":{"visits":4.3333,"sd":1.2411,"km":189.7364,"min":305.9501,"ms":16.4011,"best":0.9206,"work":109.0333,"runs":30,"fail":0,"to":0},"900":{"visits":3.8,"sd":1.4716,"km":172.8192,"min":316.3297,"ms":16.2828,"best":0.9103,"work":78.2667,"runs":30,"fail":0,"to":0},"1080":{"visits":3.8667,"sd":1.7367,"km":186.62,"min":289.3351,"ms":16.378,"best":0.9889,"work":80.0667,"runs":30,"fail":0,"to":0}},"ils":{"360":{"visits":4.2333,"sd":1.1651,"km":186.6574,"min":321.1149,"ms":157.584,"best":0.9889,"work":1082746.0667,"runs":30,"fail":0,"to":0},"540":{"visits":4.3333,"sd":1.6046,"km":188.2567,"min":287.7436,"ms":136.3716,"best":0.975,"work":953259.3667,"runs":30,"fail":0,"to":0},"720":{"visits":4.6667,"sd":1.3476,"km":192.4458,"min":304.0936,"ms":122.7071,"best":0.9861,"work":821977.5333,"runs":30,"fail":0,"to":0},"900":{"visits":4.1667,"sd":1.3667,"km":193.635,"min":321.2667,"ms":93.5031,"best":1.0,"work":584604.9333,"runs":30,"fail":0,"to":0},"1080":{"visits":3.9333,"sd":1.7991,"km":181.2593,"min":282.9402,"ms":72.3121,"best":1.0,"work":418051.6333,"runs":30,"fail":0,"to":0}},"nn":{"360":{"visits":2.2333,"sd":1.04,"km":88.0091,"min":319.3954,"ms":16.2568,"best":0.5589,"work":92.8667,"runs":30,"fail":0,"to":0},"540":{"visits":3.3667,"sd":1.2452,"km":173.8836,"min":296.5505,"ms":16.2347,"best":0.7992,"work":122.9,"runs":30,"fail":0,"to":0},"720":{"visits":2.7333,"sd":1.2015,"km":114.2702,"min":286.8823,"ms":16.0824,"best":0.5923,"work":106.2,"runs":30,"fail":0,"to":0},"900":{"visits":2.3,"sd":1.1188,"km":88.3206,"min":324.0751,"ms":16.0234,"best":0.5835,"work":94.6,"runs":30,"fail":0,"to":0},"1080":{"visits":3.1333,"sd":1.4559,"km":155.0896,"min":266.6321,"ms":15.9506,"best":0.8317,"work":116.5,"runs":30,"fail":0,"to":0}}},"pairs":{"360":{"gi":2,"ils":13,"tie":15,"diff":-0.1333,"ci":[-0.3667,0.1],"n":30},"540":{"gi":1,"ils":12,"tie":17,"diff":-0.2,"ci":[-0.4333,0.0],"n":30},"720":{"gi":3,"ils":17,"tie":10,"diff":-0.3333,"ci":[-0.6333,-0.0667],"n":30},"900":{"gi":2,"ils":11,"tie":17,"diff":-0.3667,"ci":[-0.6333,-0.1333],"n":30},"1080":{"gi":0,"ils":8,"tie":22,"diff":-0.0667,"ci":[-0.1667,0.0],"n":30}}}};
+/* Worked example: docs/ALGORITHM_SPEC.md section 8 (instance n4-seed5). */
+const INST={depart:360,deadline:1440,speed:40,
+  id:[1735161,12746846,1768785,7565878,7797539],
+  lat:[3.1412,3.30007,3.4856,4.0393,2.6933],lon:[101.68653,101.28984,102.1389,100.9051,102.9456],
+  opens:[0,360,1170,630,360],closes:[1440,630,1440,900,630],slot:[null,0,3,1,0],
+  dist:[[0,47.451234145176535,63.15310334482244,132.26182998024285,148.42595395769408],
+  [47.451234145176535,0,96.47726640161441,92.62472737632565,195.84834886780092],
+  [63.15310334482244,96.47726640161441,0,150.1042605946633,125.63584985287612],
+  [132.26182998024285,92.62472737632565,150.1042605946633,0,271.48013918706766],
+  [148.42595395769408,195.84834886780092,125.63584985287612,271.48013918706766,0]]};
+
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const SLOTC=['var(--slot-1)','var(--slot-2)','var(--slot-3)','var(--slot-4)'],SLOTN=['06:00–10:30','10:30–15:00','15:00–19:30','19:30–24:00'];
+const clock=m=>{const x=Math.floor(m+1e-6);return String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0');};
+const f2=x=>x.toFixed(2),f1=x=>x.toFixed(1);
+const ALG={gi:{name:'A: Greedy',short:'A',c:'var(--gi)',sh:'c'},ils:{name:'B: ILS',short:'B',c:'var(--ils)',sh:'s'},nn:{name:'NN',short:'NN',c:'var(--nn)',sh:'d'}},ORDER=['gi','ils','nn'];
+$$('[data-slots]').forEach(el=>el.innerHTML=SLOTN.map((s,i)=>`<span><i style="background:${SLOTC[i]}"></i>${s}</span>`).join(''));
+
+/* ---- deck ---- */
+const slides=$$('.slide'),stage=$('#stage'),tip=$('#tip'),notesP=$('#notesPanel');let cur=0,scale=1,notesOn=false;
+function fit(){scale=Math.min(innerWidth/1920,innerHeight/1080);stage.style.setProperty('--s',scale);}
+addEventListener('resize',fit);fit();
+slides.forEach((s,i)=>{const f=document.createElement('div');f.className='foot';f.innerHTML=`<span>G4T1 · CS201 · ${s.dataset.title}</span><span class="num">${i+1} / ${slides.length}</span>`;s.appendChild(f);});
+const steppers={};
+function goto(i,fromHash){cur=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,k)=>s.classList.toggle('active',k===cur));
+  hideTip();const st=steppers[slides[cur].dataset.step];if(st)st.set(0);
+  if(!fromHash)history.replaceState(null,'','#'+(cur+1));drawNotes();}
+function drawNotes(){const a=$('.notes',slides[cur]);notesP.style.display=notesOn&&a?'block':'none';if(a){$('.who',notesP).textContent='Speaker: '+a.dataset.speaker;$('.txt',notesP).textContent=a.textContent;}}
+function hideTip(){tip.style.display='none';}
+function showTip(e,html){tip.innerHTML=html;tip.style.display='block';const r=stage.getBoundingClientRect(),x=(e.clientX-r.left)/scale,y=(e.clientY-r.top)/scale,w=tip.offsetWidth,h=tip.offsetHeight;
+  tip.style.left=(x+w+36>1920?x-w-22:x+22)+'px';tip.style.top=Math.max(8,Math.min(1072-h,y-h/2))+'px';}
+addEventListener('keydown',e=>{if(e.target.matches('input'))return;const k=e.key;
+  if(['ArrowRight','ArrowDown','PageDown',' '].includes(k)){e.preventDefault();goto(cur+1);}
+  else if(['ArrowLeft','ArrowUp','PageUp'].includes(k)){e.preventDefault();goto(cur-1);}
+  else if(k==='Home')goto(0);else if(k==='End')goto(slides.length-1);
+  else if(k==='Enter'){e.preventDefault();const s=steppers[slides[cur].dataset.step];if(s)s.next();}
+  else if(k==='Backspace'){e.preventDefault();const s=steppers[slides[cur].dataset.step];if(s)s.prev();}
+  else if(k==='f'||k==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
+  else if(k==='n'||k==='N'){notesOn=!notesOn;drawNotes();}
+  else if(k==='t'||k==='T'){slides[cur].classList.toggle('show-table');}
+});
+addEventListener('hashchange',()=>goto((parseInt(location.hash.slice(1))||1)-1,true));
+function allFinal(){Object.values(steppers).forEach(s=>s.set(s.n-1));hideTip();}
+addEventListener('beforeprint',allFinal);matchMedia('print').addEventListener('change',e=>{if(e.matches)allFinal();});
+$$('[data-t]').forEach(b=>b.onclick=()=>{const sl=b.closest('.slide');sl.classList.toggle('show-table');b.classList.toggle('on');});
+
+function makeStepper(name,slideEl,n,render){slideEl.dataset.step=name;const ctl=$(`[data-stepctl="${name}"]`);let i=n-1;
+  const s={n,set(v){i=Math.max(0,Math.min(n-1,v));render(i);if(ctl)$('.pg',ctl).textContent=`step ${i+1} / ${n}`;},next(){s.set(i+1);},prev(){s.set(i-1);}};
+  if(ctl){ctl.innerHTML='<button>Back</button><button>Enter: next</button><span class="pg"></span>';const[b,nx]=$$('button',ctl);b.onclick=s.prev;nx.onclick=s.next;}
+  steppers[name]=s;s.set(n-1);return s;}
+$$('.shot[data-src]').forEach(f=>{const im=new Image();im.alt=f.dataset.alt;im.onload=()=>{f.innerHTML='';f.appendChild(im);};im.src=f.dataset.src;});
+
+/* ---- worked-example map and timeline ---- */
+function miniMap(I,edges,{w=640,h=340,on=null,hot=null}={}){const pad=34,lo=Math.min(...I.lon),hi=Math.max(...I.lon),la=Math.min(...I.lat),lb=Math.max(...I.lat);
+  const X=i=>pad+(I.lon[i]-lo)/(hi-lo)*(w-2*pad),Y=i=>h-pad-(I.lat[i]-la)/(lb-la)*(h-2*pad);
+  let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="Map of the worked example">`;
+  edges.forEach(([a,b])=>{s+=`<line x1="${X(a)}" y1="${Y(a)}" x2="${X(b)}" y2="${Y(b)}" stroke="var(--accent)" stroke-width="3"/>`;});
+  I.lon.forEach((_,i)=>{const dep=i===0,used=!on||on.includes(i),hv=hot===i,c=dep?'var(--accent)':SLOTC[I.slot[i]];
+    s+=dep?`<rect x="${X(i)-14}" y="${Y(i)-14}" width="28" height="28" fill="var(--surface)" stroke="${c}" stroke-width="3"/>`:`<circle cx="${X(i)}" cy="${Y(i)}" r="${hv?17:14}" fill="${used?c:'var(--surface)'}" stroke="${c}" stroke-width="3"/>`;
+    s+=`<text x="${X(i)}" y="${Y(i)+6}" text-anchor="middle" font-size="17" font-weight="700" fill="${dep||!used?'var(--ink)':'#06090d'}">${dep?'D':i}</text>`;});
+  return s+'</svg>';}
+$('#titleMap').innerHTML=miniMap(INST,[[0,1],[1,3],[3,2],[2,0]],{w:620,h:380});
+
+function timeline(I,legs,upto){const w=940,h=132,L=8,R=w-8,T=30,B=80,x=m=>L+(m-360)/1080*(R-L);let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="Clock timeline">`;
+  [360,630,900,1170].forEach((m,i)=>{s+=`<rect x="${x(m)}" y="${T}" width="${x(m+270)-x(m)-2}" height="${B-T}" fill="${SLOTC[i]}" opacity=".13"/>`;});
+  [360,630,900,1170,1440].forEach(m=>{s+=`<text x="${m===1440?x(m):m===360?x(m):x(m)}" y="20" font-size="19" fill="var(--muted)" text-anchor="${m===360?'start':m===1440?'end':'middle'}">${m===1440?'24:00':clock(m)}</text>`;});
+  legs.slice(0,upto).forEach(l=>{s+=`<rect x="${x(l.from)}" y="${T+8}" width="${Math.max(0,x(l.arrive)-x(l.from))}" height="${B-T-16}" fill="var(--accent)"/>`;
+    if(l.wait>0.01)s+=`<rect x="${x(l.arrive)}" y="${T+8}" width="${x(l.leave)-x(l.arrive)}" height="${B-T-16}" fill="var(--focus)"/>`;});
+  s+=`<rect x="8" y="104" width="18" height="18" fill="var(--accent)"/><text x="34" y="120" font-size="20" fill="var(--ink-2)">driving</text><rect x="130" y="104" width="18" height="18" fill="var(--focus)"/><text x="156" y="120" font-size="20" fill="var(--ink-2)">waiting</text>`;
+  const waited=legs.slice(0,upto).reduce((a,l)=>a+l.wait,0);s+=`<text x="${R}" y="120" font-size="21" text-anchor="end" fill="var(--ink)">waited ${f2(waited)} min</text>`;return s+'</svg>';}
+
+/* NN replay */
+const nnRoute=solveNN(INST),nnVal=validate(INST,nnRoute);
+const nnSrc=['here ← depot, clock ← 06:00','<span class="k">loop</span>:','  best ← nearest unvisited j where','    start_j = max(clock + travel, opens_j)','    start_j ≤ closes_j','    start_j + travel(j, depot) ≤ deadline','  <span class="k">if</span> none: <span class="k">break</span>','  go to best, clock ← start_best','return to depot'];
+const nnFrames=[{l:[0],c:`Leave the depot at <b class="mono">06:00</b>. Nearest reachable place is customer 1.`}].concat(nnVal.legs.map((g,i)=>{const dep=g.b===0;
+  return dep?{l:[8],c:`Back at <b class="mono">${clock(g.arrive)}</b>: <b>3</b> visits, <span class="mono">${f2(nnVal.km)}</span> km. Customer 4 was skipped, since its window closed. Waiting: <b class="mono">${f2(nnVal.wait)}</b> min.`}
+  :{l:[2,3,4,5,7],c:`Customer ${g.b}: arrive <b class="mono">${clock(g.arrive)}</b>${g.wait>.01?`, then <b style="color:var(--focus)">wait <span class="mono">${f2(g.wait)}</span> min</b> until <span class="mono">${clock(g.leave)}</span>.`:', window open, no wait.'}`};}));
+function codeLines(el,src,on){el.innerHTML=src.map((t,i)=>`<span class="l${on.includes(i)?' on':''}">${t}</span>`).join('');}
+makeStepper('nn',slides[6],nnFrames.length,i=>{const r=nnRoute.slice(0,Math.min(i+1,nnRoute.length)),edges=r.slice(1).map((b,k)=>[r[k],b]);
+  codeLines($('#nnCode'),nnSrc,nnFrames[i].l);$('#nnMap').innerHTML=miniMap(INST,edges,{on:r,hot:r[r.length-1]||null});$('#nnTime').innerHTML=timeline(INST,nnVal.legs,i);$('#nnCap').innerHTML=nnFrames[i].c;});
+
+/* GI replay */
+const giLog=[];solveGI(INST,giLog);
+const giSrc=['route ← [0, 0]; alive ← all customers','<span class="k">while</span> alive not empty:','  rebuild leave[], latest[]     <span class="c"># O(k)</span>','  best ← none','  <span class="k">for</span> v <span class="k">in</span> alive:               <span class="c"># O(n)</span>','    <span class="k">for</span> each gap p in route:    <span class="c"># O(k)</span>','      <span class="k">if</span> O(1) check passes:','        Δ ← d(a,v) + d(v,b) − d(a,b)','        keep smallest (Δ, closes_v, id, p)','    <span class="k">if</span> v fits nowhere: drop v forever','  <span class="k">if</span> best is none: <span class="k">break</span>','  insert best                   <span class="c"># O(k)</span>','<span class="k">return</span> route'];
+const giFrames=[];giLog.forEach((r,idx)=>{if(r.final){giFrames.push({route:r.route,l:[12],c:`Nothing is left to insert. Final route visits <b>${r.route.length-2}</b> customers, valid by the same replay.`});return;}
+  const b=r.best,nr=[...r.route];nr.splice(b[3],0,b[4]);giFrames.push({route:nr,nw:b[4],l:[4,5,6,7,8],c:`Round ${idx+1}: insert customer <b class="mono">${b[4]}</b>, adding <b class="mono">${f2(b[0])}</b> km.`+(r.pruned.length?` Customer <b class="mono">${r.pruned.join(', ')}</b> fits no gap: dropped for good.`:'')});});
+giFrames.unshift({route:[0,0],l:[0],c:'Start with an empty route: depot, depot.'});
+makeStepper('gi',slides[8],giFrames.length,i=>{const f=giFrames[i],edges=f.route.slice(1).map((b,k)=>[f.route[k],b]);codeLines($('#giCode'),giSrc,f.l);$('#giMap').innerHTML=miniMap(INST,edges,{on:f.route,hot:f.nw});
+  $('#giChain').innerHTML=f.route.map((v,k)=>`<span class="${v===0?'dep':v===f.nw?'new':''}">${v===0?'D':v}</span>`).join('<em>→</em>');$('#giCap').innerHTML=f.c;});
+
+/* cache explorer: real arrays for route 0,1,2,0 */
+const T=travelOf(INST),cRoute=[0,1,2,0],ck=cRoute.length,cLeave=[360],cLatest=new Array(ck).fill(0);
+for(let p=1;p<ck-1;p++)cLeave[p]=Math.max(cLeave[p-1]+T[cRoute[p-1]][cRoute[p]],INST.opens[cRoute[p]]);
+cLatest[ck-1]=1440;for(let p=ck-2;p>0;p--)cLatest[p]=Math.min(INST.closes[cRoute[p]],cLatest[p+1]-T[cRoute[p]][cRoute[p+1]]);
+let cV=3,cP=2;
+function drawCache(){const a=cRoute[cP-1],b=cRoute[cP],s=Math.max(cLeave[cP-1]+T[a][cV],INST.opens[cV]),e=s+T[cV][b],c1=s<=INST.closes[cV],c2=e<=cLatest[cP],ok=c1&&c2;
+  const ctl=$('#cacheCtl');ctl.innerHTML=`<span>customer</span>`+[3,4].map(v=>`<button data-v="${v}" class="${v===cV?'on':''}">${v}</button>`).join('')+`<span style="margin-left:18px">gap</span>`+[1,2,3].map(p=>`<button data-p="${p}" class="${p===cP?'on':''}">${cRoute[p-1]||'D'}→${cRoute[p]||'D'}</button>`).join('');
+  $$('button',ctl).forEach(x=>x.onclick=()=>{if(x.dataset.v)cV=+x.dataset.v;else cP=+x.dataset.p;drawCache();});
+  const m=(okk)=>`<b style="color:${okk?'var(--ok)':'var(--bad)'}">${okk?'pass':'fail'}</b>`;
+  $('#cacheOut').innerHTML=`start_v = max(${f2(cLeave[cP-1])} + ${f2(T[a][cV])}, ${INST.opens[cV]}) = <b>${f2(s)}</b><br>start_v ≤ closes[v] : ${f2(s)} ≤ ${INST.closes[cV]} &nbsp;${m(c1)}<br>start_v + travel(v,b) ≤ latest[p] : ${f2(e)} ≤ ${f2(cLatest[cP])} &nbsp;${m(c2)}<br><b style="color:${ok?'var(--ok)':'var(--bad)'}">${ok?'Fits':'Does not fit'}</b> <span class="muted">after two comparisons</span>`;}
+drawCache();
+
+/* shake stepper (mirrors the update rule in iterated-local-search/solve.py) */
+const M=8;let sR=1,sP=1,sN=0;
+function drawShake(){const drop=new Set();for(let t=0;t<Math.min(sR,M);t++)drop.add(((sP-1+t)%M)+1);let h='<span class="dep">D</span>';for(let p=1;p<=M;p++)h+=`<span class="${drop.has(p)?'drop':''}">${p}</span>`;$('#shakeChain').innerHTML=h+'<span class="dep">D</span>';
+  $('#shakeState').innerHTML=`R = <b>${sR}</b> &nbsp; P = <b>${sP}</b>`;}
+const ilsSrc=['route ← insert_by_shift([0, 0]); best ← route','R ← 1, P ← 1, since ← 0, stall ← 0','<span class="k">while</span> stall &lt; 4000 <span class="k">and</span> checks &lt; 2,000,000:','  remove R consecutive visits from P (wrap)','  insert_by_shift(route)','  <span class="k">if</span> route better than best:','    best ← route; R, P ← 1; since, stall ← 0','  <span class="k">else</span>:','    stall++, since++; P ← P + R','    <span class="k">if</span> P past the end: wrap P; R++','      <span class="k">if</span> R &gt; max(2, visits/2): R ← 1','    <span class="k">if</span> since ≥ 150: route ← best; R, P ← 1','<span class="k">return</span> best'];
+const ilsMark=l=>codeLines($('#ilsCode'),ilsSrc,l);ilsMark([3,4]);
+function shakeFail(){ilsMark([8,9,10]);sP+=sR;let w='Window moves on by R.';if(sP>M){sP-=M;sR++;w='Swept the whole route: widen the window.';const cap=Math.min(M,Math.max(2,Math.floor(M/2)));if(sR>cap){sR=1;w='Reached the cap of half the route: back to R = 1.';}}sN++;$('#shakeCap').textContent=w;drawShake();}
+function shakeBest(){ilsMark([5,6]);sR=1;sP=1;sN=0;$('#shakeCap').textContent='New best saved: reset to R = 1, P = 1.';drawShake();}
+$('#shakeNo').onclick=shakeFail;$('#shakeYes').onclick=shakeBest;drawShake();
+$('#shakeCap').textContent='Removed visits are refilled by greedy insertion.';
+slides[10].dataset.step='shake';steppers.shake={n:1,set(){ilsMark([3,4]);sR=1;sP=1;sN=0;drawShake();$('#shakeCap').textContent='Removed visits are refilled by greedy insertion.';},next:shakeFail,prev(){}};
+
+/* two caches side by side */
+(function(){const v=[360],ar=[360],w=[0];for(let p=1;p<ck;p++){ar[p]=v[p-1]+T[cRoute[p-1]][cRoute[p]];v[p]=p===ck-1?ar[p]:Math.max(ar[p],INST.opens[cRoute[p]]);w[p]=v[p]-ar[p];}
+  const ms=new Array(ck).fill(0);ms[ck-1]=1440-ar[ck-1];for(let p=ck-2;p>0;p--)ms[p]=Math.min(INST.closes[cRoute[p]]-v[p],w[p+1]+ms[p+1]);
+  let h='<table style="font-size:31px"><tr><th>Stop</th><th class="num-col">visit</th><th class="num-col">latest</th><th class="num-col">latest − visit</th><th class="num-col">max_shift</th></tr>';
+  for(let p=1;p<ck;p++){h+=`<tr><td class="mono">${cRoute[p]===0?'D (end)':cRoute[p]}</td><td class="num-col">${f2(v[p])}</td><td class="num-col">${f2(cLatest[p])}</td><td class="num-col">${f2(cLatest[p]-v[p])}</td><td class="num-col"><b>${f2(ms[p])}</b></td></tr>`;}
+  $('#twoCaches').innerHTML=h+'</table>';})();
+
+/* slide 2: arrival slider */
+function drawArr(){const m=+$('#arrRange').value;$('#arrClock').textContent=m===1440?'24:00':clock(m);
+  const row=(n,o,c)=>{let st,col;if(m<o){st=`Early: wait ${o-m} min`;col='var(--focus)';}else if(m<=c){st='Accepted';col='var(--ok)';}else{st='Too late: trip wasted';col='var(--bad)';}
+    return `<div class="row" style="justify-content:space-between;gap:20px"><span>${n} <span class="muted mono" style="font-size:25px">${clock(o)}–${c===1440?'24:00':clock(c)}</span></span><b style="color:${col}">${st}</b></div>`;};
+  $('#arrRows').innerHTML=row('Café',360,630)+row('Mall outlet',1170,1440);}
+$('#arrRange').oninput=drawArr;drawArr();
+$('#slotBar').innerHTML=SLOTN.map((s,i)=>`<div style="flex:1;background:${SLOTC[i]};color:#06090d;font-size:21px">${s}</div>`).join('');
+
+/* ---- charts ---- */
+const merged=(a)=>{const s=DATA.scaling,t=DATA.stress;return {xs:s.values.concat(t.values.filter(v=>v>100)),get:(v,k)=>(v>100?t:s).series[a][v][k]};};
+const shape=(k,x,y,c)=>{const ring='stroke="var(--surface)" stroke-width="2"';return k==='c'?`<circle cx="${x}" cy="${y}" r="7" fill="${c}" ${ring}/>`:k==='s'?`<rect x="${x-7}" y="${y-7}" width="14" height="14" rx="2" fill="${c}" ${ring}/>`:`<path d="M${x} ${y-9}L${x+9} ${y}L${x} ${y+9}L${x-9} ${y}Z" fill="${c}" ${ring}/>`;};
+function chart(host,o){const {w,h}=o,m=Object.assign({l:74,r:60,t:18,b:o.xTitle?72:42},o.m||{}),iw=w-m.l-m.r,ih=h-m.t-m.b;
+  const xv=o.xs,xp=o.xScale==='cat'?(v=>m.l+xv.indexOf(v)/(xv.length-1)*iw):o.xScale==='log'?(v=>m.l+Math.log(v/xv[0])/Math.log(xv[xv.length-1]/xv[0])*iw):(v=>m.l+(v-xv[0])/(xv[xv.length-1]-xv[0])*iw);
+  const yp=o.yLog?(v=>m.t+ih-(Math.log10(v)-o.yLog[0])/(o.yLog[1]-o.yLog[0])*ih):(v=>m.t+ih-(v-(o.yMin||0))/(o.yMax-(o.yMin||0))*ih);
+  const hide=o.hide||new Set(),ser=o.series.filter(s=>!hide.has(s.key));
+  let g=`<svg viewBox="0 0 ${w} ${h}" width="100%" style="display:block" role="img" aria-label="${o.label}">`;
+  o.yTicks.forEach(t=>{g+=`<line x1="${m.l}" x2="${w-m.r}" y1="${yp(t)}" y2="${yp(t)}" stroke="var(--line)"/><text x="${m.l-12}" y="${yp(t)+7}" font-size="${o.fs||20}" text-anchor="end" fill="var(--muted)">${o.yFmt?o.yFmt(t):t}</text>`;});
+  (o.xTicks||xv).forEach(t=>{g+=`<text x="${xp(t)}" y="${h-m.b+28}" font-size="${o.fs||20}" text-anchor="middle" fill="var(--muted)">${o.xFmt?o.xFmt(t):t}</text>`;});
+  if(o.xTitle)g+=`<text x="${m.l+iw/2}" y="${h-10}" font-size="21" text-anchor="middle" fill="var(--ink-2)">${o.xTitle}</text>`;
+  if(o.yRef!=null)g+=`<line x1="${m.l}" x2="${w-m.r}" y1="${yp(o.yRef)}" y2="${yp(o.yRef)}" stroke="var(--line-strong)"/><text x="${m.l+6}" y="${yp(o.yRef)-8}" font-size="19" fill="var(--ink-2)">${o.yRefLabel}</text>`;
+  ser.forEach(s=>{const pts=s.pts.map(p=>[xp(p.x),yp(p.y)]);g+=`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="${s.c}" stroke-width="2.5" stroke-linejoin="round"/>`;pts.forEach(p=>g+=shape(s.sh,p[0],p[1],s.c));});
+  const last=ser.map(s=>{const p=s.pts[s.pts.length-1];return{s,x:xp(p.x),y:yp(p.y)};}).sort((a,b)=>a.y-b.y);for(let i=1;i<last.length;i++)if(last[i].y-last[i-1].y<25)last[i].y=last[i-1].y+25;
+  if(o.endLabels!==false)last.forEach(l=>g+=`<text x="${l.x+14}" y="${l.y+8}" font-size="${o.fs||21}" font-weight="700" fill="var(--ink)">${l.s.short}</text>`);
+  g+=`<line class="xh" y1="${m.t}" y2="${m.t+ih}" stroke="var(--accent)" opacity="0"/><rect class="hit" x="${m.l-20}" y="${m.t}" width="${iw+40}" height="${ih+6}" fill="transparent"/></svg>`;
+  host.innerHTML=g;const svg=$('svg',host),xh=$('.xh',svg);
+  $('.hit',svg).onpointermove=e=>{const r=svg.getBoundingClientRect(),px=(e.clientX-r.left)/r.width*w,py=(e.clientY-r.top)/r.height*h;
+    if(o.free){let best=null,bd=1e9;ser.forEach(s=>s.pts.forEach(p=>{const d=Math.hypot(xp(p.x)-px,yp(p.y)-py);if(d<bd){bd=d;best={s,p};}}));if(best&&bd<70){xh.setAttribute('opacity',0);showTip(e,o.tip(best.s,best.p));}else hideTip();return;}
+    let b=xv[0];xv.forEach(v=>{if(Math.abs(xp(v)-px)<Math.abs(xp(b)-px))b=v;});xh.setAttribute('x1',xp(b));xh.setAttribute('x2',xp(b));xh.setAttribute('opacity',.6);
+    showTip(e,`<b>${o.xName} ${o.xFmt?o.xFmt(b):b}</b><br>`+ser.map(s=>{const p=s.pts.find(q=>q.x===b);return `${s.short.padEnd(3,' ')} ${o.tip(s,p)}`;}).join('<br>'));};
+  $('.hit',svg).onpointerleave=()=>{xh.setAttribute('opacity',0);hideTip();};}
+function tableOf(host,head,rows){host.innerHTML='<table><tr>'+head.map(c=>`<th>${c}</th>`).join('')+'</tr>'+rows.map(r=>'<tr>'+r.map(c=>`<td>${c}</td>`).join('')+'</tr>').join('')+'</table>';}
+function legend(name,draw,hide){const el=$(`[data-legend="${name}"]`);el.innerHTML=ORDER.map(a=>`<button data-a="${a}"><span class="swatch" style="background:${ALG[a].c};border-radius:${ALG[a].sh==='c'?'50%':'2px'};${ALG[a].sh==='d'?'transform:rotate(45deg) scale(.8)':''}"></span>${ALG[a].name}</button>`).join('');
+  $$('button',el).forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(hide.has(a))hide.delete(a);else hide.add(a);b.classList.toggle('off',hide.has(a));draw();});}
+const srs=(fn,vals)=>ORDER.map(a=>({key:a,short:ALG[a].short,c:ALG[a].c,sh:ALG[a].sh,pts:vals.map(v=>fn(a,v))}));
+
+/* scaling */
+{const d=DATA.scaling,hide=new Set();let met='visits';
+ function draw(){const best=met==='best';chart($('#scaleChart'),{w:1320,h:650,label:best?'Percent of best found versus customers':'Places visited versus customers',xs:d.values,xScale:'log',xName:'n =',xTitle:'Customers (n, log scale)',yMax:best?100:40,yTicks:best?[0,25,50,75,100]:[0,10,20,30,40],yFmt:best?(t=>t+'%'):null,hide,fs:21,
+   series:srs((a,v)=>{const g=d.series[a][v];return{x:v,y:best?g.best*100:g.visits,sd:g.sd};},d.values),tip:(s,p)=>best?f1(p.y)+'%':`${f2(p.y)} <span style="color:var(--muted)">± ${f2(p.sd)} sd</span>`});}
+ legend('scaling',draw,hide);draw();
+ $$('#scaleCtl [data-m]').forEach(b=>b.onclick=()=>{met=b.dataset.m;$$('#scaleCtl [data-m]').forEach(x=>x.classList.toggle('on',x===b));draw();});
+ tableOf($('#scaleTwin'),['n',...['NN','A','B'].map(x=>x+' visits'),...['NN','A','B'].map(x=>x+' best%'),'A ms','B ms'],d.values.map(v=>{const g=a=>d.series[a][v];return[v,f2(g('nn').visits),f2(g('gi').visits),f2(g('ils').visits),f1(g('nn').best*100),f1(g('gi').best*100),f1(g('ils').best*100),f1(g('gi').ms),f1(g('ils').ms)];}));
+ const n=d.series;$('#scaleStats').innerHTML=[['ils','B: ILS'],['gi','A: Greedy'],['nn','NN baseline']].map(([a,l])=>`<div><div class="stat mono">${f2(n[a][100].visits)}</div><div class="lab">${l}, mean visits at n=100</div></div>`).join('');}
+
+/* small multiples */
+{const panels=[['#m1','time-budget',{xScale:'lin',xName:'period',xFmt:v=>v/60+'h',xTitle:'Period',xTicks:[240,480,720,960,1080]}],['#m2','speed',{xScale:'lin',xName:'speed',xFmt:v=>v,xTitle:'km/h'}],['#m3','spread',{xScale:'log',xName:'radius',xFmt:v=>v,xTitle:'km (log scale)'}],['#m4','window-alignment',{xScale:'cat',xName:'depart',xFmt:v=>clock(v).slice(0,2)+'h',xTitle:'Departure'}]];
+ const hide=new Set();const ymax={'time-budget':20,'speed':30,'spread':24,'window-alignment':6},tk={'time-budget':[0,5,10,15,20],'speed':[0,10,20,30],'spread':[0,6,12,18,24],'window-alignment':[0,2,4,6]};
+ function draw(){panels.forEach(([id,k,o])=>{const d=DATA[k];chart($(id),Object.assign({w:414,h:630,label:'Places visited versus '+o.xName,m:{l:46,r:36,t:14,b:74},xs:d.values,hide,fs:18,endLabels:true,yMax:ymax[k],yTicks:tk[k],series:srs((a,v)=>({x:v,y:d.series[a][v].visits}),d.values),tip:(s,p)=>f2(p.y)},o));});}
+ legend('multi',draw,hide);draw();
+ panels.forEach(([id,k,o])=>{const d=DATA[k];tableOf($(id+'t'),[o.xName,'A','B','NN'],d.values.map(v=>[o.xFmt?o.xFmt(v):v,f2(d.series.gi[v].visits),f2(d.series.ils[v].visits),f2(d.series.nn[v].visits)]));});}
+
+/* work vs n, log-log */
+{const xs=merged('nn').xs,hide=new Set();const fm=t=>t>=1e6?(t/1e6)+'M':t>=1e3?(t/1e3)+'k':t;
+ function draw(){chart($('#workChart'),{w:880,h:650,label:'Measured work versus customers, log scales',xs,xScale:'log',xName:'n =',xTitle:'Customers (log scale)',xTicks:[5,10,20,50,100,300],yLog:[1,7],yTicks:[10,100,1e3,1e4,1e5,1e6,1e7],yFmt:fm,hide,fs:20,m:{l:84,r:58,t:18,b:72},yRef:2e6,yRefLabel:'ILS budget: 2,000,000 checks',
+   series:srs((a,v)=>({x:v,y:merged(a).get(v,'work')}),xs),tip:(s,p)=>Math.round(p.y).toLocaleString('en-US')});}
+ legend('work',draw,hide);draw();const ex=a=>{const m=merged(a),l=xs.length-1;return Math.log(m.get(xs[l],'work')/m.get(xs[0],'work'))/Math.log(xs[l]/xs[0]);};
+ $('#cNN').textContent='≈ n^'+f1(ex('nn'));$('#cGI').textContent='≈ n^'+f1(ex('gi'));
+ tableOf($('#workTwin'),['n','A','B','NN'],xs.map(v=>[v,...['gi','ils','nn'].map(a=>Math.round(merged(a).get(v,'work')).toLocaleString('en-US'))]));}
+
+/* head-to-head */
+{const rows=[...DATA.scaling.values.map(v=>[v,DATA.scaling.pairs[v]]),...DATA.stress.values.filter(v=>v>100).map(v=>[v,DATA.stress.pairs[v]])];let h='<div class="head">n</div><div class="head">Per-instance wins</div><div class="head" style="text-align:right">A − B [95% CI]</div>';
+ rows.forEach(([v,p],i)=>{const seg=(c,k,col,lab)=>c?`<div data-i="${i}" style="flex:${c};background:${col};color:#fff;min-width:0">${c>=(p.n/8)?c:''}</div>`:'';
+  h+=`<div class="mono">${v}</div><div class="bar" style="height:44px" data-row="${i}">${seg(p.gi,'gi','var(--gi)')}${seg(p.tie,'t','var(--tie)')}${seg(p.ils,'b','var(--ils)')}</div><div style="text-align:right;font-variant-numeric:tabular-nums">${(p.diff<0?'−':'')+f2(Math.abs(p.diff))} <span class="muted">[${p.ci.map(x=>(x<0?'−':'')+f2(Math.abs(x))).join(', ')}]</span></div>`;});
+ const el=$('#h2h');el.innerHTML=h;$$('[data-row]',el).forEach(r=>{const [v,p]=rows[+r.dataset.row];r.onpointermove=e=>showTip(e,`<b>n = ${v}</b> · ${p.n} instances<br>A wins ${p.gi} · ties ${p.tie} · B wins ${p.ils}<br>mean visits A − B ${f2(p.diff)}`);r.onpointerleave=hideTip;});}
+
+/* trade-off */
+{const xs=[10,500],hide=new Set(),all=merged('nn').xs;
+ function draw(){chart($('#tradeChart'),{w:700,h:640,label:'Mean places visited against runtime',xs,xScale:'log',xName:'',xTitle:'Mean runtime (ms, log scale)',xTicks:[10,30,100,300],yMax:60,yTicks:[0,20,40,60],hide,free:true,fs:20,endLabels:true,m:{l:50,r:44,t:16,b:72},
+   series:srs((a,v)=>({x:merged(a).get(v,'ms'),y:merged(a).get(v,'visits'),n:v}),all),tip:(s,p)=>`<b>${ALG[s.key].name}</b> · n = ${p.n}<br>${f2(p.y)} visits<br>${f1(p.x)} ms`});}
+ legend('trade',draw,hide);draw();tableOf($('#tradeTwin'),['n','A ms','A visits','B ms','B visits','NN ms','NN visits'],all.map(v=>[v,...['gi','ils','nn'].flatMap(a=>[f1(merged(a).get(v,'ms')),f2(merged(a).get(v,'visits'))])]));}
+
+/* wait bars: derived, total minutes minus km / 40 * 60 */
+{const s=DATA.scaling.series;$('#waitBars').innerHTML=['nn','gi','ils'].map(a=>{const g=s[a][100],tr=g.km*1.5,wt=g.min-tr;return `<div><div class="row xs" style="justify-content:space-between;gap:16px"><span>${ALG[a].name}</span><span class="mono dim">${Math.round(tr)} min driving · <b>${Math.round(wt)} min waiting</b></span></div><div class="bar" style="height:30px;width:${g.min/1080*100}%"><div style="flex:${tr};background:var(--accent)"></div><div style="flex:${wt};background:var(--focus)"></div></div></div>`;}).join('');}
+
+/* findings, every figure read from DATA */
+{const S=DATA.scaling,St=DATA.stress,sr=S.series,wait=a=>sr[a][100].min-sr[a][100].km*1.5;
+ const cards=[[Math.round(wait('nn'))+' min','<b>Time, not distance, is the bottleneck.</b> NN waits that long at n=100; ILS waits '+Math.round(wait('ils'))+'.'],
+ ['+'+f2(-S.pairs[5].diff)+' → +'+f1(-S.pairs[100].diff),'<b>The gap grows with size.</b> ILS over A in mean visits, n=5 to n=100.'],
+ ['n ≈ 50','<b>The budget caps ILS.</b> Its 2M checks are used up from here; its lead falls from +'+f1(-St.pairs[150].diff)+' at n=150 to +'+f1(-St.pairs[300].diff)+' at n=300.'],
+ [f2(DATA['time-budget'].series.nn[240].visits)+' / '+f2(DATA['time-budget'].series.ils[240].visits),'<b>Easy problems flatten everyone.</b> NN vs ILS with 240 minutes: almost no difference.'],
+ ['7.5×','<b>The cache costs no quality.</b> Same routes on 480 instances, faster at n=100.'],
+ ['≈ 4 visits','<b>Departure time barely moves A or B.</b> With 6 hours, the windows overlapped are the limit.']];
+ $('#findings').innerHTML=cards.map(([n,t])=>`<div class="panel" style="padding:24px 28px"><div class="stat mono" style="font-size:66px">${n}</div><p style="font-size:31px;line-height:1.28;margin-top:14px">${t}</p></div>`).join('');}
+
+/* sandbox */
+(function(){const W=540,H=500,R=150,km=W/(2*R+24);let seed=7,sel=0,pts=[];
+ const rng=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
+ function gen(n){const r=rng(seed);pts=[{x:0,y:0,s:null}];for(let i=0;i<n;i++){const a=r()*2*Math.PI,d=R*Math.sqrt(r());pts.push({x:d*Math.cos(a),y:d*Math.sin(a),s:Math.floor(r()*4)});}}
+ function inst(){const op=[360,630,900,1170];return{depart:360,deadline:1440,speed:40,opens:pts.map(p=>p.s==null?0:op[p.s]),closes:pts.map(p=>p.s==null?1440:op[p.s]+270),dist:pts.map(a=>pts.map(b=>Math.hypot(a.x-b.x,a.y-b.y)))};}
+ function run(){const I=inst(),host=$('#sbmaps'),algs=[['ils',solveILS],['gi',solveGI],['nn',solveNN]];
+  const SX=p=>W/2+p.x*km,SY=p=>H/2-p.y*km;
+  host.innerHTML=algs.map(([a,fn])=>{const r=fn(I),v=validate(I,r),on=new Set(r);let s=`<svg viewBox="0 0 ${W} ${H}" data-map role="img" aria-label="Route map for ${ALG[a].name}"><rect width="${W}" height="${H}" fill="var(--surface)"/><circle cx="${W/2}" cy="${H/2}" r="${R*km}" fill="none" stroke="var(--line-strong)"/>`;
+   s+=`<polyline points="${r.map(i=>SX(pts[i])+','+SY(pts[i])).join(' ')}" fill="none" stroke="${ALG[a].c}" stroke-width="2.5"/>`;
+   pts.forEach((p,i)=>{if(i===0)return;s+=`<circle cx="${SX(p)}" cy="${SY(p)}" r="${on.has(i)?7:4.5}" fill="${on.has(i)?SLOTC[p.s]:'none'}" stroke="${SLOTC[p.s]}" stroke-width="1.5" opacity="${on.has(i)?1:.55}"/>`;});
+   s+=`<rect x="${W/2-9}" y="${H/2-9}" width="18" height="18" fill="var(--accent)"/></svg>`;
+   return `<div>${s}<div class="row" style="justify-content:space-between;padding:10px 2px;font:600 23px var(--mono);white-space:nowrap"><span>${ALG[a].name}</span><span>${v.visited} visits${v.valid?'':' INVALID'} · ${Math.round(v.km)} km · wait ${Math.round(v.wait)}m</span></div></div>`;}).join('');
+  $$('[data-map]',host).forEach(m=>m.onclick=e=>{const b=m.getBoundingClientRect(),sx=(e.clientX-b.left)/b.width*W,sy=(e.clientY-b.top)/b.height*H;pts.push({x:(sx-W/2)/km,y:(H/2-sy)/km,s:sel});run();});}
+ const sc=$('#sbSlots');function dr(){sc.innerHTML='<span>new shop slot</span>'+SLOTN.map((s,i)=>`<button class="${i===sel?'on':''}" data-s="${i}"><i style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${SLOTC[i]};margin-right:8px"></i>${s}</button>`).join('');$$('button',sc).forEach(b=>b.onclick=()=>{sel=+b.dataset.s;dr();});}
+ dr();const N=$('#sbN');function reset(){gen(+N.value);$('#sbNv').textContent=N.value;run();}
+ N.oninput=reset;$('#sbNew').onclick=()=>{seed++;reset();};reset();})();
+
+goto((parseInt(location.hash.slice(1))||1)-1,true);
+</script>
+</body>
+</html>
