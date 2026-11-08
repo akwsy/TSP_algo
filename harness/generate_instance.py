@@ -4,7 +4,7 @@ import json
 import sys
 from pathlib import Path
 
-from .config import (ConfigError, DEFAULT_DEPARTURE, DEFAULT_PERIOD, DEFAULT_SPEED,
+from .config import (ConfigError, DEFAULT_DEPARTURE, DEFAULT_PERIOD, DEFAULT_RADIUS_KM, DEFAULT_SPEED,
                      InstanceConfig)
 from .dataset import DatasetError, load_places
 from .instance import build_instance
@@ -20,13 +20,15 @@ def main(argv=None):
     ap.add_argument("--departure", type=int, default=DEFAULT_DEPARTURE, help="departure minute since midnight")
     ap.add_argument("--period", type=int, default=DEFAULT_PERIOD, help="period in minutes")
     ap.add_argument("--speed", type=float, default=DEFAULT_SPEED, help="km/h")
+    ap.add_argument("--radius", type=float, default=DEFAULT_RADIUS_KM,
+                    help="customers are chosen within this many km of the depot")
     ap.add_argument("--dataset", default=str(DEFAULT_DATASET))
     ap.add_argument("--out", help="output file (default instances/<instanceId>.json)")
     args = ap.parse_args(argv)
     try:
         config = InstanceConfig(seed=args.seed, num_customers=args.customers,
                                 departure_minute=args.departure, period_minutes=args.period,
-                                speed_kmh=args.speed)
+                                speed_kmh=args.speed, radius_km=args.radius)
         instance = build_instance(load_places(args.dataset), config)
     except (ConfigError, DatasetError, OSError) as e:
         print(f"error: {e}", file=sys.stderr)

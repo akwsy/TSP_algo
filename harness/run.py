@@ -14,8 +14,8 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .config import (ConfigError, DEFAULT_DEPARTURE, DEFAULT_PERIOD, DEFAULT_SPEED,
-                     InstanceConfig)
+from .config import (ConfigError, DEFAULT_DEPARTURE, DEFAULT_PERIOD, DEFAULT_RADIUS_KM,
+                     DEFAULT_SPEED, InstanceConfig)
 from .dataset import DatasetError, load_places
 from .generate_instance import DEFAULT_DATASET
 from .instance import build_instance
@@ -280,6 +280,7 @@ def main(argv=None):
     ap.add_argument("--departure", type=int, default=DEFAULT_DEPARTURE)
     ap.add_argument("--period", type=int, default=DEFAULT_PERIOD)
     ap.add_argument("--speed", type=float, default=DEFAULT_SPEED)
+    ap.add_argument("--radius", type=float, default=DEFAULT_RADIUS_KM)
     ap.add_argument("--dataset", default=str(DEFAULT_DATASET))
     ap.add_argument("--algorithms-dir", default=str(ROOT / "algorithms"))
     ap.add_argument("--instances-dir", default="instances")
@@ -290,7 +291,8 @@ def main(argv=None):
         places = load_places(args.dataset)
         instances = [build_instance(places, InstanceConfig(
             seed=s, num_customers=args.customers, departure_minute=args.departure,
-            period_minutes=args.period, speed_kmh=args.speed)) for s in args.seeds]
+            period_minutes=args.period, speed_kmh=args.speed,
+            radius_km=args.radius)) for s in args.seeds]
         algorithms = discover_algorithms(args.algorithms_dir)
     except (ConfigError, DatasetError, OSError, ValueError) as e:
         print(f"error: {e}", file=sys.stderr)
