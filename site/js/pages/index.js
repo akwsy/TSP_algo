@@ -13,6 +13,7 @@ import scaling from "./scaling.js";
 import history from "./history.js";
 import instance from "./instance.js";
 import run from "./run.js";
+import compare from "./compare.js";
 
-export const pages = [overview, scaling, instance, run, history, failures];
+export const pages = [overview, compare, scaling, instance, run, history, failures];
 export const defaultPath = "overview";

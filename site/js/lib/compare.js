@@ -43,6 +43,25 @@ export function sweepRange(param, lo, hi) {
   }
 }
 
+/** A swept value as an axis tick: "5", "4 h", "20", "09:00", "25" (the unit is in the axis title). */
+export function sweepTick(param, value) {
+  if (!has(value)) return "n/a";
+  if (param === "period") return hours(value);
+  if (param === "departure") return clock(value);
+  return String(value);
+}
+
+const AXES = { customers: "Places to visit", period: "Day length", speed: "Speed (km/h)", departure: "Departure time", radius: "Radius around the depot (km)" };
+/** The x-axis title for a swept parameter. */
+export const sweepAxis = (param) => AXES[param] || String(param);
+
+/** How big the series is: experiments, settings (experiment and sweep value), runs and algorithms. */
+export function totals(model) {
+  return { experiments: model.experiments.length, settings: model.experiments.reduce((n, e) => n + e.values.length, 0),
+    runs: model.experiments.flatMap((e) => e.agg.groups).reduce((n, g) => n + (has(g.runs) ? g.runs : 0), 0),
+    algorithms: model.algorithms.length };
+}
+
 /** The experiment series: experiments in suite order that have their aggregates (`aggs` maps name to the parsed
  *  file, or null when it could not be loaded), the names of those without, and every algorithm id, sorted. */
 export function buildModel(suite, aggs) {
@@ -92,7 +111,8 @@ export function standings(model) {
   return { byExperiment, overall };
 }
 
-const ORD = (n) => `${n}${n % 10 === 1 && n % 100 !== 11 ? "st" : n % 10 === 2 && n % 100 !== 12 ? "nd" : n % 10 === 3 && n % 100 !== 13 ? "rd" : "th"}`;
+/** "1st", "2nd", "3rd", "11th". */
+export const ordinal = (n) => `${n}${n % 10 === 1 && n % 100 !== 11 ? "st" : n % 10 === 2 && n % 100 !== 12 ? "nd" : n % 10 === 3 && n % 100 !== 13 ? "rd" : "th"}`;
 
 /** The mean over every setting of `row` minus `col` in places visited (null when never compared). */
 function meanLead(model, row, col) {
@@ -115,7 +135,7 @@ export function headline(model, names = {}, algs = {}) {
   const text = level
     ? `${nm(first.id)} and ${nm(second.id)} visited the most places equally often (each first in ${first.firsts} of ${plural(total, "experiment")}), over ${plural(nSettings, "setting")}.`
     : `${nm(first.id)} visited the most places in ${where}${joined ? `: on average ${joined}` : ""}, over ${plural(nSettings, "setting")}.`;
-  const standing = overall.map((o, i) => `${ORD(i + 1)} ${nm(o.id)}, average rank ${num(o.avgRank, 1)}`);
+  const standing = overall.map((o, i) => `${ordinal(i + 1)} ${nm(o.id)}, average rank ${num(o.avgRank, 1)}`);
 
   const caveats = [];
   const groups = model.experiments.flatMap((e) => e.agg.groups);
@@ -343,6 +363,18 @@ export function frontierText(points, names = {}) {
   return out;
 }
 
+/** What each step along the frontier (fastest first) costs in run time and gains in places visited. */
+export function frontierSteps(points, names = {}) {
+  const on = points.filter((p) => p.frontier === true).sort((x, y) => x.runtimeMs - y.runtimeMs);
+  return on.slice(1).map((p, i) => {
+    const q = on[i];
+    const r = q.runtimeMs > 0 ? p.runtimeMs / q.runtimeMs : null;
+    const ratio = r == null ? `${msText(p.runtimeMs - q.runtimeMs)} more run time` : r < 1.05 ? "about the same run time" : `${num(r, 1)} times the run time`;
+    const gain = p.visited - q.visited;
+    return `From ${names[q.id] || q.id} to ${names[p.id] || p.id}: ${ratio} for ${Math.abs(gain) < 1e-9 ? "the same number of" : `${diffNum(gain)} more`} places.`;
+  });
+}
+
 // ---- where they differ ----
 
 /** For every pair of algorithms (a before b alphabetically), the examples with the biggest gap in places visited in
@@ -405,6 +437,23 @@ export function pairCell(agg, value, row, col) {
     gaps: (p.largestGaps || []).map((g) => ({ instanceId: g.instanceId,
       rowVisited: flip ? g.bVisited : g.aVisited, colVisited: flip ? g.aVisited : g.bVisited, difference: sign(g.difference) })),
   };
+}
+
+const signed = (x) => (has(x) ? `${x > 0 ? "+" : x < 0 ? "−" : ""}${diffNum(x)}` : "n/a");
+const TONES = { more: ["▲", "more"], fewer: ["▼", "fewer"], even: ["≈", "too close to call"] };
+
+/** What a grid cell shows: tone (for colour) plus an icon and a word, the signed average difference, its margin of
+ *  error, wins-ties-losses and an accessible name that says it all. */
+export function cellLabel(cell, names = {}) {
+  if (!cell || !cell.verdict) {
+    return { tone: "none", icon: "–", word: "not compared", diff: "n/a", margin: "n/a", record: "n/a",
+      aria: cell ? `${names[cell.row] || cell.row} against ${names[cell.col] || cell.col}: not compared.` : "Not compared." };
+  }
+  const [icon, word] = TONES[cell.verdict];
+  const margin = `${signed(cell.ci[0])} to ${signed(cell.ci[1])}`;
+  const d = Math.abs(cell.diff) < 1e-9 ? "the same number of places on average" : `${diffNum(cell.diff)} ${cell.diff < 0 ? "fewer" : "more"} places on average`;
+  return { tone: cell.verdict, icon, word, diff: signed(cell.diff), margin, record: `${cell.wins}-${cell.ties}-${cell.losses}`,
+    aria: `${names[cell.row] || cell.row} against ${names[cell.col] || cell.col}: ${d}, margin of error ${margin}; won ${cell.wins}, tied ${cell.ties}, lost ${cell.losses}.` };
 }
 
 const count = (n) => (n === 0 ? "none" : has(n) ? String(n) : "n/a");

@@ -38,6 +38,14 @@ class SweepLabelTest(unittest.TestCase):
         self.assertEqual(js("[['customers', 5, 100], ['period', 240, 1080], ['speed', 20, 80], ['departure', 360, 1080], ['radius', 25, 250], ['wind', 1, 2]].map(([p, a, b]) => m.sweepRange(p, a, b))"),
                          ["5 to 100 places", "day length 4 h to 18 h", "speed 20 to 80 km/h", "leaves at 06:00 to 18:00", "customers within 25 to 250 km", "wind 1 to 2"])
 
+    def test_short_axis_ticks_and_titles(self):
+        self.assertEqual(js("[['customers', 5], ['period', 240], ['speed', 20], ['departure', 540], ['radius', 25], ['wind', 3]].map(([p, v]) => [m.sweepTick(p, v), m.sweepAxis(p)])"),
+                         [["5", "Places to visit"], ["4 h", "Day length"], ["20", "Speed (km/h)"], ["09:00", "Departure time"],
+                          ["25", "Radius around the depot (km)"], ["3", "wind"]])
+
+    def test_totals_of_the_series(self):
+        self.assertEqual(js("m.totals(m.buildModel(suite, aggs))"), {"experiments": 6, "settings": 31, "runs": 2550, "algorithms": 3})
+
     def test_one_place_is_singular_and_unknown_parameters_still_read(self):
         self.assertEqual(js("[m.sweepLabel('customers', 1), m.sweepLabel('wind', 3), m.sweepLabel('speed', null)]"),
                          ["1 place", "wind 3", "speed n/a"])
@@ -82,6 +90,14 @@ class HeadToHeadTest(unittest.TestCase):
         back = js("m.pairCell(aggs.scaling, 30, 'greedy-insertion-cached', 'iterated-local-search')")
         self.assertEqual((back["wins"], back["losses"], back["verdict"]), (0, 29, "fewer"))
         self.assertAlmostEqual(back["ci"][0], -2.7333333333333334)
+
+    def test_grid_cell_label_has_an_icon_and_words_not_only_colour(self):
+        self.assertEqual(js("m.cellLabel(m.pairCell(aggs.scaling, 30, 'iterated-local-search', 'greedy-insertion-cached'), NAMES)"), {
+            "tone": "more", "icon": "▲", "word": "more", "diff": "+2.2", "margin": "+1.6 to +2.7", "record": "29-1-0",
+            "aria": "ILS against Greedy: 2.2 more places on average, margin of error +1.6 to +2.7; won 29, tied 1, lost 0."})
+        even = js("m.cellLabel(m.pairCell(aggs['window-alignment'], 360, 'greedy-insertion-cached', 'iterated-local-search'), NAMES)")
+        self.assertEqual((even["tone"], even["icon"], even["word"], even["diff"], even["margin"]), ("even", "≈", "too close to call", "−0.1", "−0.4 to +0.1"))
+        self.assertEqual(js("m.cellLabel(null, NAMES)")["word"], "not compared")
 
     def test_within_the_margin_of_error_is_even_and_a_missing_pair_is_null(self):
         c = js("m.pairCell(aggs['window-alignment'], 360, 'greedy-insertion-cached', 'iterated-local-search')")
@@ -269,6 +285,15 @@ class TradeOffAndGapsTest(unittest.TestCase):
             "C has no run time, so it cannot be placed."])
         self.assertEqual(js("m.frontierText(m.tradeoff(m.buildModel(suite, aggs), 'scaling', 30), NAMES)"),
                          ["On the efficient frontier (nothing else is both faster and visits more places): NN, Greedy, ILS, from fastest to most places."])
+
+    def test_what_each_step_along_the_frontier_costs(self):
+        # all settings: NN 18.616 ms 4.873 places, Greedy 20.433 ms 14.457, ILS 175.330 ms 16.477
+        self.assertEqual(js("m.frontierSteps(m.tradeoff(m.buildModel(suite, aggs), null, null), NAMES)"), [
+            "From NN to Greedy: 1.1 times the run time for 9.6 more places.",
+            "From Greedy to ILS: 8.6 times the run time for 2.0 more places."])
+        self.assertEqual(js(f"m.frontierSteps(m.tradeoff({tiny_suite([group('a', 5, 5, runtime=10)])}, 'scaling', 5), {{}})"), [])
+        near = tiny_suite([group("a", 5, 5, runtime=10), group("b", 5, 6, runtime=10.4)])
+        self.assertEqual(js(f"m.frontierSteps(m.tradeoff({near}, 'scaling', 5), {{}})"), ["From a to b: about the same run time for 1.0 more places."])
 
     def test_biggest_gaps_for_each_pair_in_both_directions(self):
         g = js("m.pairGaps(m.buildModel(suite, aggs), 2)")
