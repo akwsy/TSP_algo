@@ -1,0 +1,1 @@
+{"id":"broken-infeasible","displayName":"Broken example (infeasible)","author":"tests","description":"Deliberately broken fixture","complexity":{"time":"O(1)","space":"O(1)"},"exact":false,"command":["python3","../../broken/solve.py","infeasible"],"timeLimitSeconds":1}

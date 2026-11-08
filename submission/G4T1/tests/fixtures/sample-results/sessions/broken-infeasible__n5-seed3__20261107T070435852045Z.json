@@ -1,0 +1,48 @@
+{
+  "algorithmId": "broken-infeasible",
+  "commit": null,
+  "fingerprint": "204278bde7a36493663a40853fbce4512aa9044e4d5183726bdd7983cd44e55d",
+  "instanceId": "n5-seed3",
+  "seed": 3,
+  "numCustomers": 5,
+  "runId": "20261107T070435852045Z",
+  "timestamp": "2026-11-07T07:04:35+00:00",
+  "outcome": "did not finish",
+  "stopReason": "invalid_route",
+  "stopDay": 1,
+  "explanation": "Stopped on day 1: the algorithm gave an invalid route (route repeats a customer)",
+  "partialFigures": true,
+  "unvisitedAtStop": 5,
+  "days": 1,
+  "visitedSoFar": 0,
+  "workingMinutes": 0,
+  "totalDistanceKm": 0,
+  "totalRuntimeMs": 13.445458999740367,
+  "finalReturnMinute": null,
+  "dayRecords": [
+    {
+      "day": 1,
+      "instanceId": "n5-seed3",
+      "numPlaces": 5,
+      "route": [
+        0,
+        1,
+        1,
+        0
+      ],
+      "status": "HEURISTIC",
+      "killed": false,
+      "runtimeMs": 13.445458999740367,
+      "stats": null,
+      "valid": false,
+      "failureReason": "route repeats a customer",
+      "visited": [],
+      "distanceKm": null,
+      "returnMinute": null,
+      "schedule": null,
+      "workingMinutes": null
+    }
+  ],
+  "experiment": "scaling",
+  "instanceHash": "c5195f48ba42d5dceba3a29642909eb720d9d1d901806b9bad404b03887c1464"
+}

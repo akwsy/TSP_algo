@@ -1,0 +1,1225 @@
+{
+  "experiment": "scaling",
+  "parameters": {
+    "sizes": [
+      5,
+      10,
+      15
+    ],
+    "instancesPerSize": 3,
+    "seeds": [
+      1,
+      2,
+      3
+    ],
+    "departureMinute": 360,
+    "periodMinutes": 480,
+    "speedKmh": 40.0
+  },
+  "sizes": [
+    5,
+    10,
+    15
+  ],
+  "algorithms": [
+    "broken-crash",
+    "broken-infeasible",
+    "broken-sleep",
+    "nearest-neighbour"
+  ],
+  "groups": [
+    {
+      "algorithmId": "broken-crash",
+      "numCustomers": 5,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 14.747999666724354,
+        "std": 0.4660198852566653,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-crash",
+      "numCustomers": 10,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 18.137097329599783,
+        "std": 5.562498782861385,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-crash",
+      "numCustomers": 15,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 15.972667000217674,
+        "std": 1.376777733054516,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-infeasible",
+      "numCustomers": 5,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 14.666750335891265,
+        "std": 0.8231426497380802,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-infeasible",
+      "numCustomers": 10,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 13.98808333275762,
+        "std": 0.25891226790174393,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-infeasible",
+      "numCustomers": 15,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 13.924485998965489,
+        "std": 0.12594280120598036,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-sleep",
+      "numCustomers": 5,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 3,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 1004.4069166639625,
+        "std": 0.5304594724827453,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-sleep",
+      "numCustomers": 10,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 3,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 1004.4554860020677,
+        "std": 0.4117332529089642,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "broken-sleep",
+      "numCustomers": 15,
+      "runs": 3,
+      "failures": 3,
+      "timeouts": 3,
+      "optimalReports": 0,
+      "visited": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "distanceKm": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "totalMinutes": {
+        "mean": null,
+        "std": null,
+        "n": 0
+      },
+      "runtimeMs": {
+        "mean": 1005.3405136689738,
+        "std": 1.494620989361204,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": null,
+        "n": 0
+      },
+      "visitsBehindBest": {
+        "mean": null,
+        "n": 0
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "nearest-neighbour",
+      "numCustomers": 5,
+      "runs": 3,
+      "failures": 0,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": 1.0,
+        "std": 1.0,
+        "n": 3
+      },
+      "distanceKm": {
+        "mean": 125.64617770901025,
+        "std": 131.49842236477448,
+        "n": 3
+      },
+      "totalMinutes": {
+        "mean": 249.81071072334018,
+        "std": 217.15258675049438,
+        "n": 3
+      },
+      "runtimeMs": {
+        "mean": 19.152610999299213,
+        "std": 6.393287520275342,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": 1.0,
+        "n": 3
+      },
+      "visitsBehindBest": {
+        "mean": 0.0,
+        "n": 3
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "nearest-neighbour",
+      "numCustomers": 10,
+      "runs": 3,
+      "failures": 0,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": 3.0,
+        "std": 1.0,
+        "n": 3
+      },
+      "distanceKm": {
+        "mean": 200.55713272193802,
+        "std": 112.48184577283386,
+        "n": 3
+      },
+      "totalMinutes": {
+        "mean": 381.22791924982477,
+        "std": 35.299402349571,
+        "n": 3
+      },
+      "runtimeMs": {
+        "mean": 14.048041664257957,
+        "std": 0.2177267797706539,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": 1.0,
+        "n": 3
+      },
+      "visitsBehindBest": {
+        "mean": 0.0,
+        "n": 3
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    },
+    {
+      "algorithmId": "nearest-neighbour",
+      "numCustomers": 15,
+      "runs": 3,
+      "failures": 0,
+      "timeouts": 0,
+      "optimalReports": 0,
+      "visited": {
+        "mean": 2.0,
+        "std": 1.0,
+        "n": 3
+      },
+      "distanceKm": {
+        "mean": 109.0594236613468,
+        "std": 61.23913590467957,
+        "n": 3
+      },
+      "totalMinutes": {
+        "mean": 389.33352724703013,
+        "std": 79.39376705230234,
+        "n": 3
+      },
+      "runtimeMs": {
+        "mean": 14.04468033433659,
+        "std": 0.1505865955951433,
+        "n": 3
+      },
+      "bestKnownRatio": {
+        "mean": 1.0,
+        "n": 3
+      },
+      "visitsBehindBest": {
+        "mean": 0.0,
+        "n": 3
+      },
+      "work": {
+        "mean": null,
+        "n": 0,
+        "key": null
+      }
+    }
+  ],
+  "bestKnown": [
+    {
+      "instanceId": "n5-seed1",
+      "numCustomers": 5,
+      "visited": 0,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n5-seed2",
+      "numCustomers": 5,
+      "visited": 1,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n5-seed3",
+      "numCustomers": 5,
+      "visited": 2,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n10-seed1",
+      "numCustomers": 10,
+      "visited": 4,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n10-seed2",
+      "numCustomers": 10,
+      "visited": 3,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n10-seed3",
+      "numCustomers": 10,
+      "visited": 2,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n15-seed1",
+      "numCustomers": 15,
+      "visited": 2,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n15-seed2",
+      "numCustomers": 15,
+      "visited": 1,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    },
+    {
+      "instanceId": "n15-seed3",
+      "numCustomers": 15,
+      "visited": 3,
+      "achievedBy": [
+        "nearest-neighbour"
+      ],
+      "optimalReported": false
+    }
+  ],
+  "full": {
+    "sizes": [
+      5,
+      10,
+      15
+    ],
+    "algorithms": [
+      "broken-crash",
+      "broken-infeasible",
+      "broken-sleep",
+      "nearest-neighbour"
+    ],
+    "instancesPerSize": {
+      "5": 3,
+      "10": 3,
+      "15": 3
+    },
+    "groups": [
+      {
+        "algorithmId": "broken-crash",
+        "numCustomers": 5,
+        "instances": 3,
+        "finished": 0,
+        "stopped": 3,
+        "stopReasons": {
+          "crashed": 3
+        },
+        "workingHours": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "days": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalDistanceKm": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalRuntimeMs": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        }
+      },
+      {
+        "algorithmId": "broken-crash",
+        "numCustomers": 10,
+        "instances": 3,
+        "finished": 0,
+        "stopped": 3,
+        "stopReasons": {
+          "crashed": 3
+        },
+        "workingHours": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "days": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalDistanceKm": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalRuntimeMs": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        }
+      },
+      {
+        "algorithmId": "broken-crash",
+        "numCustomers": 15,
+        "instances": 3,
+        "finished": 0,
+        "stopped": 3,
+        "stopReasons": {
+          "crashed": 3
+        },
+        "workingHours": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "days": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalDistanceKm": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalRuntimeMs": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        }
+      },
+      {
+        "algorithmId": "broken-infeasible",
+        "numCustomers": 5,
+        "instances": 3,
+        "finished": 0,
+        "stopped": 3,
+        "stopReasons": {
+          "invalid_route": 3
+        },
+        "workingHours": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "days": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalDistanceKm": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalRuntimeMs": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        }
+      },
+      {
+        "algorithmId": "broken-infeasible",
+        "numCustomers": 10,
+        "instances": 3,
+        "finished": 0,
+        "stopped": 3,
+        "stopReasons": {
+          "invalid_route": 3
+        },
+        "workingHours": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "days": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalDistanceKm": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalRuntimeMs": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        }
+      },
+      {
+        "algorithmId": "broken-infeasible",
+        "numCustomers": 15,
+        "instances": 3,
+        "finished": 0,
+        "stopped": 3,
+        "stopReasons": {
+          "invalid_route": 3
+        },
+        "workingHours": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "days": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalDistanceKm": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalRuntimeMs": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        }
+      },
+      {
+        "algorithmId": "broken-sleep",
+        "numCustomers": 5,
+        "instances": 3,
+        "finished": 0,
+        "stopped": 3,
+        "stopReasons": {
+          "timed_out": 3
+        },
+        "workingHours": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "days": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalDistanceKm": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalRuntimeMs": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        }
+      },
+      {
+        "algorithmId": "broken-sleep",
+        "numCustomers": 10,
+        "instances": 3,
+        "finished": 0,
+        "stopped": 3,
+        "stopReasons": {
+          "timed_out": 3
+        },
+        "workingHours": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "days": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalDistanceKm": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalRuntimeMs": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        }
+      },
+      {
+        "algorithmId": "broken-sleep",
+        "numCustomers": 15,
+        "instances": 3,
+        "finished": 0,
+        "stopped": 3,
+        "stopReasons": {
+          "timed_out": 3
+        },
+        "workingHours": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "days": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalDistanceKm": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        },
+        "totalRuntimeMs": {
+          "mean": null,
+          "std": null,
+          "n": 0
+        }
+      },
+      {
+        "algorithmId": "nearest-neighbour",
+        "numCustomers": 5,
+        "instances": 3,
+        "finished": 3,
+        "stopped": 0,
+        "stopReasons": {},
+        "workingHours": {
+          "mean": 35.22638580508949,
+          "std": 6.307128434123432,
+          "n": 3
+        },
+        "days": {
+          "mean": 3.0,
+          "std": 0.0,
+          "n": 3
+        },
+        "totalDistanceKm": {
+          "mean": 801.5394905014886,
+          "std": 71.68437168654114,
+          "n": 3
+        },
+        "totalRuntimeMs": {
+          "mean": 51.032430333331526,
+          "std": 9.14699039852673,
+          "n": 3
+        }
+      },
+      {
+        "algorithmId": "nearest-neighbour",
+        "numCustomers": 10,
+        "instances": 3,
+        "finished": 3,
+        "stopped": 0,
+        "stopReasons": {},
+        "workingHours": {
+          "mean": 53.270270181879084,
+          "std": 12.433055168113444,
+          "n": 3
+        },
+        "days": {
+          "mean": 3.6666666666666665,
+          "std": 1.1547005383792515,
+          "n": 3
+        },
+        "totalDistanceKm": {
+          "mean": 1010.7346138325225,
+          "std": 84.09394190744725,
+          "n": 3
+        },
+        "totalRuntimeMs": {
+          "mean": 49.934722333091486,
+          "std": 15.081076652222757,
+          "n": 3
+        }
+      },
+      {
+        "algorithmId": "nearest-neighbour",
+        "numCustomers": 15,
+        "instances": 3,
+        "finished": 2,
+        "stopped": 1,
+        "stopReasons": {
+          "no_progress": 1
+        },
+        "workingHours": {
+          "mean": 77.71490146115957,
+          "std": 32.87077637626436,
+          "n": 2
+        },
+        "days": {
+          "mean": 6.5,
+          "std": 2.1213203435596424,
+          "n": 2
+        },
+        "totalDistanceKm": {
+          "mean": 1760.1473654428182,
+          "std": 402.97999182839055,
+          "n": 2
+        },
+        "totalRuntimeMs": {
+          "mean": 87.68727200003923,
+          "std": 28.706621885069055,
+          "n": 2
+        }
+      }
+    ],
+    "ranking": [
+      {
+        "numCustomers": 5,
+        "instances": 3,
+        "entries": [
+          {
+            "rank": 1,
+            "algorithmId": "nearest-neighbour",
+            "finishedAll": true,
+            "unfinished": 0,
+            "finished": 3,
+            "workingHours": {
+              "mean": 35.22638580508949,
+              "std": 6.307128434123432,
+              "n": 3
+            },
+            "totalDistanceKm": {
+              "mean": 801.5394905014886,
+              "std": 71.68437168654114,
+              "n": 3
+            }
+          },
+          {
+            "rank": null,
+            "algorithmId": "broken-crash",
+            "finishedAll": false,
+            "unfinished": 3,
+            "finished": 0,
+            "workingHours": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            },
+            "totalDistanceKm": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            }
+          },
+          {
+            "rank": null,
+            "algorithmId": "broken-infeasible",
+            "finishedAll": false,
+            "unfinished": 3,
+            "finished": 0,
+            "workingHours": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            },
+            "totalDistanceKm": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            }
+          },
+          {
+            "rank": null,
+            "algorithmId": "broken-sleep",
+            "finishedAll": false,
+            "unfinished": 3,
+            "finished": 0,
+            "workingHours": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            },
+            "totalDistanceKm": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            }
+          }
+        ]
+      },
+      {
+        "numCustomers": 10,
+        "instances": 3,
+        "entries": [
+          {
+            "rank": 1,
+            "algorithmId": "nearest-neighbour",
+            "finishedAll": true,
+            "unfinished": 0,
+            "finished": 3,
+            "workingHours": {
+              "mean": 53.270270181879084,
+              "std": 12.433055168113444,
+              "n": 3
+            },
+            "totalDistanceKm": {
+              "mean": 1010.7346138325225,
+              "std": 84.09394190744725,
+              "n": 3
+            }
+          },
+          {
+            "rank": null,
+            "algorithmId": "broken-crash",
+            "finishedAll": false,
+            "unfinished": 3,
+            "finished": 0,
+            "workingHours": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            },
+            "totalDistanceKm": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            }
+          },
+          {
+            "rank": null,
+            "algorithmId": "broken-infeasible",
+            "finishedAll": false,
+            "unfinished": 3,
+            "finished": 0,
+            "workingHours": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            },
+            "totalDistanceKm": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            }
+          },
+          {
+            "rank": null,
+            "algorithmId": "broken-sleep",
+            "finishedAll": false,
+            "unfinished": 3,
+            "finished": 0,
+            "workingHours": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            },
+            "totalDistanceKm": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            }
+          }
+        ]
+      },
+      {
+        "numCustomers": 15,
+        "instances": 3,
+        "entries": [
+          {
+            "rank": 1,
+            "algorithmId": "nearest-neighbour",
+            "finishedAll": false,
+            "unfinished": 1,
+            "finished": 2,
+            "workingHours": {
+              "mean": 77.71490146115957,
+              "std": 32.87077637626436,
+              "n": 2
+            },
+            "totalDistanceKm": {
+              "mean": 1760.1473654428182,
+              "std": 402.97999182839055,
+              "n": 2
+            }
+          },
+          {
+            "rank": null,
+            "algorithmId": "broken-crash",
+            "finishedAll": false,
+            "unfinished": 3,
+            "finished": 0,
+            "workingHours": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            },
+            "totalDistanceKm": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            }
+          },
+          {
+            "rank": null,
+            "algorithmId": "broken-infeasible",
+            "finishedAll": false,
+            "unfinished": 3,
+            "finished": 0,
+            "workingHours": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            },
+            "totalDistanceKm": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            }
+          },
+          {
+            "rank": null,
+            "algorithmId": "broken-sleep",
+            "finishedAll": false,
+            "unfinished": 3,
+            "finished": 0,
+            "workingHours": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            },
+            "totalDistanceKm": {
+              "mean": null,
+              "std": null,
+              "n": 0
+            }
+          }
+        ]
+      }
+    ],
+    "overall": [
+      {
+        "algorithmId": "nearest-neighbour",
+        "averageRank": 1.0
+      },
+      {
+        "algorithmId": "broken-crash",
+        "averageRank": 5.0
+      },
+      {
+        "algorithmId": "broken-infeasible",
+        "averageRank": 5.0
+      },
+      {
+        "algorithmId": "broken-sleep",
+        "averageRank": 5.0
+      }
+    ]
+  }
+}

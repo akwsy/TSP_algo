@@ -1,0 +1,36 @@
+{
+  "algorithmId": "nearest-neighbour",
+  "commit": "2918102ce3635fb1f03659d1e3c1a474a802c4eb",
+  "instanceId": "n5-seed1",
+  "seed": 1,
+  "numCustomers": 5,
+  "runId": "20261106T141414018011Z",
+  "timestamp": "2026-11-06T14:14:23+00:00",
+  "status": "HEURISTIC",
+  "route": [
+    0,
+    0
+  ],
+  "runtimeMs": 26.485583002795465,
+  "stats": {
+    "customersVisited": 0
+  },
+  "stderr": "",
+  "valid": true,
+  "failureReason": null,
+  "visited": 0,
+  "skipped": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "distanceKm": 0.0,
+  "travelMinutes": 0.0,
+  "waitMinutes": 0,
+  "totalMinutes": 0.0,
+  "returnMinute": 360.0,
+  "schedule": [],
+  "experiment": "scaling"
+}
