@@ -1,0 +1,2989 @@
+{
+ "experiment": "window-alignment",
+ "parameters": {
+  "sweepParam": "departure",
+  "values": [
+   360,
+   540,
+   720,
+   900,
+   1080
+  ],
+  "instancesPerSize": 30,
+  "seeds": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30
+  ],
+  "customers": 30,
+  "periodMinutes": 360,
+  "speedKmh": 40.0,
+  "radiusKm": 150.0
+ },
+ "sizes": [
+  30
+ ],
+ "sweepValues": [
+  360,
+  540,
+  720,
+  900,
+  1080
+ ],
+ "algorithms": [
+  "greedy-insertion-cached",
+  "iterated-local-search",
+  "nearest-neighbour"
+ ],
+ "groups": [
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 360,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 4.1,
+    "std": 1.241522980192001,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 184.626885832914,
+    "std": 45.920218690281736,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 318.0294173719747,
+    "std": 28.803142907752804,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 17.92591116688224,
+    "std": 2.7822191188196195,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.9583333333333334,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.2,
+    "n": 30
+   },
+   "work": {
+    "mean": 73.3,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 540,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 4.133333333333334,
+    "std": 1.5252661346824676,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 190.83994052204406,
+    "std": 37.46008016094287,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 291.9626414230764,
+    "std": 58.03873328290158,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 16.580991799977102,
+    "std": 0.34255696950301134,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.9372222222222223,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.3,
+    "n": 30
+   },
+   "work": {
+    "mean": 78.83333333333333,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 720,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 4.333333333333333,
+    "std": 1.2410599844719317,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 189.73637920091025,
+    "std": 35.368323732780645,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 305.95011552045287,
+    "std": 44.59312798296313,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 16.401090300072003,
+    "std": 0.25535954183463494,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.9205555555555556,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.4,
+    "n": 30
+   },
+   "work": {
+    "mean": 109.03333333333333,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 900,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 3.8,
+    "std": 1.4715696522350923,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 172.8192179618782,
+    "std": 46.61468385342605,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 316.32972266208964,
+    "std": 41.32733386049095,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 16.28282356687123,
+    "std": 0.14998589718760594,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.9102777777777777,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.36666666666666664,
+    "n": 30
+   },
+   "work": {
+    "mean": 78.26666666666667,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 1080,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 3.8666666666666667,
+    "std": 1.736689941821219,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 186.62000543200818,
+    "std": 42.17311376193975,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 289.3350848053191,
+    "std": 62.970602033777894,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 16.378013933172042,
+    "std": 0.20884850403359378,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.9888888888888889,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.06666666666666667,
+    "n": 30
+   },
+   "work": {
+    "mean": 80.06666666666666,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 360,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 4.233333333333333,
+    "std": 1.1651056880677462,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 186.65739771907724,
+    "std": 46.690677018933826,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 321.11486862144994,
+    "std": 26.448883151531053,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 157.5840334332194,
+    "std": 23.421507842464557,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.9888888888888889,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.06666666666666667,
+    "n": 30
+   },
+   "work": {
+    "mean": 1082746.0666666667,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 540,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 4.333333333333333,
+    "std": 1.604591114171508,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 188.2567494919035,
+    "std": 37.88598644984316,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 287.74358830359535,
+    "std": 57.943720751062294,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 136.37159443363393,
+    "std": 30.085185961116267,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.975,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.1,
+    "n": 30
+   },
+   "work": {
+    "mean": 953259.3666666667,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 720,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 4.666666666666667,
+    "std": 1.3476245597431757,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 192.4458087458723,
+    "std": 33.14822284965206,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 304.0936186837326,
+    "std": 41.01378050561189,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 122.70711663325831,
+    "std": 20.17523205791131,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.986111111111111,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.06666666666666667,
+    "n": 30
+   },
+   "work": {
+    "mean": 821977.5333333333,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 900,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 4.166666666666667,
+    "std": 1.366680683976335,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 193.63498930984778,
+    "std": 40.92111422150819,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 321.2667127454709,
+    "std": 29.904998741840245,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 93.503125033385,
+    "std": 15.93642017061368,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 1.0,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.0,
+    "n": 30
+   },
+   "work": {
+    "mean": 584604.9333333333,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 1080,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 3.933333333333333,
+    "std": 1.7991057804352144,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 181.25934749338907,
+    "std": 43.35328244984298,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 282.9401616241029,
+    "std": 65.95248515178287,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 72.31210546657773,
+    "std": 11.877928283288036,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 1.0,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.0,
+    "n": 30
+   },
+   "work": {
+    "mean": 418051.63333333336,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 360,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 2.2333333333333334,
+    "std": 1.0400044208570938,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 88.00912070493801,
+    "std": 63.29572504538847,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 319.395357519112,
+    "std": 23.479517995969637,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 16.25678593336488,
+    "std": 0.505996131428953,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.5588888888888889,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 2.066666666666667,
+    "n": 30
+   },
+   "work": {
+    "mean": 92.86666666666666,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 540,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 3.3666666666666667,
+    "std": 1.2452207485597395,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 173.8835656330559,
+    "std": 36.50060880909467,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 296.5505332596685,
+    "std": 48.39897310878461,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 16.23465003340243,
+    "std": 0.38490874860351876,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.7991666666666667,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 1.0666666666666667,
+    "n": 30
+   },
+   "work": {
+    "mean": 122.9,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 720,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 2.7333333333333334,
+    "std": 1.2015315896469556,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 114.27017359289296,
+    "std": 54.4944945110904,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 286.8822948460584,
+    "std": 49.90541309599536,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 16.082427866725386,
+    "std": 0.4808231649528969,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.5923015873015873,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 2.0,
+    "n": 30
+   },
+   "work": {
+    "mean": 106.2,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 900,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 2.3,
+    "std": 1.118804780974337,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 88.32060682304483,
+    "std": 59.446864136523004,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 324.07513111766997,
+    "std": 26.209033601566443,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 16.023443033615575,
+    "std": 0.3473062693362401,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.583531746031746,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 1.8666666666666667,
+    "n": 30
+   },
+   "work": {
+    "mean": 94.6,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 30,
+   "sweepParam": "departure",
+   "sweepValue": 1080,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 3.1333333333333333,
+    "std": 1.4558640835892125,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 155.0895932576721,
+    "std": 52.53295475069422,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 266.63214571345355,
+    "std": 75.004524963271,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 15.950594366404403,
+    "std": 0.15309365523786164,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.8317460317460318,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.8,
+    "n": 30
+   },
+   "work": {
+    "mean": 116.5,
+    "n": 30,
+    "key": "iterations"
+   }
+  }
+ ],
+ "bestKnown": [
+  {
+   "instanceId": "n30-seed1-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed1-dep540-per360",
+   "numCustomers": 30,
+   "visited": 2,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed1-dep720-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed1-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed1-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed10-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed10-dep540-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed10-dep720-per360",
+   "numCustomers": 30,
+   "visited": 9,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed10-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed10-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed11-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed11-dep540-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed11-dep720-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed11-dep900-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed11-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed12-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed12-dep540-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed12-dep720-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed12-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed12-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed13-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed13-dep540-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed13-dep720-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed13-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed13-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed14-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 2,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed14-dep540-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed14-dep720-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed14-dep900-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed14-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed15-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed15-dep540-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed15-dep720-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed15-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed15-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed16-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed16-dep540-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed16-dep720-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed16-dep900-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed16-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed17-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 1,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed17-dep540-per360",
+   "numCustomers": 30,
+   "visited": 2,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed17-dep720-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed17-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed17-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed18-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed18-dep540-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed18-dep720-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed18-dep900-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed18-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed19-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed19-dep540-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed19-dep720-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed19-dep900-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed19-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed2-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed2-dep540-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed2-dep720-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed2-dep900-per360",
+   "numCustomers": 30,
+   "visited": 2,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed2-per360",
+   "numCustomers": 30,
+   "visited": 2,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed20-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 2,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed20-dep540-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed20-dep720-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed20-dep900-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed20-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed21-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed21-dep540-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed21-dep720-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed21-dep900-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed21-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed22-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed22-dep540-per360",
+   "numCustomers": 30,
+   "visited": 2,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed22-dep720-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed22-dep900-per360",
+   "numCustomers": 30,
+   "visited": 8,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed22-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed23-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed23-dep540-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed23-dep720-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed23-dep900-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed23-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed24-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 2,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed24-dep540-per360",
+   "numCustomers": 30,
+   "visited": 8,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed24-dep720-per360",
+   "numCustomers": 30,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed24-dep900-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed24-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed25-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed25-dep540-per360",
+   "numCustomers": 30,
+   "visited": 8,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed25-dep720-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed25-dep900-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed25-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed26-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed26-dep540-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed26-dep720-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed26-dep900-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed26-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed27-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed27-dep540-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed27-dep720-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed27-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed27-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed28-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 2,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed28-dep540-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed28-dep720-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed28-dep900-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed28-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed29-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed29-dep540-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed29-dep720-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed29-dep900-per360",
+   "numCustomers": 30,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed29-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed3-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed3-dep540-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed3-dep720-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed3-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed3-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed30-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed30-dep540-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed30-dep720-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed30-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed30-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed4-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed4-dep540-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed4-dep720-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed4-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed4-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed5-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 1,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed5-dep540-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed5-dep720-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed5-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed5-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed6-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed6-dep540-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed6-dep720-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed6-dep900-per360",
+   "numCustomers": 30,
+   "visited": 2,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed6-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed7-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 2,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed7-dep540-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed7-dep720-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed7-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed7-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed8-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed8-dep540-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed8-dep720-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed8-dep900-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed8-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed9-dep1080-per360",
+   "numCustomers": 30,
+   "visited": 6,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed9-dep540-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed9-dep720-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed9-dep900-per360",
+   "numCustomers": 30,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed9-per360",
+   "numCustomers": 30,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  }
+ ],
+ "pairs": [
+  {
+   "sweepParam": "departure",
+   "sweepValue": 360,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 2,
+   "bWins": 13,
+   "ties": 15,
+   "meanVisitDiff": -0.13333333333333333,
+   "visitDiffCI95": [
+    -0.36666666666666664,
+    0.1
+   ],
+   "meanDistanceDiffWhenEqualVisits": 1.8588677360068087,
+   "meanOverlap": 0.8583862433862434,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed15-per360",
+     "aVisited": 3,
+     "bVisited": 5,
+     "difference": -2
+    },
+    {
+     "instanceId": "n30-seed30-per360",
+     "aVisited": 3,
+     "bVisited": 5,
+     "difference": -2
+    },
+    {
+     "instanceId": "n30-seed8-per360",
+     "aVisited": 6,
+     "bVisited": 4,
+     "difference": 2
+    },
+    {
+     "instanceId": "n30-seed14-per360",
+     "aVisited": 4,
+     "bVisited": 5,
+     "difference": -1
+    },
+    {
+     "instanceId": "n30-seed17-per360",
+     "aVisited": 3,
+     "bVisited": 4,
+     "difference": -1
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 360,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 23,
+   "bWins": 5,
+   "ties": 2,
+   "meanVisitDiff": 1.8666666666666667,
+   "visitDiffCI95": [
+    1.2666666666666666,
+    2.5
+   ],
+   "meanDistanceDiffWhenEqualVisits": 9.596585978173753,
+   "meanOverlap": 0.52,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed10-per360",
+     "aVisited": 6,
+     "bVisited": 1,
+     "difference": 5
+    },
+    {
+     "instanceId": "n30-seed25-per360",
+     "aVisited": 6,
+     "bVisited": 1,
+     "difference": 5
+    },
+    {
+     "instanceId": "n30-seed11-per360",
+     "aVisited": 5,
+     "bVisited": 1,
+     "difference": 4
+    },
+    {
+     "instanceId": "n30-seed20-per360",
+     "aVisited": 6,
+     "bVisited": 2,
+     "difference": 4
+    },
+    {
+     "instanceId": "n30-seed21-per360",
+     "aVisited": 6,
+     "bVisited": 2,
+     "difference": 4
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 360,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 25,
+   "bWins": 1,
+   "ties": 4,
+   "meanVisitDiff": 2.0,
+   "visitDiffCI95": [
+    1.4666666666666666,
+    2.6
+   ],
+   "meanDistanceDiffWhenEqualVisits": 2.5111358059347944,
+   "meanOverlap": 0.48007936507936505,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed10-per360",
+     "aVisited": 6,
+     "bVisited": 1,
+     "difference": 5
+    },
+    {
+     "instanceId": "n30-seed25-per360",
+     "aVisited": 6,
+     "bVisited": 1,
+     "difference": 5
+    },
+    {
+     "instanceId": "n30-seed11-per360",
+     "aVisited": 5,
+     "bVisited": 1,
+     "difference": 4
+    },
+    {
+     "instanceId": "n30-seed20-per360",
+     "aVisited": 6,
+     "bVisited": 2,
+     "difference": 4
+    },
+    {
+     "instanceId": "n30-seed21-per360",
+     "aVisited": 6,
+     "bVisited": 2,
+     "difference": 4
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 540,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 1,
+   "bWins": 12,
+   "ties": 17,
+   "meanVisitDiff": -0.2,
+   "visitDiffCI95": [
+    -0.43333333333333335,
+    0.0
+   ],
+   "meanDistanceDiffWhenEqualVisits": 3.2488544125434564,
+   "meanOverlap": 0.8288095238095238,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed25-dep540-per360",
+     "aVisited": 6,
+     "bVisited": 8,
+     "difference": -2
+    },
+    {
+     "instanceId": "n30-seed9-dep540-per360",
+     "aVisited": 3,
+     "bVisited": 5,
+     "difference": -2
+    },
+    {
+     "instanceId": "n30-seed18-dep540-per360",
+     "aVisited": 3,
+     "bVisited": 4,
+     "difference": -1
+    },
+    {
+     "instanceId": "n30-seed20-dep540-per360",
+     "aVisited": 4,
+     "bVisited": 5,
+     "difference": -1
+    },
+    {
+     "instanceId": "n30-seed30-dep540-per360",
+     "aVisited": 4,
+     "bVisited": 5,
+     "difference": -1
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 540,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 19,
+   "bWins": 4,
+   "ties": 7,
+   "meanVisitDiff": 0.7666666666666667,
+   "visitDiffCI95": [
+    0.4,
+    1.1666666666666667
+   ],
+   "meanDistanceDiffWhenEqualVisits": -0.6973818606485929,
+   "meanOverlap": 0.761547619047619,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed25-dep540-per360",
+     "aVisited": 6,
+     "bVisited": 2,
+     "difference": 4
+    },
+    {
+     "instanceId": "n30-seed11-dep540-per360",
+     "aVisited": 4,
+     "bVisited": 2,
+     "difference": 2
+    },
+    {
+     "instanceId": "n30-seed29-dep540-per360",
+     "aVisited": 5,
+     "bVisited": 3,
+     "difference": 2
+    },
+    {
+     "instanceId": "n30-seed3-dep540-per360",
+     "aVisited": 5,
+     "bVisited": 3,
+     "difference": 2
+    },
+    {
+     "instanceId": "n30-seed30-dep540-per360",
+     "aVisited": 4,
+     "bVisited": 2,
+     "difference": 2
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 540,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 22,
+   "bWins": 3,
+   "ties": 5,
+   "meanVisitDiff": 0.9666666666666667,
+   "visitDiffCI95": [
+    0.5,
+    1.5
+   ],
+   "meanDistanceDiffWhenEqualVisits": -3.753539318473711,
+   "meanOverlap": 0.650436507936508,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed25-dep540-per360",
+     "aVisited": 8,
+     "bVisited": 2,
+     "difference": 6
+    },
+    {
+     "instanceId": "n30-seed30-dep540-per360",
+     "aVisited": 5,
+     "bVisited": 2,
+     "difference": 3
+    },
+    {
+     "instanceId": "n30-seed11-dep540-per360",
+     "aVisited": 4,
+     "bVisited": 2,
+     "difference": 2
+    },
+    {
+     "instanceId": "n30-seed20-dep540-per360",
+     "aVisited": 5,
+     "bVisited": 3,
+     "difference": 2
+    },
+    {
+     "instanceId": "n30-seed29-dep540-per360",
+     "aVisited": 5,
+     "bVisited": 3,
+     "difference": 2
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 720,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 3,
+   "bWins": 17,
+   "ties": 10,
+   "meanVisitDiff": -0.3333333333333333,
+   "visitDiffCI95": [
+    -0.6333333333333333,
+    -0.06666666666666667
+   ],
+   "meanDistanceDiffWhenEqualVisits": 10.371738275578394,
+   "meanOverlap": 0.7042857142857143,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed10-dep720-per360",
+     "aVisited": 6,
+     "bVisited": 9,
+     "difference": -3
+    },
+    {
+     "instanceId": "n30-seed28-dep720-per360",
+     "aVisited": 4,
+     "bVisited": 6,
+     "difference": -2
+    },
+    {
+     "instanceId": "n30-seed7-dep720-per360",
+     "aVisited": 3,
+     "bVisited": 5,
+     "difference": -2
+    },
+    {
+     "instanceId": "n30-seed1-dep720-per360",
+     "aVisited": 4,
+     "bVisited": 3,
+     "difference": 1
+    },
+    {
+     "instanceId": "n30-seed14-dep720-per360",
+     "aVisited": 2,
+     "bVisited": 3,
+     "difference": -1
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 720,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 23,
+   "bWins": 5,
+   "ties": 2,
+   "meanVisitDiff": 1.6,
+   "visitDiffCI95": [
+    1.0666666666666667,
+    2.1333333333333333
+   ],
+   "meanDistanceDiffWhenEqualVisits": 19.807603202655734,
+   "meanOverlap": 0.5723015873015872,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed24-dep720-per360",
+     "aVisited": 7,
+     "bVisited": 2,
+     "difference": 5
+    },
+    {
+     "instanceId": "n30-seed27-dep720-per360",
+     "aVisited": 6,
+     "bVisited": 2,
+     "difference": 4
+    },
+    {
+     "instanceId": "n30-seed4-dep720-per360",
+     "aVisited": 5,
+     "bVisited": 1,
+     "difference": 4
+    },
+    {
+     "instanceId": "n30-seed10-dep720-per360",
+     "aVisited": 6,
+     "bVisited": 3,
+     "difference": 3
+    },
+    {
+     "instanceId": "n30-seed16-dep720-per360",
+     "aVisited": 6,
+     "bVisited": 3,
+     "difference": 3
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 720,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 26,
+   "bWins": 1,
+   "ties": 3,
+   "meanVisitDiff": 1.9333333333333333,
+   "visitDiffCI95": [
+    1.4,
+    2.5
+   ],
+   "meanDistanceDiffWhenEqualVisits": 1.0146837906570738,
+   "meanOverlap": 0.5137301587301587,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed10-dep720-per360",
+     "aVisited": 9,
+     "bVisited": 3,
+     "difference": 6
+    },
+    {
+     "instanceId": "n30-seed24-dep720-per360",
+     "aVisited": 7,
+     "bVisited": 2,
+     "difference": 5
+    },
+    {
+     "instanceId": "n30-seed27-dep720-per360",
+     "aVisited": 6,
+     "bVisited": 2,
+     "difference": 4
+    },
+    {
+     "instanceId": "n30-seed28-dep720-per360",
+     "aVisited": 6,
+     "bVisited": 2,
+     "difference": 4
+    },
+    {
+     "instanceId": "n30-seed4-dep720-per360",
+     "aVisited": 5,
+     "bVisited": 1,
+     "difference": 4
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 900,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 2,
+   "bWins": 11,
+   "ties": 17,
+   "meanVisitDiff": -0.36666666666666664,
+   "visitDiffCI95": [
+    -0.6333333333333333,
+    -0.13333333333333333
+   ],
+   "meanDistanceDiffWhenEqualVisits": -1.8108219230567584,
+   "meanOverlap": 0.8171031746031746,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed17-dep900-per360",
+     "aVisited": 1,
+     "bVisited": 4,
+     "difference": -3
+    },
+    {
+     "instanceId": "n30-seed11-dep900-per360",
+     "aVisited": 3,
+     "bVisited": 5,
+     "difference": -2
+    },
+    {
+     "instanceId": "n30-seed14-dep900-per360",
+     "aVisited": 2,
+     "bVisited": 3,
+     "difference": -1
+    },
+    {
+     "instanceId": "n30-seed16-dep900-per360",
+     "aVisited": 5,
+     "bVisited": 6,
+     "difference": -1
+    },
+    {
+     "instanceId": "n30-seed22-dep900-per360",
+     "aVisited": 7,
+     "bVisited": 8,
+     "difference": -1
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 900,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 22,
+   "bWins": 5,
+   "ties": 3,
+   "meanVisitDiff": 1.5,
+   "visitDiffCI95": [
+    0.9666666666666667,
+    2.033333333333333
+   ],
+   "meanDistanceDiffWhenEqualVisits": 14.096559440480686,
+   "meanOverlap": 0.5792063492063492,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed23-dep900-per360",
+     "aVisited": 6,
+     "bVisited": 1,
+     "difference": 5
+    },
+    {
+     "instanceId": "n30-seed22-dep900-per360",
+     "aVisited": 7,
+     "bVisited": 3,
+     "difference": 4
+    },
+    {
+     "instanceId": "n30-seed9-dep900-per360",
+     "aVisited": 5,
+     "bVisited": 1,
+     "difference": 4
+    },
+    {
+     "instanceId": "n30-seed10-dep900-per360",
+     "aVisited": 4,
+     "bVisited": 1,
+     "difference": 3
+    },
+    {
+     "instanceId": "n30-seed18-dep900-per360",
+     "aVisited": 6,
+     "bVisited": 3,
+     "difference": 3
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 900,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 25,
+   "bWins": 2,
+   "ties": 3,
+   "meanVisitDiff": 1.8666666666666667,
+   "visitDiffCI95": [
+    1.3666666666666667,
+    2.3666666666666667
+   ],
+   "meanDistanceDiffWhenEqualVisits": 9.404431267381018,
+   "meanOverlap": 0.504484126984127,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed22-dep900-per360",
+     "aVisited": 8,
+     "bVisited": 3,
+     "difference": 5
+    },
+    {
+     "instanceId": "n30-seed23-dep900-per360",
+     "aVisited": 6,
+     "bVisited": 1,
+     "difference": 5
+    },
+    {
+     "instanceId": "n30-seed9-dep900-per360",
+     "aVisited": 5,
+     "bVisited": 1,
+     "difference": 4
+    },
+    {
+     "instanceId": "n30-seed10-dep900-per360",
+     "aVisited": 4,
+     "bVisited": 1,
+     "difference": 3
+    },
+    {
+     "instanceId": "n30-seed11-dep900-per360",
+     "aVisited": 5,
+     "bVisited": 2,
+     "difference": 3
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 1080,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 0,
+   "bWins": 8,
+   "ties": 22,
+   "meanVisitDiff": -0.06666666666666667,
+   "visitDiffCI95": [
+    -0.16666666666666666,
+    0.0
+   ],
+   "meanDistanceDiffWhenEqualVisits": 5.885866432301888,
+   "meanOverlap": 0.9297619047619048,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed27-dep1080-per360",
+     "aVisited": 5,
+     "bVisited": 6,
+     "difference": -1
+    },
+    {
+     "instanceId": "n30-seed9-dep1080-per360",
+     "aVisited": 5,
+     "bVisited": 6,
+     "difference": -1
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 1080,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 19,
+   "bWins": 1,
+   "ties": 10,
+   "meanVisitDiff": 0.7333333333333333,
+   "visitDiffCI95": [
+    0.4666666666666667,
+    1.0333333333333334
+   ],
+   "meanDistanceDiffWhenEqualVisits": -2.2856644901278456,
+   "meanOverlap": 0.803968253968254,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed10-dep1080-per360",
+     "aVisited": 4,
+     "bVisited": 2,
+     "difference": 2
+    },
+    {
+     "instanceId": "n30-seed18-dep1080-per360",
+     "aVisited": 7,
+     "bVisited": 5,
+     "difference": 2
+    },
+    {
+     "instanceId": "n30-seed19-dep1080-per360",
+     "aVisited": 7,
+     "bVisited": 5,
+     "difference": 2
+    },
+    {
+     "instanceId": "n30-seed23-dep1080-per360",
+     "aVisited": 4,
+     "bVisited": 2,
+     "difference": 2
+    },
+    {
+     "instanceId": "n30-seed26-dep1080-per360",
+     "aVisited": 4,
+     "bVisited": 2,
+     "difference": 2
+    }
+   ]
+  },
+  {
+   "sweepParam": "departure",
+   "sweepValue": 1080,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 21,
+   "bWins": 0,
+   "ties": 9,
+   "meanVisitDiff": 0.8,
+   "visitDiffCI95": [
+    0.4666666666666667,
+    1.1333333333333333
+   ],
+   "meanDistanceDiffWhenEqualVisits": -7.812237781662064,
+   "meanOverlap": 0.763968253968254,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed27-dep1080-per360",
+     "aVisited": 6,
+     "bVisited": 3,
+     "difference": 3
+    },
+    {
+     "instanceId": "n30-seed9-dep1080-per360",
+     "aVisited": 6,
+     "bVisited": 3,
+     "difference": 3
+    },
+    {
+     "instanceId": "n30-seed10-dep1080-per360",
+     "aVisited": 4,
+     "bVisited": 2,
+     "difference": 2
+    },
+    {
+     "instanceId": "n30-seed18-dep1080-per360",
+     "aVisited": 7,
+     "bVisited": 5,
+     "difference": 2
+    },
+    {
+     "instanceId": "n30-seed19-dep1080-per360",
+     "aVisited": 7,
+     "bVisited": 5,
+     "difference": 2
+    }
+   ]
+  }
+ ]
+}
