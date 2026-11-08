@@ -26,6 +26,12 @@ export const loadAlgorithms = () => once("algorithms", async () =>
 export const loadAggregate = (experiment) =>
   once("agg:" + experiment, () => getJson(`/results/aggregates-${encodeURIComponent(experiment)}.json`, true));
 
+/** results/suite.json (the experiment series written by `python3 -m harness.experiment suite`), or null when absent. */
+export const loadSuite = () => once("suite", () => getJson("/results/suite.json", true).catch(() => null));
+
+/** An aggregates file named in suite.json (e.g. "aggregates-speed.json"), or null when absent or unreadable. */
+export const loadAggregateFile = (file) => once("aggfile:" + file, () => getJson(`/results/${encodeURIComponent(file)}`, true).catch(() => null));
+
 /** One full run record (route, schedule, stderr...). `file` comes from the index. */
 export const loadRun = (file) => once("run:" + file, () => getJson(`/results/${encodeURIComponent(file)}`));
 

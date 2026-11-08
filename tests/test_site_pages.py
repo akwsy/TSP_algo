@@ -30,10 +30,25 @@ class SitePagesTest(unittest.TestCase):
                              capture_output=True, text=True, timeout=120)
         self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
         pages = json.loads(out.stdout)
-        self.assertEqual(len(pages), 12)  # six pages, each in both toggle states
+        self.assertEqual(len(pages), 14)  # seven pages, each in both toggle states
         self.assertEqual({p["view"] for p in pages}, {"first", "full"})
         for p in pages:
             self.assertEqual(p["errors"], [], f"{p['page']} ({p['view']})")
+
+    def test_compare_page_on_the_suite_fixture(self):
+        """The Compare page on a real experiment series (tests/fixtures/sample-suite, trimmed from a full suite run): every
+        section, one chart per experiment plus the trade-off, a selected grid cell and links to examples on the map."""
+        server = serve.make_server(0, FIX / "sample-suite", ROOT / "algorithms", instances=FIX / "sample-instances")
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        out = subprocess.run(["node", str(ROOT / "tests" / "site_smoke.mjs"), f"http://127.0.0.1:{server.server_port}", "--wait", "3000",
+                              "--pages", "compare", "--matrix"], capture_output=True, text=True, timeout=180)
+        self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
+        pages = json.loads(out.stdout)
+        self.assertEqual(len(pages), 8)  # desktop and phone, light and dark, both toggle states
+        for p in pages:
+            self.assertEqual(p["errors"], [], f"{p['device']} {p['scheme']} ({p['view']})")
 
     def test_map_fullscreen_fills_the_viewport_and_escape_restores(self):
         """Regression: an ancestor's entrance animation (transform) became the containing block of the position:fixed overlay,

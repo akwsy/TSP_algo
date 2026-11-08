@@ -1,0 +1,4038 @@
+{
+ "experiment": "scaling",
+ "parameters": {
+  "sizes": [
+   5,
+   10,
+   15,
+   20,
+   30,
+   50,
+   100
+  ],
+  "sweepParam": "customers",
+  "values": [
+   5,
+   10,
+   15,
+   20,
+   30,
+   50,
+   100
+  ],
+  "instancesPerSize": 30,
+  "seeds": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30
+  ],
+  "departureMinute": 360,
+  "periodMinutes": 1080,
+  "speedKmh": 40.0,
+  "radiusKm": 150.0
+ },
+ "sizes": [
+  5,
+  10,
+  15,
+  20,
+  30,
+  50,
+  100
+ ],
+ "sweepValues": [
+  5,
+  10,
+  15,
+  20,
+  30,
+  50,
+  100
+ ],
+ "algorithms": [
+  "greedy-insertion-cached",
+  "iterated-local-search",
+  "nearest-neighbour"
+ ],
+ "groups": [
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 5,
+   "sweepParam": "customers",
+   "sweepValue": 5,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 4.266666666666667,
+    "std": 0.6914918072835208,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 428.47496496633914,
+    "std": 88.91147028142566,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 892.9540465449373,
+    "std": 161.18853462489432,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 14.936631899884864,
+    "std": 0.888176717143076,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.9833333333333333,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.06666666666666667,
+    "n": 30
+   },
+   "work": {
+    "mean": 30.533333333333335,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 10,
+   "sweepParam": "customers",
+   "sweepValue": 10,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 7.133333333333334,
+    "std": 1.224275530553741,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 559.9057371211497,
+    "std": 81.28575352524112,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 969.8451758540449,
+    "std": 82.0836672111697,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 15.568198633445718,
+    "std": 2.348483061688734,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.9602248677248677,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.3,
+    "n": 30
+   },
+   "work": {
+    "mean": 144.06666666666666,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 15,
+   "sweepParam": "customers",
+   "sweepValue": 15,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 8.966666666666667,
+    "std": 1.2726115785600325,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 565.1101373078586,
+    "std": 94.34134426531156,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 996.8594829115314,
+    "std": 81.71236398206466,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 15.249881866596601,
+    "std": 0.6330966388427081,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.9344172494172495,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.6666666666666666,
+    "n": 30
+   },
+   "work": {
+    "mean": 339.1,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 20,
+   "sweepParam": "customers",
+   "sweepValue": 20,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 10.566666666666666,
+    "std": 1.6333450621206844,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 599.5633345178935,
+    "std": 70.71500196001837,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 1009.6322060608642,
+    "std": 50.076696377609274,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 14.89636663342632,
+    "std": 0.16665764994545262,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.8907220557220558,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 1.3,
+    "n": 30
+   },
+   "work": {
+    "mean": 623.9,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 30,
+   "sweepParam": "customers",
+   "sweepValue": 30,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 13.966666666666667,
+    "std": 2.2966742571984735,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 632.4725382154669,
+    "std": 65.13481546699393,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 1021.7590990646604,
+    "std": 57.95546826008482,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 16.645838933436607,
+    "std": 1.04524133358465,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.8667917847832708,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 2.1666666666666665,
+    "n": 30
+   },
+   "work": {
+    "mean": 1433.4,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 50,
+   "sweepParam": "customers",
+   "sweepValue": 50,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 17.8,
+    "std": 2.591764144228858,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 664.5288961215831,
+    "std": 45.91954879660519,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 1046.738834035896,
+    "std": 33.797294033380126,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 16.99517353342041,
+    "std": 0.6366301991550616,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.7789193206431956,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 5.266666666666667,
+    "n": 30
+   },
+   "work": {
+    "mean": 3902.4666666666667,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 100,
+   "sweepParam": "customers",
+   "sweepValue": 100,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 25.433333333333334,
+    "std": 3.276702856408466,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 663.4149010133327,
+    "std": 32.684267058658506,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 1046.305439906233,
+    "std": 33.51641878337202,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 22.34590550003001,
+    "std": 1.1239944506914157,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.741454452749614,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 9.1,
+    "n": 30
+   },
+   "work": {
+    "mean": 15526.833333333334,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 5,
+   "sweepParam": "customers",
+   "sweepValue": 5,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 4.333333333333333,
+    "std": 0.6064784348631228,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 419.6860452718469,
+    "std": 86.82862435179575,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 898.5659429370266,
+    "std": 153.9386880769602,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 32.41681533333273,
+    "std": 1.001923707012671,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 1.0,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.0,
+    "n": 30
+   },
+   "work": {
+    "mean": 40926.86666666667,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 10,
+   "sweepParam": "customers",
+   "sweepValue": 10,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 7.4,
+    "std": 1.1325893433586842,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 529.5847051416963,
+    "std": 83.64584599177581,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 959.9561963540821,
+    "std": 83.25487383806002,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 55.780159666513406,
+    "std": 5.088430280579574,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.9958333333333333,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.03333333333333333,
+    "n": 30
+   },
+   "work": {
+    "mean": 189320.06666666668,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 15,
+   "sweepParam": "customers",
+   "sweepValue": 15,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 9.633333333333333,
+    "std": 1.3514572807192966,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 550.0948457997201,
+    "std": 78.03296566188001,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 980.6276805998324,
+    "std": 85.77088892180102,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 88.91523899989504,
+    "std": 10.24814826445293,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 1.0,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.0,
+    "n": 30
+   },
+   "work": {
+    "mean": 447098.43333333335,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 20,
+   "sweepParam": "customers",
+   "sweepValue": 20,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 11.866666666666667,
+    "std": 1.3060425438846859,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 618.1645117873575,
+    "std": 45.930980549931654,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 1018.3340945179808,
+    "std": 54.31524055371689,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 130.83794996661405,
+    "std": 12.854100112293814,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 1.0,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.0,
+    "n": 30
+   },
+   "work": {
+    "mean": 814471.6333333333,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 30,
+   "sweepParam": "customers",
+   "sweepValue": 30,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 16.133333333333333,
+    "std": 2.1291625896895083,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 632.2555232855732,
+    "std": 71.60767927329705,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 1024.1587076949193,
+    "std": 63.89652962926103,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 249.3344529000145,
+    "std": 16.870780336008266,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 1.0,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.0,
+    "n": 30
+   },
+   "work": {
+    "mean": 1912699.8666666667,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 50,
+   "sweepParam": "customers",
+   "sweepValue": 50,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 23.066666666666666,
+    "std": 2.5042492623171704,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 650.8826448772428,
+    "std": 42.33635731547954,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 1044.3715631893108,
+    "std": 36.249878791791794,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 237.72980433338185,
+    "std": 7.599361436968628,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 1.0,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.0,
+    "n": 30
+   },
+   "work": {
+    "mean": 2000778.8666666667,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 100,
+   "sweepParam": "customers",
+   "sweepValue": 100,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 34.53333333333333,
+    "std": 3.234867511366107,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 686.7563615259321,
+    "std": 21.00820673081644,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 1057.7474362047817,
+    "std": 25.776693373392852,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 221.42261810016257,
+    "std": 3.0590858629533764,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 1.0,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 0.0,
+    "n": 30
+   },
+   "work": {
+    "mean": 2004255.1333333333,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 5,
+   "sweepParam": "customers",
+   "sweepValue": 5,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 2.3666666666666667,
+    "std": 0.9643054793328016,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 217.82440434539856,
+    "std": 116.70947768452129,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 876.8981114114706,
+    "std": 148.8396225946731,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 14.431713866603483,
+    "std": 0.2398499472452217,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.5561111111111111,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 1.9666666666666666,
+    "n": 30
+   },
+   "work": {
+    "mean": 12.4,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 10,
+   "sweepParam": "customers",
+   "sweepValue": 10,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 2.8333333333333335,
+    "std": 1.3152509484776145,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 188.6475053984762,
+    "std": 108.96177470789884,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 952.6483197319463,
+    "std": 75.74458473494003,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 17.580430533295537,
+    "std": 10.344932790675188,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.3866269841269841,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 4.6,
+    "n": 30
+   },
+   "work": {
+    "mean": 32.06666666666667,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 15,
+   "sweepParam": "customers",
+   "sweepValue": 15,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 3.3,
+    "std": 1.1788363637137231,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 176.49052325456822,
+    "std": 72.30812109439455,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 960.1157807424081,
+    "std": 76.23764442105548,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 14.553327799815937,
+    "std": 0.2475922150092527,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.3415848040848041,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 6.333333333333333,
+    "n": 30
+   },
+   "work": {
+    "mean": 56.733333333333334,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 20,
+   "sweepParam": "customers",
+   "sweepValue": 20,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 3.7666666666666666,
+    "std": 1.6333450621206844,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 185.57021257270617,
+    "std": 64.80837328969646,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 989.4043901946745,
+    "std": 65.703619130714,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 15.523217933453756,
+    "std": 0.3449619389550906,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.31848595848595845,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 8.1,
+    "n": 30
+   },
+   "work": {
+    "mean": 85.06666666666666,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 30,
+   "sweepParam": "customers",
+   "sweepValue": 30,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 4.533333333333333,
+    "std": 1.6131642354623141,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 195.2403349883647,
+    "std": 68.68575997505158,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 1012.6586651395617,
+    "std": 63.73463620705028,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 15.684988999782945,
+    "std": 1.550614207201208,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.2852701753011351,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 11.6,
+    "n": 30
+   },
+   "work": {
+    "mean": 152.2,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 50,
+   "sweepParam": "customers",
+   "sweepValue": 50,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 5.866666666666666,
+    "std": 2.012603963188903,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 191.61031461586296,
+    "std": 49.82523222792624,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 1032.0289442404649,
+    "std": 46.08792873543517,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 15.808236066792839,
+    "std": 0.20675842016968407,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.2593590325543033,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 17.2,
+    "n": 30
+   },
+   "work": {
+    "mean": 321.23333333333335,
+    "n": 30,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 100,
+   "sweepParam": "customers",
+   "sweepValue": 100,
+   "runs": 30,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 7.1,
+    "std": 1.6681602503026065,
+    "n": 30
+   },
+   "distanceKm": {
+    "mean": 185.0596452835294,
+    "std": 37.97475302786179,
+    "n": 30
+   },
+   "totalMinutes": {
+    "mean": 1042.418913649364,
+    "std": 42.51324020056717,
+    "n": 30
+   },
+   "runtimeMs": {
+    "mean": 19.650238833370775,
+    "std": 0.1983229656062862,
+    "n": 30
+   },
+   "bestKnownRatio": {
+    "mean": 0.20772407582288802,
+    "n": 30
+   },
+   "visitsBehindBest": {
+    "mean": 27.433333333333334,
+    "n": 30
+   },
+   "work": {
+    "mean": 779.9,
+    "n": 30,
+    "key": "iterations"
+   }
+  }
+ ],
+ "bestKnown": [
+  {
+   "instanceId": "n5-seed1",
+   "numCustomers": 5,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed10",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed11",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed12",
+   "numCustomers": 5,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed13",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed14",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed15",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed16",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed17",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed18",
+   "numCustomers": 5,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed19",
+   "numCustomers": 5,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed2",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed20",
+   "numCustomers": 5,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed21",
+   "numCustomers": 5,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed22",
+   "numCustomers": 5,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed23",
+   "numCustomers": 5,
+   "visited": 3,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed24",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed25",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed26",
+   "numCustomers": 5,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed27",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed28",
+   "numCustomers": 5,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed29",
+   "numCustomers": 5,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed3",
+   "numCustomers": 5,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed30",
+   "numCustomers": 5,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed4",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search",
+    "nearest-neighbour"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed5",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed6",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed7",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed8",
+   "numCustomers": 5,
+   "visited": 4,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n5-seed9",
+   "numCustomers": 5,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed1",
+   "numCustomers": 10,
+   "visited": 8,
+   "achievedBy": [
+    "greedy-insertion-cached"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed10",
+   "numCustomers": 10,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed11",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed12",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed13",
+   "numCustomers": 10,
+   "visited": 8,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed14",
+   "numCustomers": 10,
+   "visited": 8,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed15",
+   "numCustomers": 10,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed16",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed17",
+   "numCustomers": 10,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed18",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed19",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed2",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed20",
+   "numCustomers": 10,
+   "visited": 10,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed21",
+   "numCustomers": 10,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed22",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed23",
+   "numCustomers": 10,
+   "visited": 5,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed24",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed25",
+   "numCustomers": 10,
+   "visited": 8,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed26",
+   "numCustomers": 10,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed27",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed28",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed29",
+   "numCustomers": 10,
+   "visited": 8,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed3",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed30",
+   "numCustomers": 10,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed4",
+   "numCustomers": 10,
+   "visited": 9,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed5",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed6",
+   "numCustomers": 10,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed7",
+   "numCustomers": 10,
+   "visited": 8,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed8",
+   "numCustomers": 10,
+   "visited": 6,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n10-seed9",
+   "numCustomers": 10,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed1",
+   "numCustomers": 15,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed10",
+   "numCustomers": 15,
+   "visited": 11,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed11",
+   "numCustomers": 15,
+   "visited": 8,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed12",
+   "numCustomers": 15,
+   "visited": 10,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed13",
+   "numCustomers": 15,
+   "visited": 11,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed14",
+   "numCustomers": 15,
+   "visited": 8,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed15",
+   "numCustomers": 15,
+   "visited": 8,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed16",
+   "numCustomers": 15,
+   "visited": 10,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed17",
+   "numCustomers": 15,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed18",
+   "numCustomers": 15,
+   "visited": 10,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed19",
+   "numCustomers": 15,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed2",
+   "numCustomers": 15,
+   "visited": 7,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed20",
+   "numCustomers": 15,
+   "visited": 13,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed21",
+   "numCustomers": 15,
+   "visited": 10,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed22",
+   "numCustomers": 15,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed23",
+   "numCustomers": 15,
+   "visited": 8,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed24",
+   "numCustomers": 15,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed25",
+   "numCustomers": 15,
+   "visited": 11,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed26",
+   "numCustomers": 15,
+   "visited": 10,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed27",
+   "numCustomers": 15,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed28",
+   "numCustomers": 15,
+   "visited": 10,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed29",
+   "numCustomers": 15,
+   "visited": 11,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed3",
+   "numCustomers": 15,
+   "visited": 10,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed30",
+   "numCustomers": 15,
+   "visited": 12,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed4",
+   "numCustomers": 15,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed5",
+   "numCustomers": 15,
+   "visited": 8,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed6",
+   "numCustomers": 15,
+   "visited": 11,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed7",
+   "numCustomers": 15,
+   "visited": 11,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed8",
+   "numCustomers": 15,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n15-seed9",
+   "numCustomers": 15,
+   "visited": 9,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed1",
+   "numCustomers": 20,
+   "visited": 11,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed10",
+   "numCustomers": 20,
+   "visited": 14,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed11",
+   "numCustomers": 20,
+   "visited": 12,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed12",
+   "numCustomers": 20,
+   "visited": 10,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed13",
+   "numCustomers": 20,
+   "visited": 12,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed14",
+   "numCustomers": 20,
+   "visited": 12,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed15",
+   "numCustomers": 20,
+   "visited": 11,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed16",
+   "numCustomers": 20,
+   "visited": 12,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed17",
+   "numCustomers": 20,
+   "visited": 12,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed18",
+   "numCustomers": 20,
+   "visited": 14,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed19",
+   "numCustomers": 20,
+   "visited": 14,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed2",
+   "numCustomers": 20,
+   "visited": 11,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed20",
+   "numCustomers": 20,
+   "visited": 13,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed21",
+   "numCustomers": 20,
+   "visited": 13,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed22",
+   "numCustomers": 20,
+   "visited": 10,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed23",
+   "numCustomers": 20,
+   "visited": 11,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed24",
+   "numCustomers": 20,
+   "visited": 11,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed25",
+   "numCustomers": 20,
+   "visited": 10,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed26",
+   "numCustomers": 20,
+   "visited": 12,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed27",
+   "numCustomers": 20,
+   "visited": 14,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed28",
+   "numCustomers": 20,
+   "visited": 11,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed29",
+   "numCustomers": 20,
+   "visited": 13,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed3",
+   "numCustomers": 20,
+   "visited": 11,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed30",
+   "numCustomers": 20,
+   "visited": 14,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed4",
+   "numCustomers": 20,
+   "visited": 11,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed5",
+   "numCustomers": 20,
+   "visited": 11,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed6",
+   "numCustomers": 20,
+   "visited": 12,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed7",
+   "numCustomers": 20,
+   "visited": 13,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed8",
+   "numCustomers": 20,
+   "visited": 10,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n20-seed9",
+   "numCustomers": 20,
+   "visited": 11,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed1",
+   "numCustomers": 30,
+   "visited": 17,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed10",
+   "numCustomers": 30,
+   "visited": 18,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed11",
+   "numCustomers": 30,
+   "visited": 17,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed12",
+   "numCustomers": 30,
+   "visited": 16,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed13",
+   "numCustomers": 30,
+   "visited": 16,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed14",
+   "numCustomers": 30,
+   "visited": 13,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed15",
+   "numCustomers": 30,
+   "visited": 15,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed16",
+   "numCustomers": 30,
+   "visited": 18,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed17",
+   "numCustomers": 30,
+   "visited": 19,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed18",
+   "numCustomers": 30,
+   "visited": 18,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed19",
+   "numCustomers": 30,
+   "visited": 17,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed2",
+   "numCustomers": 30,
+   "visited": 11,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed20",
+   "numCustomers": 30,
+   "visited": 17,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed21",
+   "numCustomers": 30,
+   "visited": 16,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed22",
+   "numCustomers": 30,
+   "visited": 14,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed23",
+   "numCustomers": 30,
+   "visited": 12,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed24",
+   "numCustomers": 30,
+   "visited": 17,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed25",
+   "numCustomers": 30,
+   "visited": 16,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed26",
+   "numCustomers": 30,
+   "visited": 14,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed27",
+   "numCustomers": 30,
+   "visited": 18,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed28",
+   "numCustomers": 30,
+   "visited": 16,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed29",
+   "numCustomers": 30,
+   "visited": 18,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed3",
+   "numCustomers": 30,
+   "visited": 16,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed30",
+   "numCustomers": 30,
+   "visited": 17,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed4",
+   "numCustomers": 30,
+   "visited": 14,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed5",
+   "numCustomers": 30,
+   "visited": 12,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed6",
+   "numCustomers": 30,
+   "visited": 18,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed7",
+   "numCustomers": 30,
+   "visited": 19,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed8",
+   "numCustomers": 30,
+   "visited": 17,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n30-seed9",
+   "numCustomers": 30,
+   "visited": 18,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed1",
+   "numCustomers": 50,
+   "visited": 24,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed10",
+   "numCustomers": 50,
+   "visited": 23,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed11",
+   "numCustomers": 50,
+   "visited": 23,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed12",
+   "numCustomers": 50,
+   "visited": 19,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed13",
+   "numCustomers": 50,
+   "visited": 25,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed14",
+   "numCustomers": 50,
+   "visited": 21,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed15",
+   "numCustomers": 50,
+   "visited": 24,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed16",
+   "numCustomers": 50,
+   "visited": 22,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed17",
+   "numCustomers": 50,
+   "visited": 25,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed18",
+   "numCustomers": 50,
+   "visited": 28,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed19",
+   "numCustomers": 50,
+   "visited": 23,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed2",
+   "numCustomers": 50,
+   "visited": 21,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed20",
+   "numCustomers": 50,
+   "visited": 23,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed21",
+   "numCustomers": 50,
+   "visited": 24,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed22",
+   "numCustomers": 50,
+   "visited": 20,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed23",
+   "numCustomers": 50,
+   "visited": 22,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed24",
+   "numCustomers": 50,
+   "visited": 24,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed25",
+   "numCustomers": 50,
+   "visited": 21,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed26",
+   "numCustomers": 50,
+   "visited": 20,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed27",
+   "numCustomers": 50,
+   "visited": 26,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed28",
+   "numCustomers": 50,
+   "visited": 26,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed29",
+   "numCustomers": 50,
+   "visited": 26,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed3",
+   "numCustomers": 50,
+   "visited": 20,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed30",
+   "numCustomers": 50,
+   "visited": 25,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed4",
+   "numCustomers": 50,
+   "visited": 22,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed5",
+   "numCustomers": 50,
+   "visited": 19,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed6",
+   "numCustomers": 50,
+   "visited": 21,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed7",
+   "numCustomers": 50,
+   "visited": 27,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed8",
+   "numCustomers": 50,
+   "visited": 21,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n50-seed9",
+   "numCustomers": 50,
+   "visited": 27,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed1",
+   "numCustomers": 100,
+   "visited": 40,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed10",
+   "numCustomers": 100,
+   "visited": 34,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed11",
+   "numCustomers": 100,
+   "visited": 34,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed12",
+   "numCustomers": 100,
+   "visited": 29,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed13",
+   "numCustomers": 100,
+   "visited": 33,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed14",
+   "numCustomers": 100,
+   "visited": 35,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed15",
+   "numCustomers": 100,
+   "visited": 30,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed16",
+   "numCustomers": 100,
+   "visited": 30,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed17",
+   "numCustomers": 100,
+   "visited": 37,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed18",
+   "numCustomers": 100,
+   "visited": 41,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed19",
+   "numCustomers": 100,
+   "visited": 37,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed2",
+   "numCustomers": 100,
+   "visited": 31,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed20",
+   "numCustomers": 100,
+   "visited": 31,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed21",
+   "numCustomers": 100,
+   "visited": 36,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed22",
+   "numCustomers": 100,
+   "visited": 32,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed23",
+   "numCustomers": 100,
+   "visited": 32,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed24",
+   "numCustomers": 100,
+   "visited": 37,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed25",
+   "numCustomers": 100,
+   "visited": 34,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed26",
+   "numCustomers": 100,
+   "visited": 31,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed27",
+   "numCustomers": 100,
+   "visited": 33,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed28",
+   "numCustomers": 100,
+   "visited": 36,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed29",
+   "numCustomers": 100,
+   "visited": 36,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed3",
+   "numCustomers": 100,
+   "visited": 40,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed30",
+   "numCustomers": 100,
+   "visited": 36,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed4",
+   "numCustomers": 100,
+   "visited": 34,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed5",
+   "numCustomers": 100,
+   "visited": 31,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed6",
+   "numCustomers": 100,
+   "visited": 40,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed7",
+   "numCustomers": 100,
+   "visited": 34,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed8",
+   "numCustomers": 100,
+   "visited": 36,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed9",
+   "numCustomers": 100,
+   "visited": 36,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  }
+ ],
+ "pairs": [
+  {
+   "sweepParam": "customers",
+   "sweepValue": 5,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 1,
+   "bWins": 13,
+   "ties": 16,
+   "meanVisitDiff": -0.06666666666666667,
+   "visitDiffCI95": [
+    -0.16666666666666666,
+    0.0
+   ],
+   "meanDistanceDiffWhenEqualVisits": 21.945891202623113,
+   "meanOverlap": 0.9433333333333334,
+   "largestGaps": [
+    {
+     "instanceId": "n5-seed17",
+     "aVisited": 3,
+     "bVisited": 4,
+     "difference": -1
+    },
+    {
+     "instanceId": "n5-seed8",
+     "aVisited": 3,
+     "bVisited": 4,
+     "difference": -1
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 5,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 29,
+   "bWins": 1,
+   "ties": 0,
+   "meanVisitDiff": 1.9,
+   "visitDiffCI95": [
+    1.5,
+    2.3
+   ],
+   "meanDistanceDiffWhenEqualVisits": -3.198300974353117,
+   "meanOverlap": 0.5405555555555555,
+   "largestGaps": [
+    {
+     "instanceId": "n5-seed12",
+     "aVisited": 5,
+     "bVisited": 1,
+     "difference": 4
+    },
+    {
+     "instanceId": "n5-seed21",
+     "aVisited": 5,
+     "bVisited": 1,
+     "difference": 4
+    },
+    {
+     "instanceId": "n5-seed3",
+     "aVisited": 5,
+     "bVisited": 1,
+     "difference": 4
+    },
+    {
+     "instanceId": "n5-seed15",
+     "aVisited": 4,
+     "bVisited": 1,
+     "difference": 3
+    },
+    {
+     "instanceId": "n5-seed19",
+     "aVisited": 5,
+     "bVisited": 2,
+     "difference": 3
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 5,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 1.9666666666666666,
+   "visitDiffCI95": [
+    1.5666666666666667,
+    2.4
+   ],
+   "meanDistanceDiffWhenEqualVisits": -22.85515184191371,
+   "meanOverlap": 0.5211111111111111,
+   "largestGaps": [
+    {
+     "instanceId": "n5-seed12",
+     "aVisited": 5,
+     "bVisited": 1,
+     "difference": 4
+    },
+    {
+     "instanceId": "n5-seed21",
+     "aVisited": 5,
+     "bVisited": 1,
+     "difference": 4
+    },
+    {
+     "instanceId": "n5-seed3",
+     "aVisited": 5,
+     "bVisited": 1,
+     "difference": 4
+    },
+    {
+     "instanceId": "n5-seed15",
+     "aVisited": 4,
+     "bVisited": 1,
+     "difference": 3
+    },
+    {
+     "instanceId": "n5-seed17",
+     "aVisited": 4,
+     "bVisited": 1,
+     "difference": 3
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 10,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 1,
+   "bWins": 19,
+   "ties": 10,
+   "meanVisitDiff": -0.26666666666666666,
+   "visitDiffCI95": [
+    -0.5,
+    -0.06666666666666667
+   ],
+   "meanDistanceDiffWhenEqualVisits": 31.925320369426355,
+   "meanOverlap": 0.828968253968254,
+   "largestGaps": [
+    {
+     "instanceId": "n10-seed12",
+     "aVisited": 5,
+     "bVisited": 7,
+     "difference": -2
+    },
+    {
+     "instanceId": "n10-seed24",
+     "aVisited": 5,
+     "bVisited": 7,
+     "difference": -2
+    },
+    {
+     "instanceId": "n10-seed1",
+     "aVisited": 8,
+     "bVisited": 7,
+     "difference": 1
+    },
+    {
+     "instanceId": "n10-seed14",
+     "aVisited": 7,
+     "bVisited": 8,
+     "difference": -1
+    },
+    {
+     "instanceId": "n10-seed20",
+     "aVisited": 9,
+     "bVisited": 10,
+     "difference": -1
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 10,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 4.3,
+   "visitDiffCI95": [
+    3.7,
+    4.866666666666666
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.37193121693121695,
+   "largestGaps": [
+    {
+     "instanceId": "n10-seed30",
+     "aVisited": 9,
+     "bVisited": 1,
+     "difference": 8
+    },
+    {
+     "instanceId": "n10-seed25",
+     "aVisited": 8,
+     "bVisited": 1,
+     "difference": 7
+    },
+    {
+     "instanceId": "n10-seed9",
+     "aVisited": 9,
+     "bVisited": 2,
+     "difference": 7
+    },
+    {
+     "instanceId": "n10-seed1",
+     "aVisited": 8,
+     "bVisited": 2,
+     "difference": 6
+    },
+    {
+     "instanceId": "n10-seed13",
+     "aVisited": 8,
+     "bVisited": 2,
+     "difference": 6
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 10,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 4.566666666666666,
+   "visitDiffCI95": [
+    4.0,
+    5.1
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.3506613756613756,
+   "largestGaps": [
+    {
+     "instanceId": "n10-seed30",
+     "aVisited": 9,
+     "bVisited": 1,
+     "difference": 8
+    },
+    {
+     "instanceId": "n10-seed20",
+     "aVisited": 10,
+     "bVisited": 3,
+     "difference": 7
+    },
+    {
+     "instanceId": "n10-seed25",
+     "aVisited": 8,
+     "bVisited": 1,
+     "difference": 7
+    },
+    {
+     "instanceId": "n10-seed9",
+     "aVisited": 9,
+     "bVisited": 2,
+     "difference": 7
+    },
+    {
+     "instanceId": "n10-seed13",
+     "aVisited": 8,
+     "bVisited": 2,
+     "difference": 6
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 15,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 3,
+   "bWins": 21,
+   "ties": 6,
+   "meanVisitDiff": -0.6666666666666666,
+   "visitDiffCI95": [
+    -1.0,
+    -0.36666666666666664
+   ],
+   "meanDistanceDiffWhenEqualVisits": 25.755485680493464,
+   "meanOverlap": 0.7892994042994043,
+   "largestGaps": [
+    {
+     "instanceId": "n15-seed12",
+     "aVisited": 7,
+     "bVisited": 10,
+     "difference": -3
+    },
+    {
+     "instanceId": "n15-seed30",
+     "aVisited": 9,
+     "bVisited": 12,
+     "difference": -3
+    },
+    {
+     "instanceId": "n15-seed14",
+     "aVisited": 6,
+     "bVisited": 8,
+     "difference": -2
+    },
+    {
+     "instanceId": "n15-seed20",
+     "aVisited": 11,
+     "bVisited": 13,
+     "difference": -2
+    },
+    {
+     "instanceId": "n15-seed23",
+     "aVisited": 6,
+     "bVisited": 8,
+     "difference": -2
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 15,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 5.666666666666667,
+   "visitDiffCI95": [
+    5.233333333333333,
+    6.133333333333334
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.35699134199134197,
+   "largestGaps": [
+    {
+     "instanceId": "n15-seed20",
+     "aVisited": 11,
+     "bVisited": 3,
+     "difference": 8
+    },
+    {
+     "instanceId": "n15-seed6",
+     "aVisited": 11,
+     "bVisited": 3,
+     "difference": 8
+    },
+    {
+     "instanceId": "n15-seed16",
+     "aVisited": 10,
+     "bVisited": 3,
+     "difference": 7
+    },
+    {
+     "instanceId": "n15-seed17",
+     "aVisited": 9,
+     "bVisited": 2,
+     "difference": 7
+    },
+    {
+     "instanceId": "n15-seed24",
+     "aVisited": 9,
+     "bVisited": 2,
+     "difference": 7
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 15,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 6.333333333333333,
+   "visitDiffCI95": [
+    5.866666666666666,
+    6.833333333333333
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.3113089688089688,
+   "largestGaps": [
+    {
+     "instanceId": "n15-seed20",
+     "aVisited": 13,
+     "bVisited": 3,
+     "difference": 10
+    },
+    {
+     "instanceId": "n15-seed30",
+     "aVisited": 12,
+     "bVisited": 3,
+     "difference": 9
+    },
+    {
+     "instanceId": "n15-seed25",
+     "aVisited": 11,
+     "bVisited": 3,
+     "difference": 8
+    },
+    {
+     "instanceId": "n15-seed28",
+     "aVisited": 10,
+     "bVisited": 2,
+     "difference": 8
+    },
+    {
+     "instanceId": "n15-seed6",
+     "aVisited": 11,
+     "bVisited": 3,
+     "difference": 8
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 20,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 1,
+   "bWins": 28,
+   "ties": 1,
+   "meanVisitDiff": -1.3,
+   "visitDiffCI95": [
+    -1.7,
+    -0.9
+   ],
+   "meanDistanceDiffWhenEqualVisits": 27.608764386637503,
+   "meanOverlap": 0.6879392720569192,
+   "largestGaps": [
+    {
+     "instanceId": "n20-seed11",
+     "aVisited": 8,
+     "bVisited": 12,
+     "difference": -4
+    },
+    {
+     "instanceId": "n20-seed14",
+     "aVisited": 8,
+     "bVisited": 12,
+     "difference": -4
+    },
+    {
+     "instanceId": "n20-seed2",
+     "aVisited": 8,
+     "bVisited": 11,
+     "difference": -3
+    },
+    {
+     "instanceId": "n20-seed3",
+     "aVisited": 8,
+     "bVisited": 11,
+     "difference": -3
+    },
+    {
+     "instanceId": "n20-seed10",
+     "aVisited": 12,
+     "bVisited": 14,
+     "difference": -2
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 20,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 6.8,
+   "visitDiffCI95": [
+    6.2,
+    7.433333333333334
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.3146231546231546,
+   "largestGaps": [
+    {
+     "instanceId": "n20-seed17",
+     "aVisited": 12,
+     "bVisited": 2,
+     "difference": 10
+    },
+    {
+     "instanceId": "n20-seed21",
+     "aVisited": 12,
+     "bVisited": 2,
+     "difference": 10
+    },
+    {
+     "instanceId": "n20-seed27",
+     "aVisited": 13,
+     "bVisited": 3,
+     "difference": 10
+    },
+    {
+     "instanceId": "n20-seed10",
+     "aVisited": 12,
+     "bVisited": 3,
+     "difference": 9
+    },
+    {
+     "instanceId": "n20-seed1",
+     "aVisited": 10,
+     "bVisited": 2,
+     "difference": 8
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 20,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 8.1,
+   "visitDiffCI95": [
+    7.466666666666667,
+    8.733333333333333
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.2631002331002331,
+   "largestGaps": [
+    {
+     "instanceId": "n20-seed10",
+     "aVisited": 14,
+     "bVisited": 3,
+     "difference": 11
+    },
+    {
+     "instanceId": "n20-seed14",
+     "aVisited": 12,
+     "bVisited": 1,
+     "difference": 11
+    },
+    {
+     "instanceId": "n20-seed21",
+     "aVisited": 13,
+     "bVisited": 2,
+     "difference": 11
+    },
+    {
+     "instanceId": "n20-seed27",
+     "aVisited": 14,
+     "bVisited": 3,
+     "difference": 11
+    },
+    {
+     "instanceId": "n20-seed16",
+     "aVisited": 12,
+     "bVisited": 2,
+     "difference": 10
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 30,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 0,
+   "bWins": 29,
+   "ties": 1,
+   "meanVisitDiff": -2.1666666666666665,
+   "visitDiffCI95": [
+    -2.7333333333333334,
+    -1.6
+   ],
+   "meanDistanceDiffWhenEqualVisits": 29.662101589573126,
+   "meanOverlap": 0.6725383300573433,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed9",
+     "aVisited": 12,
+     "bVisited": 18,
+     "difference": -6
+    },
+    {
+     "instanceId": "n30-seed14",
+     "aVisited": 8,
+     "bVisited": 13,
+     "difference": -5
+    },
+    {
+     "instanceId": "n30-seed20",
+     "aVisited": 12,
+     "bVisited": 17,
+     "difference": -5
+    },
+    {
+     "instanceId": "n30-seed30",
+     "aVisited": 12,
+     "bVisited": 17,
+     "difference": -5
+    },
+    {
+     "instanceId": "n30-seed11",
+     "aVisited": 14,
+     "bVisited": 17,
+     "difference": -3
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 30,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 9.433333333333334,
+   "visitDiffCI95": [
+    8.466666666666667,
+    10.266666666666667
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.2930913223057186,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed10",
+     "aVisited": 16,
+     "bVisited": 2,
+     "difference": 14
+    },
+    {
+     "instanceId": "n30-seed18",
+     "aVisited": 17,
+     "bVisited": 5,
+     "difference": 12
+    },
+    {
+     "instanceId": "n30-seed21",
+     "aVisited": 15,
+     "bVisited": 3,
+     "difference": 12
+    },
+    {
+     "instanceId": "n30-seed27",
+     "aVisited": 17,
+     "bVisited": 5,
+     "difference": 12
+    },
+    {
+     "instanceId": "n30-seed7",
+     "aVisited": 17,
+     "bVisited": 5,
+     "difference": 12
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 30,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 11.6,
+   "visitDiffCI95": [
+    10.633333333333333,
+    12.4
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.23297709772167977,
+   "largestGaps": [
+    {
+     "instanceId": "n30-seed10",
+     "aVisited": 18,
+     "bVisited": 2,
+     "difference": 16
+    },
+    {
+     "instanceId": "n30-seed9",
+     "aVisited": 18,
+     "bVisited": 3,
+     "difference": 15
+    },
+    {
+     "instanceId": "n30-seed11",
+     "aVisited": 17,
+     "bVisited": 3,
+     "difference": 14
+    },
+    {
+     "instanceId": "n30-seed30",
+     "aVisited": 17,
+     "bVisited": 3,
+     "difference": 14
+    },
+    {
+     "instanceId": "n30-seed7",
+     "aVisited": 19,
+     "bVisited": 5,
+     "difference": 14
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 50,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 0,
+   "bWins": 30,
+   "ties": 0,
+   "meanVisitDiff": -5.266666666666667,
+   "visitDiffCI95": [
+    -6.533333333333333,
+    -4.1
+   ],
+   "meanDistanceDiffWhenEqualVisits": 148.17960751132023,
+   "meanOverlap": 0.5404522020798564,
+   "largestGaps": [
+    {
+     "instanceId": "n50-seed13",
+     "aVisited": 12,
+     "bVisited": 25,
+     "difference": -13
+    },
+    {
+     "instanceId": "n50-seed30",
+     "aVisited": 13,
+     "bVisited": 25,
+     "difference": -12
+    },
+    {
+     "instanceId": "n50-seed1",
+     "aVisited": 13,
+     "bVisited": 24,
+     "difference": -11
+    },
+    {
+     "instanceId": "n50-seed7",
+     "aVisited": 17,
+     "bVisited": 27,
+     "difference": -10
+    },
+    {
+     "instanceId": "n50-seed9",
+     "aVisited": 17,
+     "bVisited": 27,
+     "difference": -10
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 50,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 11.933333333333334,
+   "visitDiffCI95": [
+    10.866666666666667,
+    12.966666666666667
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.29722756015241547,
+   "largestGaps": [
+    {
+     "instanceId": "n50-seed24",
+     "aVisited": 21,
+     "bVisited": 4,
+     "difference": 17
+    },
+    {
+     "instanceId": "n50-seed28",
+     "aVisited": 21,
+     "bVisited": 4,
+     "difference": 17
+    },
+    {
+     "instanceId": "n50-seed18",
+     "aVisited": 22,
+     "bVisited": 6,
+     "difference": 16
+    },
+    {
+     "instanceId": "n50-seed27",
+     "aVisited": 19,
+     "bVisited": 3,
+     "difference": 16
+    },
+    {
+     "instanceId": "n50-seed10",
+     "aVisited": 22,
+     "bVisited": 7,
+     "difference": 15
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 50,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 17.2,
+   "visitDiffCI95": [
+    15.966666666666667,
+    18.433333333333334
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.20171523071103542,
+   "largestGaps": [
+    {
+     "instanceId": "n50-seed27",
+     "aVisited": 26,
+     "bVisited": 3,
+     "difference": 23
+    },
+    {
+     "instanceId": "n50-seed9",
+     "aVisited": 27,
+     "bVisited": 4,
+     "difference": 23
+    },
+    {
+     "instanceId": "n50-seed18",
+     "aVisited": 28,
+     "bVisited": 6,
+     "difference": 22
+    },
+    {
+     "instanceId": "n50-seed28",
+     "aVisited": 26,
+     "bVisited": 4,
+     "difference": 22
+    },
+    {
+     "instanceId": "n50-seed21",
+     "aVisited": 24,
+     "bVisited": 3,
+     "difference": 21
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 100,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 0,
+   "bWins": 30,
+   "ties": 0,
+   "meanVisitDiff": -9.1,
+   "visitDiffCI95": [
+    -10.566666666666666,
+    -7.633333333333334
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.4294762557848839,
+   "largestGaps": [
+    {
+     "instanceId": "n100-seed18",
+     "aVisited": 23,
+     "bVisited": 41,
+     "difference": -18
+    },
+    {
+     "instanceId": "n100-seed1",
+     "aVisited": 23,
+     "bVisited": 40,
+     "difference": -17
+    },
+    {
+     "instanceId": "n100-seed30",
+     "aVisited": 21,
+     "bVisited": 36,
+     "difference": -15
+    },
+    {
+     "instanceId": "n100-seed8",
+     "aVisited": 21,
+     "bVisited": 36,
+     "difference": -15
+    },
+    {
+     "instanceId": "n100-seed13",
+     "aVisited": 20,
+     "bVisited": 33,
+     "difference": -13
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 100,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 18.333333333333332,
+   "visitDiffCI95": [
+    17.266666666666666,
+    19.433333333333334
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.24573739961014066,
+   "largestGaps": [
+    {
+     "instanceId": "n100-seed27",
+     "aVisited": 31,
+     "bVisited": 5,
+     "difference": 26
+    },
+    {
+     "instanceId": "n100-seed17",
+     "aVisited": 28,
+     "bVisited": 6,
+     "difference": 22
+    },
+    {
+     "instanceId": "n100-seed21",
+     "aVisited": 27,
+     "bVisited": 5,
+     "difference": 22
+    },
+    {
+     "instanceId": "n100-seed26",
+     "aVisited": 28,
+     "bVisited": 6,
+     "difference": 22
+    },
+    {
+     "instanceId": "n100-seed3",
+     "aVisited": 31,
+     "bVisited": 9,
+     "difference": 22
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 100,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 30,
+   "excluded": 0,
+   "aWins": 30,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 27.433333333333334,
+   "visitDiffCI95": [
+    26.166666666666668,
+    28.766666666666666
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.15620003103823246,
+   "largestGaps": [
+    {
+     "instanceId": "n100-seed18",
+     "aVisited": 41,
+     "bVisited": 5,
+     "difference": 36
+    },
+    {
+     "instanceId": "n100-seed1",
+     "aVisited": 40,
+     "bVisited": 6,
+     "difference": 34
+    },
+    {
+     "instanceId": "n100-seed17",
+     "aVisited": 37,
+     "bVisited": 6,
+     "difference": 31
+    },
+    {
+     "instanceId": "n100-seed21",
+     "aVisited": 36,
+     "bVisited": 5,
+     "difference": 31
+    },
+    {
+     "instanceId": "n100-seed3",
+     "aVisited": 40,
+     "bVisited": 9,
+     "difference": 31
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1562 @@
+{
+ "experiment": "stress",
+ "parameters": {
+  "sizes": [
+   100,
+   150,
+   200,
+   300
+  ],
+  "sweepParam": "customers",
+  "values": [
+   100,
+   150,
+   200,
+   300
+  ],
+  "instancesPerSize": 10,
+  "seeds": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ],
+  "departureMinute": 360,
+  "periodMinutes": 1080,
+  "speedKmh": 40.0,
+  "radiusKm": 150.0
+ },
+ "sizes": [
+  100,
+  150,
+  200,
+  300
+ ],
+ "sweepValues": [
+  100,
+  150,
+  200,
+  300
+ ],
+ "algorithms": [
+  "greedy-insertion-cached",
+  "iterated-local-search",
+  "nearest-neighbour"
+ ],
+ "groups": [
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 100,
+   "sweepParam": "customers",
+   "sweepValue": 100,
+   "runs": 10,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 26.3,
+    "std": 3.529242915351047,
+    "n": 10
+   },
+   "distanceKm": {
+    "mean": 670.5753212711135,
+    "std": 30.798831740906987,
+    "n": 10
+   },
+   "totalMinutes": {
+    "mean": 1061.3538900236667,
+    "std": 18.127275719333596,
+    "n": 10
+   },
+   "runtimeMs": {
+    "mean": 23.676687499937543,
+    "std": 0.5709785213497603,
+    "n": 10
+   },
+   "bestKnownRatio": {
+    "mean": 0.743741302972802,
+    "n": 10
+   },
+   "visitsBehindBest": {
+    "mean": 9.3,
+    "n": 10
+   },
+   "work": {
+    "mean": 16019.1,
+    "n": 10,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 150,
+   "sweepParam": "customers",
+   "sweepValue": 150,
+   "runs": 10,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 32.9,
+    "std": 3.4785054261852175,
+    "n": 10
+   },
+   "distanceKm": {
+    "mean": 672.3760869050179,
+    "std": 23.775177804534323,
+    "n": 10
+   },
+   "totalMinutes": {
+    "mean": 1058.3201497874993,
+    "std": 21.022893713557664,
+    "n": 10
+   },
+   "runtimeMs": {
+    "mean": 32.52784169999359,
+    "std": 1.0292229024508093,
+    "n": 10
+   },
+   "bestKnownRatio": {
+    "mean": 0.7974051807730165,
+    "n": 10
+   },
+   "visitsBehindBest": {
+    "mean": 8.5,
+    "n": 10
+   },
+   "work": {
+    "mean": 39121.3,
+    "n": 10,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 200,
+   "sweepParam": "customers",
+   "sweepValue": 200,
+   "runs": 10,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 39.5,
+    "std": 3.4399612400917157,
+    "n": 10
+   },
+   "distanceKm": {
+    "mean": 683.3209848411234,
+    "std": 22.94959327031945,
+    "n": 10
+   },
+   "totalMinutes": {
+    "mean": 1055.4159938555558,
+    "std": 27.43878873489257,
+    "n": 10
+   },
+   "runtimeMs": {
+    "mean": 46.028225000009115,
+    "std": 3.0405381994836254,
+    "n": 10
+   },
+   "bestKnownRatio": {
+    "mean": 0.9153269936143744,
+    "n": 10
+   },
+   "visitsBehindBest": {
+    "mean": 3.7,
+    "n": 10
+   },
+   "work": {
+    "mean": 71804.8,
+    "n": 10,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "greedy-insertion-cached",
+   "numCustomers": 300,
+   "sweepParam": "customers",
+   "sweepValue": 300,
+   "runs": 10,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 53.0,
+    "std": 4.2946995755750415,
+    "n": 10
+   },
+   "distanceKm": {
+    "mean": 687.1886773252115,
+    "std": 11.4749788595597,
+    "n": 10
+   },
+   "totalMinutes": {
+    "mean": 1056.75049023842,
+    "std": 13.797362941939491,
+    "n": 10
+   },
+   "runtimeMs": {
+    "mean": 84.28903339990939,
+    "std": 4.127938763683647,
+    "n": 10
+   },
+   "bestKnownRatio": {
+    "mean": 0.9669637852930082,
+    "n": 10
+   },
+   "visitsBehindBest": {
+    "mean": 1.9,
+    "n": 10
+   },
+   "work": {
+    "mean": 182003.9,
+    "n": 10,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 100,
+   "sweepParam": "customers",
+   "sweepValue": 100,
+   "runs": 10,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 35.6,
+    "std": 3.470510689285432,
+    "n": 10
+   },
+   "distanceKm": {
+    "mean": 688.5918849046724,
+    "std": 26.41329824413551,
+    "n": 10
+   },
+   "totalMinutes": {
+    "mean": 1055.9106537075495,
+    "std": 21.492560253429936,
+    "n": 10
+   },
+   "runtimeMs": {
+    "mean": 222.74389599970164,
+    "std": 3.1388108592034505,
+    "n": 10
+   },
+   "bestKnownRatio": {
+    "mean": 1.0,
+    "n": 10
+   },
+   "visitsBehindBest": {
+    "mean": 0.0,
+    "n": 10
+   },
+   "work": {
+    "mean": 2004576.9,
+    "n": 10,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 150,
+   "sweepParam": "customers",
+   "sweepValue": 150,
+   "runs": 10,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 41.4,
+    "std": 3.806427312965386,
+    "n": 10
+   },
+   "distanceKm": {
+    "mean": 694.3236886687932,
+    "std": 18.04931140660338,
+    "n": 10
+   },
+   "totalMinutes": {
+    "mean": 1059.079132288159,
+    "std": 19.244185856278772,
+    "n": 10
+   },
+   "runtimeMs": {
+    "mean": 222.14358740020543,
+    "std": 1.5309075133052015,
+    "n": 10
+   },
+   "bestKnownRatio": {
+    "mean": 1.0,
+    "n": 10
+   },
+   "visitsBehindBest": {
+    "mean": 0.0,
+    "n": 10
+   },
+   "work": {
+    "mean": 2002990.7,
+    "n": 10,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 200,
+   "sweepParam": "customers",
+   "sweepValue": 200,
+   "runs": 10,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 43.1,
+    "std": 2.766867462592951,
+    "n": 10
+   },
+   "distanceKm": {
+    "mean": 698.6457706983424,
+    "std": 14.71936613468307,
+    "n": 10
+   },
+   "totalMinutes": {
+    "mean": 1065.5933608857029,
+    "std": 17.298296117528185,
+    "n": 10
+   },
+   "runtimeMs": {
+    "mean": 229.84257060015807,
+    "std": 1.8245707205143804,
+    "n": 10
+   },
+   "bestKnownRatio": {
+    "mean": 0.9974358974358974,
+    "n": 10
+   },
+   "visitsBehindBest": {
+    "mean": 0.1,
+    "n": 10
+   },
+   "work": {
+    "mean": 2003770.5,
+    "n": 10,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "iterated-local-search",
+   "numCustomers": 300,
+   "sweepParam": "customers",
+   "sweepValue": 300,
+   "runs": 10,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 54.8,
+    "std": 5.28730134903956,
+    "n": 10
+   },
+   "distanceKm": {
+    "mean": 696.409435394077,
+    "std": 11.31793965702095,
+    "n": 10
+   },
+   "totalMinutes": {
+    "mean": 1062.5167811044873,
+    "std": 15.164331931850125,
+    "n": 10
+   },
+   "runtimeMs": {
+    "mean": 268.2893790997696,
+    "std": 8.191401532352797,
+    "n": 10
+   },
+   "bestKnownRatio": {
+    "mean": 0.9979591836734694,
+    "n": 10
+   },
+   "visitsBehindBest": {
+    "mean": 0.1,
+    "n": 10
+   },
+   "work": {
+    "mean": 2007567.5,
+    "n": 10,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 100,
+   "sweepParam": "customers",
+   "sweepValue": 100,
+   "runs": 10,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 7.8,
+    "std": 1.4757295747452437,
+    "n": 10
+   },
+   "distanceKm": {
+    "mean": 177.75895611124542,
+    "std": 40.16246832186949,
+    "n": 10
+   },
+   "totalMinutes": {
+    "mean": 1029.8493130629029,
+    "std": 56.470972967903755,
+    "n": 10
+   },
+   "runtimeMs": {
+    "mean": 20.750562700050068,
+    "std": 0.20628831011862728,
+    "n": 10
+   },
+   "bestKnownRatio": {
+    "mean": 0.22007273877292852,
+    "n": 10
+   },
+   "visitsBehindBest": {
+    "mean": 27.8,
+    "n": 10
+   },
+   "work": {
+    "mean": 844.7,
+    "n": 10,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 150,
+   "sweepParam": "customers",
+   "sweepValue": 150,
+   "runs": 10,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 9.0,
+    "std": 1.8257418583505538,
+    "n": 10
+   },
+   "distanceKm": {
+    "mean": 177.3536231314999,
+    "std": 22.56048576813427,
+    "n": 10
+   },
+   "totalMinutes": {
+    "mean": 1052.7391490447844,
+    "std": 24.195851182702828,
+    "n": 10
+   },
+   "runtimeMs": {
+    "mean": 26.396829199984495,
+    "std": 0.12829697817627775,
+    "n": 10
+   },
+   "bestKnownRatio": {
+    "mean": 0.21906103772050237,
+    "n": 10
+   },
+   "visitsBehindBest": {
+    "mean": 32.4,
+    "n": 10
+   },
+   "work": {
+    "mean": 1453.5,
+    "n": 10,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 200,
+   "sweepParam": "customers",
+   "sweepValue": 200,
+   "runs": 10,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 11.5,
+    "std": 2.3213980461973533,
+    "n": 10
+   },
+   "distanceKm": {
+    "mean": 195.13269142893853,
+    "std": 26.9420655016872,
+    "n": 10
+   },
+   "totalMinutes": {
+    "mean": 1063.2751857556225,
+    "std": 13.685202539299071,
+    "n": 10
+   },
+   "runtimeMs": {
+    "mean": 34.08709589984937,
+    "std": 0.28734152881724695,
+    "n": 10
+   },
+   "bestKnownRatio": {
+    "mean": 0.2661537984814761,
+    "n": 10
+   },
+   "visitsBehindBest": {
+    "mean": 31.7,
+    "n": 10
+   },
+   "work": {
+    "mean": 2425.7,
+    "n": 10,
+    "key": "iterations"
+   }
+  },
+  {
+   "algorithmId": "nearest-neighbour",
+   "numCustomers": 300,
+   "sweepParam": "customers",
+   "sweepValue": 300,
+   "runs": 10,
+   "failures": 0,
+   "timeouts": 0,
+   "selfReportedTimeLimit": 0,
+   "contradictedOptimal": 0,
+   "optimalReports": 0,
+   "visited": {
+    "mean": 13.7,
+    "std": 2.496664441476534,
+    "n": 10
+   },
+   "distanceKm": {
+    "mean": 184.97651734959192,
+    "std": 10.313679838380704,
+    "n": 10
+   },
+   "totalMinutes": {
+    "mean": 1064.104428916337,
+    "std": 12.31803543980907,
+    "n": 10
+   },
+   "runtimeMs": {
+    "mean": 61.155421000148635,
+    "std": 8.097831271324088,
+    "n": 10
+   },
+   "bestKnownRatio": {
+    "mean": 0.2499107807308864,
+    "n": 10
+   },
+   "visitsBehindBest": {
+    "mean": 41.2,
+    "n": 10
+   },
+   "work": {
+    "mean": 4306.5,
+    "n": 10,
+    "key": "iterations"
+   }
+  }
+ ],
+ "bestKnown": [
+  {
+   "instanceId": "n100-seed1",
+   "numCustomers": 100,
+   "visited": 40,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed10",
+   "numCustomers": 100,
+   "visited": 34,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed2",
+   "numCustomers": 100,
+   "visited": 31,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed3",
+   "numCustomers": 100,
+   "visited": 40,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed4",
+   "numCustomers": 100,
+   "visited": 34,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed5",
+   "numCustomers": 100,
+   "visited": 31,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed6",
+   "numCustomers": 100,
+   "visited": 40,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed7",
+   "numCustomers": 100,
+   "visited": 34,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed8",
+   "numCustomers": 100,
+   "visited": 36,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n100-seed9",
+   "numCustomers": 100,
+   "visited": 36,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n150-seed1",
+   "numCustomers": 150,
+   "visited": 38,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n150-seed10",
+   "numCustomers": 150,
+   "visited": 43,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n150-seed2",
+   "numCustomers": 150,
+   "visited": 43,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n150-seed3",
+   "numCustomers": 150,
+   "visited": 46,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n150-seed4",
+   "numCustomers": 150,
+   "visited": 39,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n150-seed5",
+   "numCustomers": 150,
+   "visited": 37,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n150-seed6",
+   "numCustomers": 150,
+   "visited": 43,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n150-seed7",
+   "numCustomers": 150,
+   "visited": 40,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n150-seed8",
+   "numCustomers": 150,
+   "visited": 48,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n150-seed9",
+   "numCustomers": 150,
+   "visited": 37,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n200-seed1",
+   "numCustomers": 200,
+   "visited": 44,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n200-seed10",
+   "numCustomers": 200,
+   "visited": 39,
+   "achievedBy": [
+    "greedy-insertion-cached"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n200-seed2",
+   "numCustomers": 200,
+   "visited": 46,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n200-seed3",
+   "numCustomers": 200,
+   "visited": 46,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n200-seed4",
+   "numCustomers": 200,
+   "visited": 42,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n200-seed5",
+   "numCustomers": 200,
+   "visited": 46,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n200-seed6",
+   "numCustomers": 200,
+   "visited": 44,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n200-seed7",
+   "numCustomers": 200,
+   "visited": 40,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n200-seed8",
+   "numCustomers": 200,
+   "visited": 44,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n200-seed9",
+   "numCustomers": 200,
+   "visited": 41,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n300-seed1",
+   "numCustomers": 300,
+   "visited": 54,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n300-seed10",
+   "numCustomers": 300,
+   "visited": 57,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n300-seed2",
+   "numCustomers": 300,
+   "visited": 59,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n300-seed3",
+   "numCustomers": 300,
+   "visited": 65,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n300-seed4",
+   "numCustomers": 300,
+   "visited": 47,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n300-seed5",
+   "numCustomers": 300,
+   "visited": 55,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n300-seed6",
+   "numCustomers": 300,
+   "visited": 49,
+   "achievedBy": [
+    "greedy-insertion-cached"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n300-seed7",
+   "numCustomers": 300,
+   "visited": 56,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n300-seed8",
+   "numCustomers": 300,
+   "visited": 51,
+   "achievedBy": [
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  },
+  {
+   "instanceId": "n300-seed9",
+   "numCustomers": 300,
+   "visited": 56,
+   "achievedBy": [
+    "greedy-insertion-cached",
+    "iterated-local-search"
+   ],
+   "optimalReported": false
+  }
+ ],
+ "pairs": [
+  {
+   "sweepParam": "customers",
+   "sweepValue": 100,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 10,
+   "excluded": 0,
+   "aWins": 0,
+   "bWins": 10,
+   "ties": 0,
+   "meanVisitDiff": -9.3,
+   "visitDiffCI95": [
+    -12.0,
+    -6.7
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.41818117050897374,
+   "largestGaps": [
+    {
+     "instanceId": "n100-seed1",
+     "aVisited": 23,
+     "bVisited": 40,
+     "difference": -17
+    },
+    {
+     "instanceId": "n100-seed8",
+     "aVisited": 21,
+     "bVisited": 36,
+     "difference": -15
+    },
+    {
+     "instanceId": "n100-seed6",
+     "aVisited": 28,
+     "bVisited": 40,
+     "difference": -12
+    },
+    {
+     "instanceId": "n100-seed10",
+     "aVisited": 24,
+     "bVisited": 34,
+     "difference": -10
+    },
+    {
+     "instanceId": "n100-seed3",
+     "aVisited": 31,
+     "bVisited": 40,
+     "difference": -9
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 100,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 10,
+   "excluded": 0,
+   "aWins": 10,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 18.5,
+   "visitDiffCI95": [
+    17.1,
+    20.0
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.268076767230126,
+   "largestGaps": [
+    {
+     "instanceId": "n100-seed3",
+     "aVisited": 31,
+     "bVisited": 9,
+     "difference": 22
+    },
+    {
+     "instanceId": "n100-seed7",
+     "aVisited": 30,
+     "bVisited": 8,
+     "difference": 22
+    },
+    {
+     "instanceId": "n100-seed2",
+     "aVisited": 28,
+     "bVisited": 7,
+     "difference": 21
+    },
+    {
+     "instanceId": "n100-seed4",
+     "aVisited": 29,
+     "bVisited": 10,
+     "difference": 19
+    },
+    {
+     "instanceId": "n100-seed6",
+     "aVisited": 28,
+     "bVisited": 9,
+     "difference": 19
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 100,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 10,
+   "excluded": 0,
+   "aWins": 10,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 27.8,
+   "visitDiffCI95": [
+    25.9,
+    30.0
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.17197143453894498,
+   "largestGaps": [
+    {
+     "instanceId": "n100-seed1",
+     "aVisited": 40,
+     "bVisited": 6,
+     "difference": 34
+    },
+    {
+     "instanceId": "n100-seed3",
+     "aVisited": 40,
+     "bVisited": 9,
+     "difference": 31
+    },
+    {
+     "instanceId": "n100-seed6",
+     "aVisited": 40,
+     "bVisited": 9,
+     "difference": 31
+    },
+    {
+     "instanceId": "n100-seed8",
+     "aVisited": 36,
+     "bVisited": 6,
+     "difference": 30
+    },
+    {
+     "instanceId": "n100-seed9",
+     "aVisited": 36,
+     "bVisited": 9,
+     "difference": 27
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 150,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 10,
+   "excluded": 0,
+   "aWins": 0,
+   "bWins": 10,
+   "ties": 0,
+   "meanVisitDiff": -8.5,
+   "visitDiffCI95": [
+    -10.9,
+    -6.7
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.5972484900968298,
+   "largestGaps": [
+    {
+     "instanceId": "n150-seed8",
+     "aVisited": 30,
+     "bVisited": 48,
+     "difference": -18
+    },
+    {
+     "instanceId": "n150-seed7",
+     "aVisited": 29,
+     "bVisited": 40,
+     "difference": -11
+    },
+    {
+     "instanceId": "n150-seed10",
+     "aVisited": 33,
+     "bVisited": 43,
+     "difference": -10
+    },
+    {
+     "instanceId": "n150-seed3",
+     "aVisited": 38,
+     "bVisited": 46,
+     "difference": -8
+    },
+    {
+     "instanceId": "n150-seed4",
+     "aVisited": 31,
+     "bVisited": 39,
+     "difference": -8
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 150,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 10,
+   "excluded": 0,
+   "aWins": 10,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 23.9,
+   "visitDiffCI95": [
+    22.1,
+    25.9
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.21978753347174398,
+   "largestGaps": [
+    {
+     "instanceId": "n150-seed6",
+     "aVisited": 38,
+     "bVisited": 7,
+     "difference": 31
+    },
+    {
+     "instanceId": "n150-seed3",
+     "aVisited": 38,
+     "bVisited": 11,
+     "difference": 27
+    },
+    {
+     "instanceId": "n150-seed10",
+     "aVisited": 33,
+     "bVisited": 8,
+     "difference": 25
+    },
+    {
+     "instanceId": "n150-seed2",
+     "aVisited": 37,
+     "bVisited": 12,
+     "difference": 25
+    },
+    {
+     "instanceId": "n150-seed1",
+     "aVisited": 31,
+     "bVisited": 7,
+     "difference": 24
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 150,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 10,
+   "excluded": 0,
+   "aWins": 10,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 32.4,
+   "visitDiffCI95": [
+    30.1,
+    34.9
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.1788807547995561,
+   "largestGaps": [
+    {
+     "instanceId": "n150-seed8",
+     "aVisited": 48,
+     "bVisited": 8,
+     "difference": 40
+    },
+    {
+     "instanceId": "n150-seed6",
+     "aVisited": 43,
+     "bVisited": 7,
+     "difference": 36
+    },
+    {
+     "instanceId": "n150-seed10",
+     "aVisited": 43,
+     "bVisited": 8,
+     "difference": 35
+    },
+    {
+     "instanceId": "n150-seed3",
+     "aVisited": 46,
+     "bVisited": 11,
+     "difference": 35
+    },
+    {
+     "instanceId": "n150-seed7",
+     "aVisited": 40,
+     "bVisited": 8,
+     "difference": 32
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 200,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 10,
+   "excluded": 0,
+   "aWins": 2,
+   "bWins": 8,
+   "ties": 0,
+   "meanVisitDiff": -3.6,
+   "visitDiffCI95": [
+    -5.7,
+    -1.8
+   ],
+   "meanDistanceDiffWhenEqualVisits": -8.814157082262682,
+   "meanOverlap": 0.6870346309381263,
+   "largestGaps": [
+    {
+     "instanceId": "n200-seed8",
+     "aVisited": 34,
+     "bVisited": 44,
+     "difference": -10
+    },
+    {
+     "instanceId": "n200-seed6",
+     "aVisited": 37,
+     "bVisited": 44,
+     "difference": -7
+    },
+    {
+     "instanceId": "n200-seed4",
+     "aVisited": 37,
+     "bVisited": 42,
+     "difference": -5
+    },
+    {
+     "instanceId": "n200-seed9",
+     "aVisited": 36,
+     "bVisited": 41,
+     "difference": -5
+    },
+    {
+     "instanceId": "n200-seed2",
+     "aVisited": 43,
+     "bVisited": 46,
+     "difference": -3
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 200,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 10,
+   "excluded": 0,
+   "aWins": 10,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 28.0,
+   "visitDiffCI95": [
+    26.3,
+    29.7
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.16716387568730054,
+   "largestGaps": [
+    {
+     "instanceId": "n200-seed2",
+     "aVisited": 43,
+     "bVisited": 10,
+     "difference": 33
+    },
+    {
+     "instanceId": "n200-seed5",
+     "aVisited": 43,
+     "bVisited": 12,
+     "difference": 31
+    },
+    {
+     "instanceId": "n200-seed1",
+     "aVisited": 42,
+     "bVisited": 12,
+     "difference": 30
+    },
+    {
+     "instanceId": "n200-seed10",
+     "aVisited": 39,
+     "bVisited": 9,
+     "difference": 30
+    },
+    {
+     "instanceId": "n200-seed7",
+     "aVisited": 40,
+     "bVisited": 12,
+     "difference": 28
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 200,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 10,
+   "excluded": 0,
+   "aWins": 10,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 31.6,
+   "visitDiffCI95": [
+    30.0,
+    33.3
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.1688166888538692,
+   "largestGaps": [
+    {
+     "instanceId": "n200-seed2",
+     "aVisited": 46,
+     "bVisited": 10,
+     "difference": 36
+    },
+    {
+     "instanceId": "n200-seed8",
+     "aVisited": 44,
+     "bVisited": 9,
+     "difference": 35
+    },
+    {
+     "instanceId": "n200-seed5",
+     "aVisited": 46,
+     "bVisited": 12,
+     "difference": 34
+    },
+    {
+     "instanceId": "n200-seed6",
+     "aVisited": 44,
+     "bVisited": 10,
+     "difference": 34
+    },
+    {
+     "instanceId": "n200-seed1",
+     "aVisited": 44,
+     "bVisited": 12,
+     "difference": 32
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 300,
+   "a": "greedy-insertion-cached",
+   "b": "iterated-local-search",
+   "instances": 10,
+   "excluded": 0,
+   "aWins": 3,
+   "bWins": 7,
+   "ties": 0,
+   "meanVisitDiff": -1.8,
+   "visitDiffCI95": [
+    -3.1,
+    -0.6
+   ],
+   "meanDistanceDiffWhenEqualVisits": -11.220165708752196,
+   "meanOverlap": 0.7922629357131477,
+   "largestGaps": [
+    {
+     "instanceId": "n300-seed10",
+     "aVisited": 52,
+     "bVisited": 57,
+     "difference": -5
+    },
+    {
+     "instanceId": "n300-seed3",
+     "aVisited": 60,
+     "bVisited": 65,
+     "difference": -5
+    },
+    {
+     "instanceId": "n300-seed7",
+     "aVisited": 52,
+     "bVisited": 56,
+     "difference": -4
+    },
+    {
+     "instanceId": "n300-seed8",
+     "aVisited": 48,
+     "bVisited": 51,
+     "difference": -3
+    },
+    {
+     "instanceId": "n300-seed1",
+     "aVisited": 53,
+     "bVisited": 54,
+     "difference": -1
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 300,
+   "a": "greedy-insertion-cached",
+   "b": "nearest-neighbour",
+   "instances": 10,
+   "excluded": 0,
+   "aWins": 10,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 39.3,
+   "visitDiffCI95": [
+    37.1,
+    42.0
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.20205513824795202,
+   "largestGaps": [
+    {
+     "instanceId": "n300-seed3",
+     "aVisited": 60,
+     "bVisited": 13,
+     "difference": 47
+    },
+    {
+     "instanceId": "n300-seed2",
+     "aVisited": 58,
+     "bVisited": 13,
+     "difference": 45
+    },
+    {
+     "instanceId": "n300-seed9",
+     "aVisited": 56,
+     "bVisited": 14,
+     "difference": 42
+    },
+    {
+     "instanceId": "n300-seed1",
+     "aVisited": 53,
+     "bVisited": 14,
+     "difference": 39
+    },
+    {
+     "instanceId": "n300-seed4",
+     "aVisited": 47,
+     "bVisited": 9,
+     "difference": 38
+    }
+   ]
+  },
+  {
+   "sweepParam": "customers",
+   "sweepValue": 300,
+   "a": "iterated-local-search",
+   "b": "nearest-neighbour",
+   "instances": 10,
+   "excluded": 0,
+   "aWins": 10,
+   "bWins": 0,
+   "ties": 0,
+   "meanVisitDiff": 41.1,
+   "visitDiffCI95": [
+    38.4,
+    44.4
+   ],
+   "meanDistanceDiffWhenEqualVisits": null,
+   "meanOverlap": 0.19052599850084445,
+   "largestGaps": [
+    {
+     "instanceId": "n300-seed3",
+     "aVisited": 65,
+     "bVisited": 13,
+     "difference": 52
+    },
+    {
+     "instanceId": "n300-seed2",
+     "aVisited": 59,
+     "bVisited": 13,
+     "difference": 46
+    },
+    {
+     "instanceId": "n300-seed10",
+     "aVisited": 57,
+     "bVisited": 15,
+     "difference": 42
+    },
+    {
+     "instanceId": "n300-seed7",
+     "aVisited": 56,
+     "bVisited": 14,
+     "difference": 42
+    },
+    {
+     "instanceId": "n300-seed9",
+     "aVisited": 56,
+     "bVisited": 14,
+     "difference": 42
+    }
+   ]
+  }
+ ]
+}

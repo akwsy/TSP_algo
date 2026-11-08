@@ -1,5 +1,5 @@
 // Headless-Chrome smoke test for the website. Usage:
-//   node tests/site_smoke.mjs <baseUrl> [--shots <dir>] [--matrix] [--wait <ms>]
+//   node tests/site_smoke.mjs <baseUrl> [--shots <dir>] [--matrix] [--wait <ms>] [--pages compare,overview]
 // Loads every page from a fresh tab and prints JSON: per page, console errors/warnings, uncaught exceptions,
 // failed requests to the site's own origin, and the main heading. --matrix repeats for desktop/phone x light/dark
 // (and writes PNGs with --shots). Exit code 1 if any page has an error. Needs Google Chrome (CHROME env overrides).
@@ -22,7 +22,8 @@ const CHROME = process.env.CHROME || [
 ].find(existsSync);
 if (!base || !CHROME) { console.error(base ? "no Chrome found" : "usage: site_smoke.mjs <baseUrl>"); process.exit(base ? 77 : 2); }
 
-const PAGES = ["overview", "scaling", "instance", "run", "history", "failures"];
+const ALL_PAGES = ["overview", "compare", "scaling", "instance", "run", "history", "failures"];
+const PAGES = opt("--pages", null)?.split(",").filter((p) => ALL_PAGES.includes(p)) ?? ALL_PAGES;
 const MODES = args.includes("--matrix")
   ? [["desktop", 1280, 800, "light"], ["desktop", 1280, 800, "dark"], ["phone", 375, 812, "light"], ["phone", 375, 812, "dark"]]
   : [["desktop", 1280, 800, "light"]];
@@ -31,6 +32,9 @@ const MODES = args.includes("--matrix")
 const getJson = async (path) => { try { const r = await fetch(base + path); return r.ok ? await r.json() : null; } catch { return null; } };
 const runsIndex = (await getJson("/results/index.json"))?.runs ?? [];
 const sessionsIdx = (await getJson("/results/sessions-index.json"))?.sessions ?? [];
+// The Compare page reads results/suite.json and the aggregates files it names; without it the page says how to make them.
+const suite = await getJson("/results/suite.json");
+const suiteShown = suite ? (await Promise.all((suite.experiments ?? []).map((e) => getJson(`/results/${encodeURIComponent(e.aggregates)}`)))).filter(Boolean).length : 0;
 const expName = [...new Set(runsIndex.map((r) => r.experiment).filter(Boolean))].sort()[0]; // the experiment the pages open on
 const full = expName ? (await getJson(`/results/aggregates-${encodeURIComponent(expName)}.json`))?.full : null;
 const hasFull = Array.isArray(full?.ranking) && full.ranking.length > 0;
@@ -101,7 +105,9 @@ for (const [device, w, hgt, scheme] of MODES) {
       }
       if (m.method === "Log.entryAdded" && m.params.entry.level === "error") {
         const u = m.params.entry.url || "";
-        (u && !u.startsWith(base) ? entry.warnings : entry.errors).push("log: " + m.params.entry.text + " " + u);
+        // A missing suite.json is an expected 404 when the data has no experiment series (the Compare page then explains how to run it).
+        const expected = !suite && u === `${base}/results/suite.json`;
+        (u && (!u.startsWith(base) || expected) ? entry.warnings : entry.errors).push("log: " + m.params.entry.text + " " + u);
       }
       if (m.method === "Network.loadingFailed") entry.failedRequests.push(m.params.errorText);
     });
@@ -139,6 +145,18 @@ for (const [device, w, hgt, scheme] of MODES) {
       if (/log-log|declared complexity/i.test(entry.mainText)) entry.errors.push("full-run scaling shows the complexity plot");
       if (has.full && has.notPlotted && !/Not plotted: /.test(entry.mainText)) entry.errors.push("full-run scaling lacks the not-plotted note");
       if (has.full && !has.notPlotted && /Not plotted: /.test(entry.mainText)) entry.errors.push("full-run scaling shows a not-plotted note though every example finished");
+    }
+    if (name === "compare") {
+      if (suite && suiteShown) {
+        for (const t of ["The takeaway", "The algorithms", "Head to head", "The experiments", "Speed against results", "Where they differ"]) {
+          if (!entry.mainText.toLowerCase().includes(t.toLowerCase())) entry.errors.push(`compare lacks the "${t}" section`);
+        }
+        if (entry.svgCharts !== suiteShown + 1) entry.errors.push(`compare shows ${entry.svgCharts} charts, expected ${suiteShown + 1} (one per experiment and the trade-off)`);
+        const grid = await s("Runtime.evaluate", { returnByValue: true, expression: "({ cells: document.querySelectorAll('.h2h-btn').length, pressed: document.querySelectorAll('.h2h-btn[aria-pressed=true]').length, links: document.querySelectorAll('main a[href^=\"#/instance?id=\"]').length })" });
+        const g = grid.result.value;
+        if (!g.cells || g.pressed !== 1) entry.errors.push(`compare grid has ${g.cells} cells and ${g.pressed} selected, expected one selected`);
+        if (!g.links) entry.errors.push("compare links to no example on the map");
+      } else if (!/python3 start\.py --suite/.test(entry.mainText)) entry.errors.push("compare without a suite does not say how to run it");
     }
     if (name === "scaling" && view === "first" && !/Measured growth against declared complexity/.test(entry.mainText)) entry.errors.push("first-day scaling lacks the complexity plot");
     if (view === "first" && !["failures", "history"].includes(name) && /coming to the|working hours/.test(entry.mainText)) entry.errors.push("first-day page shows full-run wording");
