@@ -119,7 +119,10 @@ class RunTest(CliCase):
         self.run_cli("--seeds", "1", algorithms=False)
         rec = self.record(self.entry("nearest-neighbour", 1))
         self.assertTrue(rec["valid"], rec["failureReason"])
-        self.assertRegex(rec["commit"], r"^[0-9a-f]{40}$")
+        if (ROOT / ".git").exists():  # a copy without git history (the submission folder) has no commit
+            self.assertRegex(rec["commit"], r"^[0-9a-f]{40}$")
+        else:
+            self.assertIsNone(rec["commit"])
         self.assertIsInstance(rec["stats"]["iterations"], int)
         self.assertGreater(rec["stats"]["iterations"], 0)
 
