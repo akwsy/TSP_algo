@@ -6,7 +6,6 @@ from .config import ConfigError, DAY_END, DAY_START, SLOT_COUNT, SLOT_MINUTES
 
 EARTH_RADIUS_KM = 6371.0088
 DEPOT_NAME = "Kuala Lumpur"
-RADIUS_KM = 150.0
 
 
 def haversine_km(a, b):
@@ -18,7 +17,7 @@ def haversine_km(a, b):
 
 def select_kuala_lumpur_150km(places, config, rng):
     """Default selection rule: depot Kuala Lumpur, customers a seeded sample of
-    populated places (class P) within 150 km, without replacement.
+    populated places (class P) within config.radius_km (default 150 km), without replacement.
     A rule is any function (places, config, rng) -> (depot, customers)."""
     depots = [p for p in places if p.name == DEPOT_NAME and p.feature_class == "P"]
     if not depots:
@@ -26,11 +25,11 @@ def select_kuala_lumpur_150km(places, config, rng):
     depot = min(depots, key=lambda p: p.geoname_id)
     candidates = sorted(
         (p for p in places
-         if p.feature_class == "P" and p is not depot and haversine_km(depot, p) <= RADIUS_KM),
+         if p.feature_class == "P" and p is not depot and haversine_km(depot, p) <= config.radius_km),
         key=lambda p: p.geoname_id)
     if len(candidates) < config.num_customers:
         raise ConfigError(
-            f"only {len(candidates)} candidate places within {RADIUS_KM:g} km of the depot, "
+            f"only {len(candidates)} candidate places within {config.radius_km:g} km of the depot, "
             f"but {config.num_customers} customers requested")
     return depot, rng.sample(candidates, config.num_customers)
 

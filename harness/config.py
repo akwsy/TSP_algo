@@ -10,6 +10,7 @@ SLOT_MINUTES = (DAY_END - DAY_START) // SLOT_COUNT  # 270
 DEFAULT_DEPARTURE = 360
 DEFAULT_PERIOD = 1080   # 06:00 departure until 24:00
 DEFAULT_SPEED = 40.0
+DEFAULT_RADIUS_KM = 150.0  # customers are chosen within this distance of the depot
 
 
 class ConfigError(ValueError):
@@ -23,6 +24,7 @@ class InstanceConfig:
     departure_minute: int = DEFAULT_DEPARTURE
     period_minutes: int = DEFAULT_PERIOD
     speed_kmh: float = DEFAULT_SPEED
+    radius_km: float = DEFAULT_RADIUS_KM
 
     def __post_init__(self):
         if self.seed is None:
@@ -35,6 +37,8 @@ class InstanceConfig:
             raise ConfigError("period must be positive")
         if self.speed_kmh <= 0:
             raise ConfigError("speed must be positive")
+        if self.radius_km <= 0:
+            raise ConfigError("radius must be positive")
         if self.departure_minute + self.period_minutes > DAY_END:
             raise ConfigError(
                 f"departure ({self.departure_minute}) + period ({self.period_minutes}) "
@@ -46,7 +50,7 @@ class InstanceConfig:
 
     @property
     def instance_id(self):
-        """n<N>-seed<S>, plus -dep/-per/-spd for any parameter that differs from its default,
+        """n<N>-seed<S>, plus -dep/-per/-spd/-rad for any parameter that differs from its default,
         so different problems never share an id."""
         parts = [f"n{self.num_customers}-seed{self.seed}"]
         if self.departure_minute != DEFAULT_DEPARTURE:
@@ -55,4 +59,6 @@ class InstanceConfig:
             parts.append(f"per{self.period_minutes}")
         if self.speed_kmh != DEFAULT_SPEED:
             parts.append(f"spd{self.speed_kmh:g}")
+        if self.radius_km != DEFAULT_RADIUS_KM:
+            parts.append(f"rad{self.radius_km:g}")
         return "-".join(parts)

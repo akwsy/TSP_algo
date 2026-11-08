@@ -14,8 +14,8 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .config import (ConfigError, DEFAULT_DEPARTURE, DEFAULT_PERIOD, DEFAULT_SPEED,
-                     InstanceConfig)
+from .config import (ConfigError, DEFAULT_DEPARTURE, DEFAULT_PERIOD, DEFAULT_RADIUS_KM,
+                     DEFAULT_SPEED, InstanceConfig)
 from .dataset import DatasetError, load_places
 from .generate_instance import DEFAULT_DATASET
 from .instance import build_instance
@@ -202,14 +202,17 @@ def _find_saved(index, results_dir, meta, fingerprint, ihash, extra):
 
 
 def run_batch(algorithms, instances, instances_dir, results_dir, extra=None, reuse=False,
-              rerun=(), stats=None):
+              rerun=(), stats=None, tag=None, verbose=True):
     """Run every algorithm on every instance; write instances, one result file per run and
     results/index.json. `extra` (e.g. {"experiment": "scaling"}) is added to each record and
     index entry. Returns the list of records.
 
     With reuse=True a pair already saved with the same algorithm fingerprint, instance hash and
     tag is not run again: its stored record is returned and nothing is appended to the index.
-    Algorithms whose id is in `rerun` are always re-run. `stats`, if given, is filled with
+    Algorithms whose id is in `rerun` are always re-run. `tag`, if given, is a function
+    instance -> dict of extra fields (e.g. the sweep value) added to that instance's records and
+    index entries, including reused records (in memory only); unlike `extra` it is not part of
+    what makes a saved run reusable. `verbose=False` silences the per-run lines. `stats`, if given, is filled with
     {"reused": {id: n}, "ran": {id: n}, "legacy": n}."""
     instances_dir.mkdir(parents=True, exist_ok=True)
     results_dir.mkdir(parents=True, exist_ok=True)
@@ -235,18 +238,19 @@ def run_batch(algorithms, instances, instances_dir, results_dir, extra=None, reu
             saved = (_find_saved(index, results_dir, meta, meta["_fingerprint"], ihash, extra)
                      if reuse and meta["id"] not in rerun else None)
             plan.append((meta, inst, ihash, saved))
-    if reuse:
+    if reuse and verbose:
         n_saved = sum(1 for p in plan if p[3] is not None)
         print(f"Reusing {n_saved} saved runs, running {len(plan) - n_saved} new.", flush=True)
     for meta, inst, ihash, saved in plan:
         if saved is not None:
-            records.append(saved)
+            records.append({**saved, **(tag(inst) if tag else {})})
             stats["reused"][meta["id"]] = stats["reused"].get(meta["id"], 0) + 1
             continue
         stats["ran"][meta["id"]] = stats["ran"].get(meta["id"], 0) + 1
         record = make_record(meta, inst, run_id)
         record.update(fingerprint=meta["_fingerprint"], instanceHash=ihash)
         record.update(extra or {})
+        record.update(tag(inst) if tag else {})
         records.append(record)
         name = f"{record['algorithmId']}__{record['instanceId']}__{run_id}.json"
         (results_dir / name).write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
@@ -263,11 +267,12 @@ def run_batch(algorithms, instances, instances_dir, results_dir, extra=None, reu
             "valid": record["valid"], "visited": record["visited"],
             "distanceKm": record["distanceKm"], "runtimeMs": record["runtimeMs"],
             "failureReason": record["failureReason"], "fingerprint": record["fingerprint"],
-            "instanceHash": ihash, **(extra or {})})
+            "instanceHash": ihash, **(extra or {}), **(tag(inst) if tag else {})})
         write_index(index_path, index)  # after every run, so an interrupted batch stays consistent
-        print(f"{record['algorithmId']} on {record['instanceId']}: "
-              f"{'valid, visited ' + str(record['visited']) if record['valid'] else 'FAILED: ' + str(record['failureReason'])}",
-              flush=True)
+        if verbose:
+            print(f"{record['algorithmId']} on {record['instanceId']}: "
+                  f"{'valid, visited ' + str(record['visited']) if record['valid'] else 'FAILED: ' + str(record['failureReason'])}",
+                  flush=True)
     write_index(index_path, index)
     return records
 
@@ -280,6 +285,7 @@ def main(argv=None):
     ap.add_argument("--departure", type=int, default=DEFAULT_DEPARTURE)
     ap.add_argument("--period", type=int, default=DEFAULT_PERIOD)
     ap.add_argument("--speed", type=float, default=DEFAULT_SPEED)
+    ap.add_argument("--radius", type=float, default=DEFAULT_RADIUS_KM)
     ap.add_argument("--dataset", default=str(DEFAULT_DATASET))
     ap.add_argument("--algorithms-dir", default=str(ROOT / "algorithms"))
     ap.add_argument("--instances-dir", default="instances")
@@ -290,7 +296,8 @@ def main(argv=None):
         places = load_places(args.dataset)
         instances = [build_instance(places, InstanceConfig(
             seed=s, num_customers=args.customers, departure_minute=args.departure,
-            period_minutes=args.period, speed_kmh=args.speed)) for s in args.seeds]
+            period_minutes=args.period, speed_kmh=args.speed,
+            radius_km=args.radius)) for s in args.seeds]
         algorithms = discover_algorithms(args.algorithms_dir)
     except (ConfigError, DatasetError, OSError, ValueError) as e:
         print(f"error: {e}", file=sys.stderr)

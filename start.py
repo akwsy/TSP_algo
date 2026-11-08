@@ -3,6 +3,7 @@
     python3 start.py                       full default run, then the site
     python3 start.py --sizes 5 10 --instances 3   a quick small run
     python3 start.py --full-run-instances 3   examples per size run until every place is visited
+    python3 start.py --suite               run all six experiments (see README) instead of scaling alone
     python3 start.py --skip-run            just open the site on existing results
     python3 start.py --force               re-evaluate everything (both views)
     python3 start.py --rerun nearest-neighbour    re-evaluate only these algorithms
@@ -45,6 +46,9 @@ def main(argv=None):
     ap.add_argument("--instances", type=int, help="examples per size (default: 30)")
     ap.add_argument("--full-run-instances", type=int, metavar="N",
                     help="examples per size run until every place is visited (default: 10, 0 to skip)")
+    ap.add_argument("--suite", action="store_true",
+                    help="run the whole experiment suite (python3 -m harness.experiment suite) "
+                         "instead of the scaling experiment alone")
     ap.add_argument("--force", action="store_true", help="re-evaluate everything, ignoring saved runs")
     ap.add_argument("--rerun", nargs="+", metavar="ID", default=[],
                     help="re-evaluate only these algorithms (by id), ignoring their saved runs")
@@ -53,8 +57,11 @@ def main(argv=None):
     ap.add_argument("--no-browser", action="store_true", help="do not open a browser window")
     args = ap.parse_args(argv)
 
+    if args.suite and args.sizes:
+        print("error: --sizes applies to the scaling experiment, not to --suite", file=sys.stderr)
+        return 2
     if not args.skip_run:
-        cmd = [sys.executable, "-m", "harness.experiment", "scaling"]
+        cmd = [sys.executable, "-m", "harness.experiment", "suite" if args.suite else "scaling"]
         if args.sizes:
             cmd += ["--sizes", *map(str, args.sizes)]
         if args.instances is not None:

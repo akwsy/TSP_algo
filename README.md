@@ -86,6 +86,34 @@ This is incremental, with the same `--force` and `--rerun ID [ID ...]` options a
 
 The experiment also runs each algorithm on the first 10 instances of each size **until every place is visited**: day 1 is the normal first-day run, and each later day gives the algorithm only the places still unvisited (leave 06:00, back by 24:00). One file per algorithm and instance is written to `results/sessions/` (layout documented in `harness/session.py`) with the days, the total working hours (travelling plus waiting, nights excluded, last day only until the last place is served) and the total distance and compute time. Use `--full-run-instances N` (default 10, 0 to skip) to change how many instances get this run. `--force` and `--rerun` re-evaluate the full runs too, and the run is capped at 30 days.
 
+## Experiments
+
+Each experiment varies ONE instance parameter and keeps everything else at the defaults unless stated. Every algorithm runs on identical instances (seeds 1 to N for each value). They are defined in one place, `harness/experiments.py`.
+
+| Name | Varies | Values | Fixed | Instances per value |
+|---|---|---|---|---|
+| `scaling` | customers | 5, 10, 15, 20, 30, 50, 100 | defaults | 30 |
+| `time-budget` | travel period (minutes from the 06:00 departure) | 240, 480, 720, 960, 1080 | 30 customers | 30 |
+| `speed` | speed (km/h) | 20, 30, 40, 60, 80 | 30 customers | 30 |
+| `window-alignment` | departure minute of a 6-hour period | 360, 540, 720, 900, 1080 | 30 customers, period 360 | 30 |
+| `spread` | selection radius around the depot (km) | 25, 50, 100, 150, 250 | 20 customers | 30 |
+| `stress` | customers | 100, 150, 200, 300 | defaults | 10 |
+
+`spread` uses 20 customers because the dataset has 544 candidate places within 25 km of Kuala Lumpur (and 1154, 3090, 5212, 8423 within 50, 100, 150, 250 km), so every radius can supply them. Instance ids gain `-rad<N>` when the radius is not the default 150 (like `-dep`, `-per`, `-spd`).
+
+```
+python3 -m harness.experiment --list                       # print the experiments
+python3 -m harness.experiment suite                        # run all six in order
+python3 -m harness.experiment time-budget                  # run one
+python3 -m harness.experiment speed --values 20 40 --instances 5     # a quick slice
+python3 -m harness.experiment spread --fixed customers=10  # change a fixed parameter
+python3 start.py --suite                                   # the suite, then the website
+```
+
+`--values` replaces the sweep values (`--sizes` is the same for the customers experiments `scaling` and `stress`), `--instances` the instances per value, `--fixed NAME=VALUE ...` the fixed parameters. Progress is one line per sweep value. Only customers experiments can run the "until every place is visited" view (default: 10 instances for `scaling`, none for `stress`; `--full-run-instances N`).
+
+Every run record and `index.json` entry carries `experiment`, `sweepParam` and `sweepValue` (for `scaling`, `customers` and the number of customers). Each experiment writes `results/aggregates-<name>.json`: the usual `groups` (now with `sweepParam` and `sweepValue`; `numCustomers` is kept) and `sweepValues`, plus `pairs`, a paired comparison of every pair of algorithms (a before b alphabetically) at each sweep value over the instances where both runs are valid (counts of wins and ties by the scoring rule, mean visit difference with a deterministic bootstrap 95% interval, route overlap, the largest gaps; definitions in `pairwise` in `harness/aggregate.py`). The suite also writes `results/suite.json`, listing each experiment with its description, parameter, values, instances, algorithms, aggregates file and timestamp. The algorithms here are deterministic, so the `pairs` are identical on every run; measured runtimes naturally differ.
+
 ## Full-run evaluation
 
 Design decisions for the "until every place is visited" view (confirmed with the owner except where noted):

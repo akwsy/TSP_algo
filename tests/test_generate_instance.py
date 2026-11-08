@@ -86,6 +86,15 @@ class GenerateInstanceTest(unittest.TestCase):
         names = sorted(l["name"] for l in inst["locations"][1:])
         self.assertEqual(names, ["East", "North"])
 
+    def test_radius_option_changes_the_candidate_set_and_the_id(self):
+        # East and North are 111.2 km out, Far 222.4 km: radius 120 keeps two, radius 250 three.
+        inst = self.generate(SMALL, "--seed", "5", "--customers", "3", "--radius", "250")
+        self.assertEqual(sorted(l["name"] for l in inst["locations"][1:]), ["East", "Far", "North"])
+        self.assertEqual(inst["instanceId"], "n3-seed5-rad250")
+        proc, _ = self.run_cli(self.dataset(SMALL), "--seed", "5", "--customers", "3", "--radius", "120")
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn("only 2 candidate places within 120 km", proc.stderr)
+
     def test_distance_matrix_matches_hand_worked_haversine(self):
         inst = self.generate(SMALL, "--seed", "5", "--customers", "2")
         d = inst["distanceKm"]

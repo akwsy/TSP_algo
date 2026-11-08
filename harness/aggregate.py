@@ -1,5 +1,7 @@
 """Aggregator: a pure function over run records. It knows nothing about experiments;
-it groups by (algorithmId, numCustomers) and by instanceId, so any experiment works.
+it groups by (algorithmId, sweep value) and by instanceId, so any experiment works. The sweep
+value is record["sweepValue"] (with record["sweepParam"] naming what was varied); records
+without it (older ones) are grouped by numCustomers, as "customers".
 
 Definitions
 - failure: record["valid"] is false. Failures are counted but left out of the
@@ -23,6 +25,7 @@ Definitions
 - std is the sample standard deviation (n - 1), null when n < 2.
 """
 import math
+import random
 
 DEFAULT_WORK_KEYS = ("nodesExpanded", "iterations")
 
@@ -81,13 +84,19 @@ def _best_known(records):
     return best
 
 
+def _sweep(record):
+    if "sweepValue" in record:
+        return record.get("sweepParam"), record["sweepValue"]
+    return "customers", record["numCustomers"]
+
+
 def aggregate(records, work_keys=DEFAULT_WORK_KEYS):
     best = _best_known(records)
     cells = {}
     for r in records:
-        cells.setdefault((r["algorithmId"], r["numCustomers"]), []).append(r)
+        cells.setdefault((r["algorithmId"], _sweep(r)[1]), []).append(r)
     groups = []
-    for (alg, n), runs in sorted(cells.items()):
+    for (alg, value), runs in sorted(cells.items()):
         valid = [r for r in runs if r["valid"]]
         ratios = [r["visited"] / best[r["instanceId"]]["visited"]
                   if best[r["instanceId"]]["visited"] else 1.0 for r in valid]
@@ -95,7 +104,8 @@ def aggregate(records, work_keys=DEFAULT_WORK_KEYS):
         found = [_work(r, work_keys) for r in runs]
         found = [(k, v) for k, v in found if k is not None]
         groups.append({
-            "algorithmId": alg, "numCustomers": n, "runs": len(runs),
+            "algorithmId": alg, "numCustomers": runs[0]["numCustomers"],
+            "sweepParam": _sweep(runs[0])[0], "sweepValue": value, "runs": len(runs),
             "failures": len(runs) - len(valid),
             "timeouts": sum(1 for r in runs if _killed(r)),
             "selfReportedTimeLimit": sum(1 for r in valid if r["status"] == "TIME_LIMIT" and not _killed(r)),
@@ -112,9 +122,96 @@ def aggregate(records, work_keys=DEFAULT_WORK_KEYS):
                      "key": found[0][0] if found else None},
         })
     return {"sizes": sorted({r["numCustomers"] for r in records}),
+            "sweepValues": sorted({_sweep(r)[1] for r in records}),
             "algorithms": sorted({r["algorithmId"] for r in records}),
             "groups": groups,
             "bestKnown": sorted(best.values(), key=lambda b: (b["numCustomers"], b["instanceId"]))}
+
+
+TIE_KM = 1e-9
+BOOTSTRAP_RESAMPLES = 2000
+BOOTSTRAP_SEED = 12345
+MAX_GAPS = 5
+
+
+def _bootstrap_ci95(diffs):
+    """95% percentile bootstrap interval of the mean: 2000 resamples drawn with
+    random.Random(12345), so the same input always gives the same interval. Sorted resampled
+    means m[0..1999]; the interval is [m[50], m[1949]]."""
+    rng = random.Random(BOOTSTRAP_SEED)
+    n = len(diffs)
+    means = sorted(sum(rng.choices(diffs, k=n)) / n for _ in range(BOOTSTRAP_RESAMPLES))
+    return [means[int(0.025 * BOOTSTRAP_RESAMPLES)], means[int(0.975 * BOOTSTRAP_RESAMPLES) - 1]]
+
+
+def _overlap(route_a, route_b):
+    a, b = set(route_a or []) - {0}, set(route_b or []) - {0}
+    return len(a & b) / len(a | b) if a | b else 1.0
+
+
+def _pair(param, value, a, b, runs_a, runs_b):
+    ids = sorted(set(runs_a) | set(runs_b))
+    both = [i for i in ids if i in runs_a and i in runs_b and runs_a[i]["valid"] and runs_b[i]["valid"]]
+    a_wins = b_wins = ties = 0
+    diffs, dist_diffs, overlaps, gaps = [], [], [], []
+    for i in both:
+        ra, rb = runs_a[i], runs_b[i]
+        d = ra["visited"] - rb["visited"]
+        diffs.append(d)
+        overlaps.append(_overlap(ra.get("route"), rb.get("route")))
+        if d:
+            gaps.append({"instanceId": i, "aVisited": ra["visited"], "bVisited": rb["visited"],
+                         "difference": d})
+        if d > 0:
+            a_wins += 1
+        elif d < 0:
+            b_wins += 1
+        else:
+            dd = ra["distanceKm"] - rb["distanceKm"]
+            dist_diffs.append(dd)
+            if dd < -TIE_KM:
+                a_wins += 1
+            elif dd > TIE_KM:
+                b_wins += 1
+            else:
+                ties += 1
+    gaps.sort(key=lambda g: (-abs(g["difference"]), g["instanceId"]))
+    return {"sweepParam": param, "sweepValue": value, "a": a, "b": b,
+            "instances": len(both), "excluded": len(ids) - len(both),
+            "aWins": a_wins, "bWins": b_wins, "ties": ties,
+            "meanVisitDiff": _mean(diffs),
+            "visitDiffCI95": _bootstrap_ci95(diffs) if diffs else None,
+            "meanDistanceDiffWhenEqualVisits": _mean(dist_diffs),
+            "meanOverlap": _mean(overlaps),
+            "largestGaps": gaps[:MAX_GAPS]}
+
+
+def pairwise(records):
+    """Paired comparisons, pure. For each sweep value and each pair of algorithms (a, b) with
+    a < b alphabetically, over the instances where BOTH runs are valid (`instances`; `excluded`
+    counts the other instances either algorithm ran, dropped because a run failed).
+
+    Scoring rule (the project's): more visits wins; equal visits and a distance shorter by more
+    than 1e-9 km wins; otherwise a tie. aWins/bWins/ties count that over the paired instances.
+    meanVisitDiff is the mean of (a visits - b visits); visitDiffCI95 is [low, high] from a
+    deterministic bootstrap (_bootstrap_ci95). meanDistanceDiffWhenEqualVisits is the mean of
+    (a km - b km) over instances with equal visits. meanOverlap is the mean Jaccard overlap of
+    the sets of visited customer ids of the two routes (1.0 when both visit nobody).
+    largestGaps: up to 5 instances with a non-zero visit difference, largest absolute
+    difference first, ties by instanceId; `difference` is a minus b (signed).
+    Means and intervals are null when no instance is paired. Output is sorted by sweep value,
+    then a, then b."""
+    cells = {}
+    for r in records:
+        param, value = _sweep(r)
+        cells.setdefault((value, param), {}).setdefault(r["algorithmId"], {})[r["instanceId"]] = r
+    pairs = []
+    for (value, param), by_alg in sorted(cells.items(), key=lambda kv: kv[0][0]):
+        algs = sorted(by_alg)
+        for x, a in enumerate(algs):
+            for b in algs[x + 1:]:
+                pairs.append(_pair(param, value, a, b, by_alg[a], by_alg[b]))
+    return pairs
 
 
 def aggregate_sessions(sessions):
