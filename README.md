@@ -52,6 +52,7 @@ python3 start.py --no-browser                     # do not open a browser window
 **What you see on the website.** A toggle in the page header switches between **First day only** (30 examples per size, one working day) and **Until every place is visited** (10 examples per size, one day after another). Your choice is remembered and applies to Overview, Scaling, Instance and Route detail. It is a two-option choice you reach with Tab and change with the arrow keys (or click). Top navigation:
 
 - **Overview:** every algorithm side by side with a ranking, its declared complexity, and failure counts. First day only: most places visited, then shortest distance. Until every place is visited: fewest mean working hours, then shorter distance; algorithms that finished every example come first, the others are listed below as "ranked below: N instances did not finish", with averages over the examples that finished. Pick the number of customers from the dropdown.
+- **Compare:** the algorithms across the whole series of experiments (`python3 start.py --suite` produces the data: `results/suite.json` and one `aggregates-<name>.json` per experiment). A takeaway computed from the data with its caveats, a profile per algorithm (average rank, head-to-head wins, typical run time, where it is strongest and weakest), a head-to-head grid for any experiment and setting (wins, ties and losses, the average difference in places visited with its margin of error, and the examples with the biggest gap linked to the map), a chart per experiment of places visited and run time, run time against places visited with the efficient frontier, and the examples where each pair differs most. Without the suite it says how to run it. Logic: `site/js/lib/compare.js` (tested by `tests/test_site_compare.py`).
 - **Scaling:** First day only: charts of visits, distance, time and runtime against the number of customers, and how measured runtime and work grow compared with the declared complexity (this growth plot appears only in this view). Until every place is visited: working hours, days needed, total distance and total compute time against the number of customers, with spread.
 - **Instance:** one problem at a time, showing every algorithm's route on the map for comparison (side by side or overlaid). In the full-run view a **Day** selector steps through day 1, day 2 and so on; places done on earlier days are shown as done.
 - **Route detail:** one algorithm's run on one example, with the map and a step-by-step table. Choose the algorithm, the example and the number of places from the dropdowns. In the full-run view a **Day** selector shows that day's route and schedule table.
@@ -64,6 +65,12 @@ python3 start.py --no-browser                     # do not open a browser window
 
 ```
 python3 site/serve.py --results tests/fixtures/sample-results --algorithms tests/fixtures/sample-algorithms --instances tests/fixtures/sample-instances
+```
+
+To see the **Compare** page on a real experiment series without running it, serve `tests/fixtures/sample-suite`: the `suite.json` and six `aggregates-*.json` files of a full suite run, without the run and instance files (its `index.json` is empty), so the page's links to examples on the map need real results and instances (`python3 start.py --suite`).
+
+```
+python3 site/serve.py --results tests/fixtures/sample-suite --algorithms algorithms
 ```
 
 The separate commands behind `start.py` are described in the next sections.
