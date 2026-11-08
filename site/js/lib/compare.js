@@ -30,6 +30,19 @@ export function sweepLabel(param, value) {
   }
 }
 
+/** A range of a swept setting with the unit said once: "5 to 100 places", "speed 20 to 80 km/h". */
+export function sweepRange(param, lo, hi) {
+  if (!has(lo) || !has(hi) || lo === hi) return sweepLabel(param, has(lo) ? lo : hi);
+  switch (param) {
+    case "customers": return `${lo} to ${plural(hi, "place")}`;
+    case "period": return `day length ${hours(lo)} to ${hours(hi)}`;
+    case "speed": return `speed ${lo} to ${hi} km/h`;
+    case "departure": return `leaves at ${clock(lo)} to ${clock(hi)}`;
+    case "radius": return `customers within ${lo} to ${hi} km`;
+    default: return `${param} ${lo} to ${hi}`;
+  }
+}
+
 /** The experiment series: experiments in suite order that have their aggregates (`aggs` maps name to the parsed
  *  file, or null when it could not be loaded), the names of those without, and every algorithm id, sorted. */
 export function buildModel(suite, aggs) {
@@ -137,6 +150,227 @@ export function headline(model, names = {}, algs = {}) {
     caveats.push("None of the algorithms is exact, so \"best\" means the best any of them found, not the best possible.");
   }
   return { leader: first.id, text, standing, caveats };
+}
+
+// ---- experiment cards ----
+
+const QUESTIONS = {
+  scaling: "What happens as there are more places to visit?",
+  "time-budget": "What happens when the working day is shorter or longer?",
+  speed: "What happens when travel is slower or faster?",
+  "window-alignment": "Does it matter what time of day the trip starts?",
+  spread: "What happens when the places are closer together or further apart?",
+  stress: "Do they keep up with very many places?",
+};
+/** The question an experiment answers, in plain words (its description for an experiment this page does not know). */
+export const experimentQuestion = (e) => QUESTIONS[e?.name] || e?.description || "How do the algorithms compare here?";
+
+// Fixed parameters as written in aggregates `parameters`, with the sweep parameter each one corresponds to.
+const FIXED = [["customers", "customers"], ["departureMinute", "departure"], ["periodMinutes", "period"], ["speedKmh", "speed"], ["radiusKm", "radius"]];
+
+/** "Changes: day length 4 h to 18 h. Fixed: 30 places, leaves at 06:00, ... 30 examples per setting." */
+export function settingsText(e) {
+  const p = e.agg?.parameters || {};
+  const v = e.values;
+  const changes = v.length ? `Changes: ${sweepRange(e.param, v[0], v[v.length - 1])}.` : "";
+  const fixed = FIXED.filter(([key, param]) => param !== e.param && has(p[key])).map(([key, param]) => sweepLabel(param, p[key]));
+  const per = has(e.instancesPerSize) ? `${plural(e.instancesPerSize, "example")} per setting.` : "";
+  return [changes, fixed.length ? `Fixed: ${fixed.join(", ")}.` : "", per].filter(Boolean).join(" ");
+}
+
+/** Chart series for one measure: one per algorithm (sorted by id), points by sweep value with mean +/- one standard
+ *  deviation as the band (null when there is no deviation). Missing means are left out, never drawn as 0. */
+export function experimentSeries(e, metric) {
+  const byAlg = new Map();
+  for (const g of e.agg.groups) {
+    const s = g[metric];
+    if (!s || !has(s.mean) || !has(g.sweepValue)) continue;
+    const std = has(s.std) ? s.std : null;
+    if (!byAlg.has(g.algorithmId)) byAlg.set(g.algorithmId, []);
+    byAlg.get(g.algorithmId).push({ x: g.sweepValue, y: s.mean, lo: std == null ? null : s.mean - std, hi: std == null ? null : s.mean + std });
+  }
+  return [...byAlg].sort((a, b) => a[0].localeCompare(b[0])).map(([algorithmId, points]) => ({ algorithmId, points: points.sort((a, b) => a.x - b.x) }));
+}
+
+/** One line on what an experiment shows: who visits the most places at how many settings, and how its lead over the
+ *  next best changes from the first to the last setting. */
+export function experimentTakeaway(e, names = {}) {
+  const nm = (id) => names[id] || id;
+  const model = { experiments: [e], algorithms: [...new Set(e.agg.groups.map((g) => g.algorithmId))].sort() };
+  const leader = standings(model).overall[0];
+  if (!leader || !has(standings(model).byExperiment[0].ranking[0]?.mean)) return "No valid results to compare.";
+  const tops = new Map();
+  let level = 0, close = 0;
+  const leads = [];
+  for (const value of e.values) {
+    const here = e.agg.groups.filter((g) => g.sweepValue === value && has(g.visited?.mean)).sort((x, y) => y.visited.mean - x.visited.mean);
+    if (!here.length) continue;
+    if (here.length > 1 && Math.abs(here[0].visited.mean - here[1].visited.mean) < 1e-9) level += here[0].algorithmId === leader.id || here[1].algorithmId === leader.id ? 1 : 0;
+    else {
+      tops.set(here[0].algorithmId, (tops.get(here[0].algorithmId) || 0) + 1);
+      if (here[0].algorithmId === leader.id && here.length > 1 && pairCell(e.agg, value, leader.id, here[1].algorithmId)?.verdict === "even") close += 1;
+    }
+    const mine = here.find((g) => g.algorithmId === leader.id), best = here.find((g) => g.algorithmId !== leader.id);
+    if (mine && best) leads.push({ value, lead: mine.visited.mean - best.visited.mean });
+  }
+  const total = e.values.length, n = tops.get(leader.id) || 0;
+  let text = `${nm(leader.id)} visits the most places on average at ${n === total ? `all ${plural(total, "setting")}` : `${n} of ${plural(total, "setting")}`}`;
+  if (close) text += `, ${close} of them within the margin of error`;
+  if (level) text += ` and is level at ${level}`;
+  const others = [...tops].filter(([id]) => id !== leader.id).map(([id, k]) => `${nm(id)} at ${k}`);
+  if (others.length) text += `; ${others.join(", ")}`;
+  const word = (x) => (Math.abs(x) < 1e-9 ? "none" : x > 0 ? diffNum(x) : `${diffNum(x)} behind`);
+  if (leads.length > 1) {
+    const [f, l] = [leads[0], leads[leads.length - 1]];
+    text += `; its lead over the next best goes from ${word(f.lead)} (${sweepLabel(e.param, f.value)}) to ${word(l.lead)} (${sweepLabel(e.param, l.value)})`;
+  } else if (leads.length) text += `; its lead over the next best is ${word(leads[0].lead)}`;
+  return `${text}.`;
+}
+
+// ---- algorithm profiles ----
+
+/** A run time in ms as people read it: "4.2 ms", "166 ms", "2.3 s". */
+export function msText(x) {
+  if (!has(x)) return "n/a";
+  if (x >= 1000) return `${num(x / 1000, 1)} s`;
+  return `${num(x, x < 10 ? 1 : 0)} ms`;
+}
+const msRange = (lo, hi) => {
+  const a = msText(lo), b = msText(hi);
+  return a.endsWith(" ms") && b.endsWith(" ms") ? `${a.slice(0, -3)} to ${b}` : `${a} to ${b}`;
+};
+const median = (xs) => {
+  const v = xs.filter(has).sort((a, b) => a - b);
+  if (!v.length) return null;
+  const k = Math.floor(v.length / 2);
+  return v.length % 2 ? v[k] : (v[k - 1] + v[k]) / 2;
+};
+
+/** Measured facts per algorithm (in model.algorithms order): average rank across experiments, head-to-head examples
+ *  won/tied/lost against all others, typical (median over settings) run time and its range, the average share of the
+ *  best known result, and the setting with its biggest lead (strongest) and biggest deficit (weakest), where
+ *  margin = its average places visited minus the best of the others there (rival = that best other). */
+export function profiles(model) {
+  const { overall } = standings(model);
+  return model.algorithms.map((id) => {
+    const h2h = { won: 0, tied: 0, lost: 0, total: 0 };
+    const times = [], shares = [];
+    let strongest = null, weakest = null;
+    for (const { e, value } of settings(model)) {
+      for (const p of e.agg.pairs || []) {
+        if (p.sweepValue !== value || (p.a !== id && p.b !== id)) continue;
+        const mine = p.a === id ? p.aWins : p.bWins, theirs = p.a === id ? p.bWins : p.aWins;
+        h2h.won += has(mine) ? mine : 0; h2h.lost += has(theirs) ? theirs : 0; h2h.tied += has(p.ties) ? p.ties : 0;
+      }
+      const here = e.agg.groups.filter((g) => g.sweepValue === value);
+      const g = here.find((x) => x.algorithmId === id);
+      if (!g) continue;
+      times.push(g.runtimeMs?.mean); shares.push(g.bestKnownRatio?.mean);
+      const others = here.filter((x) => x.algorithmId !== id && has(x.visited?.mean));
+      if (!has(g.visited?.mean) || !others.length) continue;
+      const rival = others.reduce((b, x) => (x.visited.mean > b.visited.mean ? x : b));
+      const spot = { experiment: e.name, param: e.param, value, rival: rival.algorithmId, margin: g.visited.mean - rival.visited.mean };
+      if (!strongest || spot.margin > strongest.margin) strongest = spot;
+      if (!weakest || spot.margin < weakest.margin) weakest = spot;
+    }
+    h2h.total = h2h.won + h2h.tied + h2h.lost;
+    const o = overall.find((x) => x.id === id);
+    const tv = times.filter(has);
+    return { id, avgRank: o?.avgRank ?? null, experiments: o?.experiments ?? 0, h2h,
+      runtime: { typical: median(tv), low: tv.length ? Math.min(...tv) : null, high: tv.length ? Math.max(...tv) : null },
+      bestShare: mean(shares), strongest, weakest };
+  });
+}
+
+/** How one setting compares with the best other algorithm there, in words. */
+function spotText(spot, names) {
+  if (!spot) return "n/a";
+  const rival = names[spot.rival] || spot.rival;
+  const at = `at ${sweepLabel(spot.param, spot.value)} (${experimentTitle(spot.experiment)})`;
+  if (Math.abs(spot.margin) < 1e-9) return `level with ${rival} ${at}`;
+  return `${diffNum(spot.margin)} ${spot.margin < 0 ? "fewer" : "more"} places than ${rival} ${at}`;
+}
+
+/** The profile as [label, text] rows for the profile card. */
+export function profileFacts(p, names = {}) {
+  const share = (x) => `${Math.round((x / p.h2h.total) * 100)}%`;
+  return [
+    ["Average rank", has(p.avgRank) ? `${num(p.avgRank, 1)} across ${plural(p.experiments, "experiment")}` : "n/a"],
+    ["Head to head", p.h2h.total ? `won ${share(p.h2h.won)}, tied ${share(p.h2h.tied)}, lost ${share(p.h2h.lost)} of ${plural(p.h2h.total, "example")}` : "no examples compared"],
+    ["Typical run time", has(p.runtime.typical) ? `${msText(p.runtime.typical)} (${msRange(p.runtime.low, p.runtime.high)} across settings)` : "n/a"],
+    ["Share of the best found", has(p.bestShare) ? `${num(p.bestShare * 100, 1)}% of the most places any algorithm reached, on average` : "n/a"],
+    ["Strongest", spotText(p.strongest, names)],
+    ["Weakest", spotText(p.weakest, names)],
+  ];
+}
+
+// ---- trade-off: run time against places visited ----
+
+const dominates = (o, p) => o.runtimeMs <= p.runtimeMs && o.visited >= p.visited && (o.runtimeMs < p.runtimeMs || o.visited > p.visited);
+
+/** One point per algorithm (model.algorithms order): average run time and average places visited at one setting
+ *  (experiment name and sweep value), or over every setting of every experiment when `experiment` is null (each
+ *  setting weighs the same). frontier: true when no other algorithm is at least as fast and visits at least as many
+ *  places (better in one), false when one is, null when the point has a missing value. */
+export function tradeoff(model, experiment, value) {
+  const groups = model.experiments.filter((e) => experiment == null || e.name === experiment)
+    .flatMap((e) => e.agg.groups.filter((g) => experiment == null || g.sweepValue === value));
+  const points = model.algorithms.map((id) => {
+    const mine = groups.filter((g) => g.algorithmId === id);
+    return { id, runtimeMs: mean(mine.map((g) => g.runtimeMs?.mean)), visited: mean(mine.map((g) => g.visited?.mean)), settings: mine.length };
+  }).filter((p) => p.settings > 0);
+  const ok = (p) => has(p.runtimeMs) && has(p.visited);
+  for (const p of points) {
+    p.frontier = ok(p) ? !points.some((o) => o !== p && ok(o) && dominates(o, p)) : null;
+    p.dominatedBy = p.frontier === false ? points.filter((o) => o !== p && ok(o) && dominates(o, p)).sort((x, y) => x.runtimeMs - y.runtimeMs)[0].id : null;
+  }
+  return points;
+}
+
+/** The frontier in words: who is on it, who is not and why, and who cannot be placed. */
+export function frontierText(points, names = {}) {
+  const nm = (id) => names[id] || id;
+  const on = points.filter((p) => p.frontier === true).sort((x, y) => x.runtimeMs - y.runtimeMs);
+  const out = [];
+  if (on.length) out.push(`On the efficient frontier (nothing else is both faster and visits more places): ${on.map((p) => nm(p.id)).join(", ")}${on.length > 1 ? ", from fastest to most places" : ""}.`);
+  for (const p of points.filter((x) => x.frontier === false)) {
+    const o = points.find((x) => x.id === p.dominatedBy);
+    out.push(`${nm(p.id)} is off the frontier: ${nm(o.id)} is ${o.runtimeMs < p.runtimeMs ? "faster" : "as fast"} and visits ${o.visited > p.visited ? "more" : "as many"} places.`);
+  }
+  for (const p of points.filter((x) => x.frontier === null)) {
+    out.push(`${nm(p.id)} has no ${has(p.runtimeMs) ? "places-visited average" : "run time"}, so it cannot be placed.`);
+  }
+  return out;
+}
+
+// ---- where they differ ----
+
+/** For every pair of algorithms (a before b alphabetically), the examples with the biggest gap in places visited in
+ *  each direction across all experiments: aAhead (a visited more) and bAhead, at most `perSide` each, biggest first
+ *  (ties in suite and sweep order). An example listed at several settings (a shared default) is kept once.
+ *  Only the largest gaps of each setting are in the files, so smaller ones can be missing. */
+export function pairGaps(model, perSide = 3) {
+  const out = new Map();
+  model.experiments.forEach((e, ei) => {
+    e.values.forEach((value, vi) => {
+      for (const p of e.agg.pairs || []) {
+        if (p.sweepValue !== value) continue;
+        const key = `${p.a}\u0000${p.b}`;
+        if (!out.has(key)) out.set(key, { a: p.a, b: p.b, rows: [], seen: new Set() });
+        const entry = out.get(key);
+        for (const g of p.largestGaps || []) {
+          if (!has(g.difference) || g.difference === 0 || entry.seen.has(g.instanceId)) continue;
+          entry.seen.add(g.instanceId);
+          entry.rows.push({ experiment: e.name, param: e.param, value, instanceId: g.instanceId,
+            aVisited: g.aVisited, bVisited: g.bVisited, difference: g.difference, order: [ei, vi] });
+        }
+      }
+    });
+  });
+  const pick = (rows) => rows.sort((x, y) => Math.abs(y.difference) - Math.abs(x.difference) || x.order[0] - y.order[0] || x.order[1] - y.order[1]
+    || x.instanceId.localeCompare(y.instanceId)).slice(0, perSide).map(({ order, ...r }) => r);
+  return [...out.values()].sort((x, y) => x.a.localeCompare(y.a) || x.b.localeCompare(y.b))
+    .map(({ a, b, rows }) => ({ a, b, aAhead: pick(rows.filter((r) => r.difference > 0)), bAhead: pick(rows.filter((r) => r.difference < 0)) }));
 }
 
 // ---- head to head ----

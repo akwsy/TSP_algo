@@ -34,6 +34,10 @@ class SweepLabelTest(unittest.TestCase):
         self.assertEqual(js("['customers', 'period', 'period', 'speed', 'departure', 'radius'].map((p, i) => m.sweepLabel(p, [30, 480, 270, 40, 540, 50][i]))"),
                          ["30 places", "day length 8 h", "day length 4.5 h", "speed 40 km/h", "leaves at 09:00", "customers within 50 km"])
 
+    def test_ranges_name_the_unit_once(self):
+        self.assertEqual(js("[['customers', 5, 100], ['period', 240, 1080], ['speed', 20, 80], ['departure', 360, 1080], ['radius', 25, 250], ['wind', 1, 2]].map(([p, a, b]) => m.sweepRange(p, a, b))"),
+                         ["5 to 100 places", "day length 4 h to 18 h", "speed 20 to 80 km/h", "leaves at 06:00 to 18:00", "customers within 25 to 250 km", "wind 1 to 2"])
+
     def test_one_place_is_singular_and_unknown_parameters_still_read(self):
         self.assertEqual(js("[m.sweepLabel('customers', 1), m.sweepLabel('wind', 3), m.sweepLabel('speed', null)]"),
                          ["1 place", "wind 3", "speed n/a"])
@@ -169,6 +173,115 @@ class HeadlineTest(unittest.TestCase):
 
     def test_headline_with_no_results(self):
         self.assertEqual(js("m.headline(m.buildModel(null, {}), {}, {})"), {"leader": None, "text": "No experiment results yet.", "standing": [], "caveats": []})
+
+
+@unittest.skipUnless(shutil.which("node"), "node not installed")
+class ProfileTest(unittest.TestCase):
+    def profile(self, alg):
+        return js(f"m.profiles(m.buildModel(suite, aggs)).find((p) => p.id === {json.dumps(alg)})")
+
+    def test_measured_facts_for_the_leader(self):
+        p = self.profile("iterated-local-search")
+        self.assertEqual(p["avgRank"], 1)
+        self.assertEqual(p["h2h"], {"won": 1445, "tied": 217, "lost": 38, "total": 1700})
+        self.assertAlmostEqual(p["runtime"]["typical"], 165.7268111667387)
+        self.assertAlmostEqual(p["bestShare"], 0.9972635552704677)
+        self.assertEqual((p["strongest"]["experiment"], p["strongest"]["value"], p["strongest"]["rival"]), ("stress", 100, "greedy-insertion-cached"))
+        self.assertAlmostEqual(p["strongest"]["margin"], 9.3)
+        self.assertEqual((p["weakest"]["experiment"], p["weakest"]["value"], p["weakest"]["margin"]), ("spread", 25, 0))
+
+    def test_facts_in_words(self):
+        f = js("(() => { const ps = m.profiles(m.buildModel(suite, aggs)); return Object.fromEntries(ps.map((p) => [p.id, m.profileFacts(p, NAMES)])); })()")
+        self.assertEqual(f["iterated-local-search"], [
+            ["Average rank", "1.0 across 6 experiments"],
+            ["Head to head", "won 85%, tied 13%, lost 2% of 1,700 examples"],
+            ["Typical run time", "166 ms (32 to 278 ms across settings)"],
+            ["Share of the best found", "99.7% of the most places any algorithm reached, on average"],
+            ["Strongest", "9.3 more places than Greedy at 100 places (Very many places)"],
+            ["Weakest", "level with Greedy at customers within 25 km (How spread out)"],
+        ])
+        self.assertEqual(f["greedy-insertion-cached"][4], ["Strongest", "level with ILS at customers within 25 km (How spread out)"])
+        self.assertEqual(f["greedy-insertion-cached"][5], ["Weakest", "9.3 fewer places than ILS at 100 places (Very many places)"])
+        self.assertEqual(f["nearest-neighbour"][2], ["Typical run time", "16 ms (14 to 61 ms across settings)"])
+        self.assertEqual(f["nearest-neighbour"][4], ["Strongest", "0.03 fewer places than ILS at day length 4 h (Day length)"])
+
+    def test_missing_numbers_read_n_a(self):
+        p = js(f"m.profileFacts(m.profiles({tiny_suite([group('a', 5, None, runtime=None), group('b', 5, 2)])})[0], {{}})")
+        self.assertEqual(p, [["Average rank", "n/a"], ["Head to head", "no examples compared"], ["Typical run time", "n/a"],
+                             ["Share of the best found", "n/a"], ["Strongest", "n/a"], ["Weakest", "n/a"]])
+
+
+@unittest.skipUnless(shutil.which("node"), "node not installed")
+class ExperimentCardTest(unittest.TestCase):
+    def exp(self, name, call):
+        return js(f"(() => {{ const e = m.buildModel(suite, aggs).experiments.find((x) => x.name === {json.dumps(name)}); return {call}; }})()")
+
+    def test_question_and_settings_in_plain_words(self):
+        self.assertEqual(self.exp("time-budget", "[m.experimentQuestion(e), m.settingsText(e)]"), [
+            "What happens when the working day is shorter or longer?",
+            "Changes: day length 4 h to 18 h. Fixed: 30 places, leaves at 06:00, speed 40 km/h, customers within 150 km. 30 examples per setting."])
+        self.assertEqual(self.exp("stress", "m.settingsText(e)"),
+                         "Changes: 100 to 300 places. Fixed: leaves at 06:00, day length 18 h, speed 40 km/h, customers within 150 km. 10 examples per setting.")
+        self.assertEqual(js("m.experimentQuestion({ name: 'other', description: 'Effect of rain.' })"), "Effect of rain.")
+
+    def test_series_per_algorithm_against_the_swept_value_with_bands(self):
+        s = self.exp("time-budget", "m.experimentSeries(e, 'visited')")
+        self.assertEqual([x["algorithmId"] for x in s], ["greedy-insertion-cached", "iterated-local-search", "nearest-neighbour"])
+        p = s[0]["points"][0]
+        self.assertEqual(p["x"], 240)
+        self.assertAlmostEqual(p["y"], 2.033333333333333)
+        self.assertAlmostEqual(p["lo"], 2.033333333333333 - 1.0661996103898193)
+        self.assertEqual([q["x"] for q in s[0]["points"]], [240, 480, 720, 960, 1080])
+
+    def test_takeaway_per_experiment(self):
+        self.assertEqual(self.exp("scaling", "m.experimentTakeaway(e, NAMES)"),
+                         "ILS visits the most places on average at all 7 settings, 1 of them within the margin of error; its lead over the next best goes from 0.07 (5 places) to 9.1 (100 places).")
+        self.assertEqual(self.exp("spread", "m.experimentTakeaway(e, NAMES)"),
+                         "ILS visits the most places on average at 4 of 5 settings and is level at 1; its lead over the next best goes from none (customers within 25 km) to 1.0 (customers within 250 km).")
+        self.assertEqual(self.exp("window-alignment", "m.experimentTakeaway(e, NAMES)"),
+                         "ILS visits the most places on average at all 5 settings, 3 of them within the margin of error; its lead over the next best goes from 0.1 (leaves at 06:00) to 0.07 (leaves at 18:00).")
+
+    def test_takeaway_names_other_leaders(self):
+        groups = [group("a", 5, 3), group("b", 5, 2), group("a", 10, 4), group("b", 10, 6)]
+        self.assertEqual(js(f"m.experimentTakeaway({tiny_suite(groups)}.experiments[0], {{a: 'A', b: 'B'}})"),
+                         "B visits the most places on average at 1 of 2 settings; A at 1; its lead over the next best goes from 1.0 behind (5 places) to 2.0 (10 places).")
+
+
+@unittest.skipUnless(shutil.which("node"), "node not installed")
+class TradeOffAndGapsTest(unittest.TestCase):
+    def test_trade_off_at_one_setting_and_over_everything(self):
+        t = js("m.tradeoff(m.buildModel(suite, aggs), 'scaling', 30)")
+        ils = next(p for p in t if p["id"] == "iterated-local-search")
+        self.assertAlmostEqual(ils["visited"], 16.133333333333333, places=6)
+        self.assertGreater(ils["runtimeMs"], 249)
+        self.assertEqual([p["frontier"] for p in t], [True, True, True])
+        every = js("m.tradeoff(m.buildModel(suite, aggs), null, null)")
+        self.assertAlmostEqual(every[0]["runtimeMs"], 20.433114026876552)
+        self.assertAlmostEqual(every[0]["visited"], 14.456989247311828)
+
+    def test_a_slower_algorithm_that_visits_fewer_places_is_off_the_frontier(self):
+        model = tiny_suite([group("a", 5, 5, runtime=10), group("b", 5, 4, runtime=20), group("c", 5, 6, runtime=None)])
+        t = js(f"m.tradeoff({model}, 'scaling', 5)")
+        self.assertEqual([(p["id"], p["frontier"]) for p in t], [("a", True), ("b", False), ("c", None)])
+        self.assertEqual(js(f"m.frontierText(m.tradeoff({model}, 'scaling', 5), {{a: 'A', b: 'B', c: 'C'}})"), [
+            "On the efficient frontier (nothing else is both faster and visits more places): A.",
+            "B is off the frontier: A is faster and visits more places.",
+            "C has no run time, so it cannot be placed."])
+        self.assertEqual(js("m.frontierText(m.tradeoff(m.buildModel(suite, aggs), 'scaling', 30), NAMES)"),
+                         ["On the efficient frontier (nothing else is both faster and visits more places): NN, Greedy, ILS, from fastest to most places."])
+
+    def test_biggest_gaps_for_each_pair_in_both_directions(self):
+        g = js("m.pairGaps(m.buildModel(suite, aggs), 2)")
+        self.assertEqual([(x["a"], x["b"]) for x in g], [("greedy-insertion-cached", "iterated-local-search"),
+                                                        ("greedy-insertion-cached", "nearest-neighbour"),
+                                                        ("iterated-local-search", "nearest-neighbour")])
+        first = g[0]
+        self.assertEqual([(x["instanceId"], x["experiment"], x["value"], x["difference"]) for x in first["bAhead"]],
+                         [("n100-seed18", "scaling", 100, -18), ("n150-seed8", "stress", 150, -18)])
+        self.assertEqual([(x["instanceId"], x["difference"]) for x in first["aAhead"]],
+                         [("n30-seed10-per480", 2), ("n30-seed8-per360", 2)])
+        self.assertEqual(g[2]["aAhead"][0]["instanceId"], "n300-seed3")
+        self.assertEqual(g[2]["bAhead"], [])
 
 
 if __name__ == "__main__":
