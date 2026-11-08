@@ -287,17 +287,16 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   <header class="hd"><div class="kicker">Approach B · iterated local search</div><h2>Destroy part of the route, rebuild it, keep the best ever seen</h2></header>
   <div class="row fill">
     <div class="panel" style="flex:0 0 940px"><pre class="code" style="font-size:27px" id="ilsCode"></pre></div>
-    <div class="col" style="flex:1;min-width:0;justify-content:center">
-      <div class="panel"><h3>THE SHAKE: WINDOW OF R VISITS STARTING AT P</h3>
-        <div class="chain" id="shakeChain" style="font-size:25px;gap:5px;margin:8px 0 18px"></div>
-        <div class="mono" style="font-size:32px" id="shakeState"></div>
-        <p class="sm dim" id="shakeCap" style="margin-top:8px;min-height:72px"></p>
-      </div>
-      <div class="ctrl"><button id="shakeNo">Enter: no improvement</button><button id="shakeYes">New best</button></div>
-      <p class="xs muted">Shake pattern shown on an illustrative 8-stop route.</p>
+    <div class="col" style="flex:1;min-width:0;justify-content:center;gap:16px">
+      <div class="panel" style="padding:10px 18px"><div id="ilsMap"></div></div>
+      <div class="chain" id="shakeChain" style="font-size:25px;gap:5px"></div>
+      <div class="mono" style="font-size:28px" id="shakeState"></div>
+      <p class="sm" id="shakeCap" style="min-height:100px"></p>
+      <div class="ctrl" data-stepctl="ils"></div>
+      <p class="xs muted">Real instance n5-seed17 from our run. The final route matches the saved harness result.</p>
     </div>
   </div>
-  <aside class="notes" data-speaker="Ben / Isaiah">The destroy step lets the search escape a local optimum, a route that no single greedy insertion can improve even though a better one exists. Press Enter to sweep the window along the route. Once it has swept the whole route, the window widens. A new best resets it. Failed shakes are not undone immediately: the walk continues from the worse route and returns to the best after 150 failures.</aside>
+  <aside class="notes" data-speaker="Ben / Isaiah">The destroy step lets the search escape a local optimum, a route that no single greedy insertion can improve even though a better one exists. Press Enter to watch a real five-shop instance. The time-shift build already reaches 4 visits, where Approach A reaches 3. Then the shake removes customer 3, and the refill brings in customer 4: the same 4 visits on a shorter route, so it becomes the new best. While the search is stuck, the window sweeps along the route and then widens; a new best resets it. Failed shakes are not undone immediately: the walk continues from the worse route and returns to the best after 150 failures.</aside>
 </section>
 
 <!-- 12 -->
@@ -499,7 +498,7 @@ function solveGI(I,log){const t=travelOf(I),n=I.dist.length,{opens,closes,dist}=
     if(log)log.push({route:[...route],leave,latest,best,pruned});
     if(best===null)break;const p=best[3],v=best[4];route.splice(p,0,v);alive=still.filter(u=>u!==v);}
   if(log)log.push({route:[...route],final:true});return route;}
-function solveILS(I){const STALL=4000,RESTART=150,MAXC=2e6,t=travelOf(I),n=I.dist.length,{opens,closes,dist}=I,gid=I.id||dist.map((_,i)=>i);
+function solveILS(I,log){const STALL=4000,RESTART=150,MAXC=2e6,t=travelOf(I),n=I.dist.length,{opens,closes,dist}=I,gid=I.id||dist.map((_,i)=>i);
   let route=[0,0],vis=new Array(n).fill(false);vis[0]=true;let arrive,at,wait,ms,rd=0,bestR=[0,0],bestD=0,cand=0;
   function sched(){const k=route.length,last=k-1;arrive=new Array(k).fill(0);at=new Array(k).fill(0);wait=new Array(k).fill(0);arrive[0]=at[0]=I.depart;let d=0;
     for(let p=1;p<k;p++){const a=route[p-1],b=route[p];d+=dist[a][b];arrive[p]=at[p-1]+t[a][b];if(p===last)at[p]=arrive[p];else{at[p]=Math.max(arrive[p],opens[b]);wait[p]=at[p]-arrive[p];}}
@@ -509,15 +508,15 @@ function solveILS(I){const STALL=4000,RESTART=150,MAXC=2e6,t=travelOf(I),n=I.dis
       for(let c=1;c<n;c++){if(vis[c])continue;for(let p=1;p<=last;p++){cand++;const pr=route[p-1],su=route[p];let v=at[p-1]+t[pr][c];if(v<opens[c])v=opens[c];if(v>closes[c]+EPS)break;
           const s=v+t[c][su]-arrive[p];if(s>wait[p]+ms[p]+EPS)continue;const ad=dist[pr][c]+dist[c][su]-dist[pr][su];
           if(b===null||better(s,ad,closes[c],gid[c],b)){b=[s,ad,closes[c],gid[c]];bc=c;bp=p;}}}
-      if(bc<0)return;route.splice(bp,0,bc);vis[bc]=true;sched();}}
+      if(bc<0)return;route.splice(bp,0,bc);vis[bc]=true;sched();if(log)log({k:'ins',route:[...route],c:bc,p:bp});}}
   function ok(r){let c=I.depart;for(let k=1;k<r.length;k++){const i=r[k-1],j=r[k],a=c+t[i][j];if(j===0)return a<=I.deadline+EPS;const s=Math.max(a,opens[j]);if(s>closes[j]+EPS)return false;c=s;}return true;}
   function save(){if(!ok(route))return false;bestR=[...route];bestD=rd;return true;}
   function restore(){route=[...bestR];vis=new Array(n).fill(false);route.forEach(v=>vis[v]=true);sched();}
-  sched();insertPhase();save();let R=1,P=1,since=0,stall=0;const can=n>1&&bestR.length>2;
+  sched();insertPhase();save();if(log)log({k:'built',route:[...bestR]});let R=1,P=1,since=0,stall=0;const can=n>1&&bestR.length>2;
   while(can&&cand<MAXC&&stall<STALL){const m=route.length-2;
-    if(m>0){const rem=Math.min(R,m),drop=new Set();for(let i=0;i<rem;i++)drop.add(((P-1+i)%m)+1);const kept=[0];for(let p=1;p<=m;p++){const v=route[p];if(drop.has(p))vis[v]=false;else kept.push(v);}kept.push(0);route=kept;sched();}
+    if(m>0){const rem=Math.min(R,m),drop=new Set();for(let i=0;i<rem;i++)drop.add(((P-1+i)%m)+1);const kept=[0];for(let p=1;p<=m;p++){const v=route[p];if(drop.has(p))vis[v]=false;else kept.push(v);}kept.push(0);if(log)log({k:'shake',before:[...route],route:[...kept],removed:[...drop].map(q=>route[q]),R,P});route=kept;sched();}
     insertPhase();const v=route.length-2,bv=bestR.length-2;
-    if((v!==bv?v>bv:rd<bestD-EPS)&&save()){R=1;P=1;since=0;stall=0;continue;}
+    const imp=(v!==bv?v>bv:rd<bestD-EPS)&&save();if(log)log({k:'end',route:[...route],imp,km:rd,visits:v});if(imp){R=1;P=1;since=0;stall=0;continue;}
     since++;stall++;const s=Math.max(1,route.length-2);P+=R;if(P>s){P-=s;R++;const cap=Math.min(s,Math.max(2,Math.floor(s/2)));if(R>cap)R=1;}
     if(since>=RESTART){restore();R=1;P=1;since=0;}}
   restore();return bestR;}
@@ -578,10 +577,11 @@ function makeStepper(name,slideEl,n,render){slideEl.dataset.step=name;const ctl=
 $$('.shot[data-src]').forEach(f=>{const im=new Image();im.alt=f.dataset.alt;im.onload=()=>{f.innerHTML='';f.appendChild(im);};im.src=f.dataset.src;});
 
 /* ---- worked-example map and timeline ---- */
-function miniMap(I,edges,{w=640,h=340,on=null,hot=null}={}){const pad=34,lo=Math.min(...I.lon),hi=Math.max(...I.lon),la=Math.min(...I.lat),lb=Math.max(...I.lat);
+function miniMap(I,edges,{w=640,h=340,on=null,hot=null,ghost=[],col='var(--accent)'}={}){const pad=34,lo=Math.min(...I.lon),hi=Math.max(...I.lon),la=Math.min(...I.lat),lb=Math.max(...I.lat);
   const X=i=>pad+(I.lon[i]-lo)/(hi-lo)*(w-2*pad),Y=i=>h-pad-(I.lat[i]-la)/(lb-la)*(h-2*pad);
   let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="Map of the worked example">`;
-  edges.forEach(([a,b])=>{s+=`<line x1="${X(a)}" y1="${Y(a)}" x2="${X(b)}" y2="${Y(b)}" stroke="var(--accent)" stroke-width="3"/>`;});
+  ghost.forEach(([a,b])=>{s+=`<line x1="${X(a)}" y1="${Y(a)}" x2="${X(b)}" y2="${Y(b)}" stroke="var(--bad)" stroke-width="3" stroke-dasharray="9 8"/>`;});
+  edges.forEach(([a,b])=>{s+=`<line x1="${X(a)}" y1="${Y(a)}" x2="${X(b)}" y2="${Y(b)}" stroke="${col}" stroke-width="3"/>`;});
   I.lon.forEach((_,i)=>{const dep=i===0,used=!on||on.includes(i),hv=hot===i,c=dep?'var(--accent)':SLOTC[I.slot[i]];
     s+=dep?`<rect x="${X(i)-14}" y="${Y(i)-14}" width="28" height="28" fill="var(--surface)" stroke="${c}" stroke-width="3"/>`:`<circle cx="${X(i)}" cy="${Y(i)}" r="${hv?17:14}" fill="${used?c:'var(--surface)'}" stroke="${c}" stroke-width="3"/>`;
     s+=`<text x="${X(i)}" y="${Y(i)+6}" text-anchor="middle" font-size="17" font-weight="700" fill="${dep||!used?'var(--ink)':'#06090d'}">${dep?'D':i}</text>`;});
@@ -627,17 +627,23 @@ function drawCache(){const a=cRoute[cP-1],b=cRoute[cP],s=Math.max(cLeave[cP-1]+T
   $('#cacheOut').innerHTML=`start_v = max(${f2(cLeave[cP-1])} + ${f2(T[a][cV])}, ${INST.opens[cV]}) = <b>${f2(s)}</b><br>start_v ≤ closes[v] : ${f2(s)} ≤ ${INST.closes[cV]} &nbsp;${m(c1)}<br>start_v + travel(v,b) ≤ latest[p] : ${f2(e)} ≤ ${f2(cLatest[cP])} &nbsp;${m(c2)}<br><b style="color:${ok?'var(--ok)':'var(--bad)'}">${ok?'Fits':'Does not fit'}</b> <span class="muted">after two comparisons</span>`;}
 drawCache();
 
-/* shake stepper (mirrors the update rule in iterated-local-search/solve.py) */
-const M=8;let sR=1,sP=1,sN=0;
-function drawShake(){const drop=new Set();for(let t=0;t<Math.min(sR,M);t++)drop.add(((sP-1+t)%M)+1);let h='<span class="dep">D</span>';for(let p=1;p<=M;p++)h+=`<span class="${drop.has(p)?'drop':''}">${p}</span>`;$('#shakeChain').innerHTML=h+'<span class="dep">D</span>';
-  $('#shakeState').innerHTML=`R = <b>${sR}</b> &nbsp; P = <b>${sP}</b>`;}
+/* ILS replay: every frame comes from the logged search on instance n5-seed17 */
 const ilsSrc=['route ← insert_by_shift([0, 0]); best ← route','R ← 1, P ← 1, since ← 0, stall ← 0','<span class="k">while</span> stall &lt; 4000 <span class="k">and</span> checks &lt; 2,000,000:','  remove R consecutive visits from P (wrap)','  insert_by_shift(route)','  <span class="k">if</span> route better than best:','    best ← route; R, P ← 1; since, stall ← 0','  <span class="k">else</span>:','    stall++, since++; P ← P + R','    <span class="k">if</span> P past the end: wrap P; R++','      <span class="k">if</span> R &gt; max(2, visits/2): R ← 1','    <span class="k">if</span> since ≥ 150: route ← best; R, P ← 1','<span class="k">return</span> best'];
-const ilsMark=l=>codeLines($('#ilsCode'),ilsSrc,l);ilsMark([3,4]);
-function shakeFail(){ilsMark([8,9,10]);sP+=sR;let w='Window moves on by R.';if(sP>M){sP-=M;sR++;w='Swept the whole route: widen the window.';const cap=Math.min(M,Math.max(2,Math.floor(M/2)));if(sR>cap){sR=1;w='Reached the cap of half the route: back to R = 1.';}}sN++;$('#shakeCap').textContent=w;drawShake();}
-function shakeBest(){ilsMark([5,6]);sR=1;sP=1;sN=0;$('#shakeCap').textContent='New best saved: reset to R = 1, P = 1.';drawShake();}
-$('#shakeNo').onclick=shakeFail;$('#shakeYes').onclick=shakeBest;drawShake();
-$('#shakeCap').textContent='Removed visits are refilled by greedy insertion.';
-slides[10].dataset.step='shake';steppers.shake={n:1,set(){ilsMark([3,4]);sR=1;sP=1;sN=0;drawShake();$('#shakeCap').textContent='Removed visits are refilled by greedy insertion.';},next:shakeFail,prev(){}};
+const ILSI={"depart":360,"deadline":1440,"speed":40.0,"id":[1735161,7797394,7697042,1770549,7566098,1770127],"lat":[3.1412,2.6567,3.2301,4.25,3.8682,2.1993],"lon":[101.68653,102.3071,102.3494,101.88333,102.5862,102.3743],"opens":[0,630,900,360,360,630],"closes":[1440,900,1170,630,630,900],"slot":[null,1,2,0,0,1],"dist":[[0.0,87.47456490507757,74.25490609695635,125.21205710438035,128.47240191688917,129.63485668675554],[87.47456490507757,0.0,63.93205760490303,183.30409178161023,138.23001414179555,51.405627663995446],[74.25490609695635,63.93205760490303,0.0,124.64205696344492,75.66417740455373,114.6532489746273],[125.21205710438035,183.30409178161023,124.64205696344492,0.0,88.76963404389365,234.45116538747195],[128.47240191688917,138.23001414179555,75.66417740455373,88.76963404389365,0.0,187.05907373734357],[129.63485668675554,51.405627663995446,114.6532489746273,234.45116538747195,187.05907373734357,0.0]]};
+(function(){const log=[];const best=solveILS(ILSI,e=>log.push(e));const km=r=>r.slice(1).reduce((a,b,k)=>a+ILSI.dist[r[k]][b],0);
+ const edgesOf=r=>r.slice(1).map((b,k)=>[r[k],b]),key=([a,b])=>a<b?a+'-'+b:b+'-'+a;
+ const iB=log.findIndex(e=>e.k==='built'),built=log[iB].route,shake=log.find(e=>e.k==='shake'),iS=log.indexOf(shake),end=log.find(e=>e.k==='end'),refill=log.slice(iS,log.indexOf(end)).filter(e=>e.k==='ins');
+ const shakes=log.filter(e=>e.k==='shake').length,aV=solveGI(ILSI).length-2;
+ const frames=[{route:[0,0],l:[0],c:'Build: start with an empty route.',st:'build'}];
+ log.slice(0,iB).forEach((e,i)=>{const last=i===iB-1;frames.push({route:e.route,nw:e.c,l:[0],st:'build',c:`Insert customer <b class="mono">${e.c}</b> where it pushes the schedule later by the least.`+(last?` <b>${built.length-2} visits</b> and <b class="mono">${f2(km(built))}</b> km, where Approach A manages ${aV}. Saved as best.`:'')});});
+ const inNew=new Set(edgesOf(shake.route).map(key));
+ frames.push({route:shake.route,chain:shake.before,removed:shake.removed,ghost:edgesOf(shake.before).filter(e=>!inNew.has(key(e))),R:shake.R,P:shake.P,l:[3],c:`Shake: remove customer <b class="mono">${shake.removed.join(', ')}</b> and its edges, leaving a gap to refill.`});
+ frames.push({route:end.route,nw:refill[0].c,R:shake.R,P:shake.P,l:[4,5,6],c:`Refill: customer <b class="mono">${refill[0].c}</b> now takes that gap. Still ${end.visits} visits, but <b class="mono">${f2(end.km)}</b> km instead of <b class="mono">${f2(km(built))}</b>: <b>new best</b>, so reset R and P.`});
+ frames.push({route:best,l:[12],st:'done',c:`The next <b class="mono">${(shakes-1).toLocaleString('en-US')}</b> shakes find nothing better, so the stall limit ends the search.`});
+ makeStepper('ils',slides[10],frames.length,i=>{const f=frames[i];codeLines($('#ilsCode'),ilsSrc,f.l);
+  $('#ilsMap').innerHTML=miniMap(ILSI,edgesOf(f.route),{h:300,on:f.route,hot:f.nw,ghost:f.ghost||[],col:'var(--ils)'});
+  const ch=f.chain||f.route,rm=new Set(f.removed||[]);$('#shakeChain').innerHTML=ch.map(v=>`<span class="${v===0?'dep':rm.has(v)?'drop':v===f.nw?'new':''}">${v===0?'D':v}</span>`).join('');
+  $('#shakeState').innerHTML=f.R?`R = <b>${f.R}</b> &nbsp; P = <b>${f.P}</b>`:(f.st==='done'?'<span class="muted">best route</span>':'<span class="muted">greedy build, smallest time shift</span>');$('#shakeCap').innerHTML=f.c;});})();
 
 /* two caches side by side */
 (function(){const v=[360],ar=[360],w=[0];for(let p=1;p<ck;p++){ar[p]=v[p-1]+T[cRoute[p-1]][cRoute[p]];v[p]=p===ck-1?ar[p]:Math.max(ar[p],INST.opens[cRoute[p]]);w[p]=v[p]-ar[p];}
