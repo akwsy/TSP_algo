@@ -18,3 +18,6 @@ instances/
 
 # Experiment output inside the submission copy (created when an experiment is run)
 submission/G4T1/experiments/*/output/
+
+# Copies saved by the Claude desktop app (not part of the project)
+Claude outputs/
