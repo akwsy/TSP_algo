@@ -36,7 +36,7 @@ G4T1/
 
 ## Requirements
 
-- Python 3 (3.9 or newer). The standard library only: nothing to install.
+- Python 3 (developed and tested on Python 3.14). The standard library only: nothing to install.
 - Optional: Node.js and Google Chrome, only for the website tests in `tests/`; those tests skip themselves when either is missing.
 - A web browser to look at the website. The internet is optional (only for map tiles; the map falls back to a plain drawing offline).
 
